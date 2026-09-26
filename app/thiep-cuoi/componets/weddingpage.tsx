@@ -164,7 +164,7 @@ export default function WeddingPage({
     <SakuraPetals />
 
 
-      <main className="overflow-x-hidden bg-[#faf7f0]">
+      <main className="wedding-page-enter overflow-x-hidden bg-[#faf7f0]">
         {/* HERO */}
 
         <section

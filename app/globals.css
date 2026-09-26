@@ -239,61 +239,504 @@ a:focus-visible {
   }
 }
 
+
 /* =========================================
-   INVITATION OPENING ANIMATION
+   INVITATION - COVER
 ========================================= */
 
-.invitation-envelope {
+.invite-cover {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+
+  display: flex;
+  min-height: 100svh;
+
+  align-items: center;
+  justify-content: center;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  padding: 35px 16px;
+
+  background: #eee4d9;
+
+  color: #54272e;
+  text-align: center;
+}
+
+.invite-background {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      rgba(250, 247, 240, 0.9),
+      rgba(235, 220, 207, 0.92)
+    ),
+    url("/images/DUY08901.JPG") center / cover no-repeat;
+}
+
+.invite-content {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  width: 100%;
+
+  flex-direction: column;
+  align-items: center;
+}
+
+/* =========================================
+   COVER TEXT
+========================================= */
+
+.invite-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+
+  letter-spacing: 0.3em;
+  color: #782f38;
+}
+
+.invite-heading {
+  margin-top: 18px;
+
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: clamp(30px, 8vw, 48px);
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.invite-date {
+  margin-top: 13px;
+
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: #806e64;
+}
+
+.invite-instruction {
+  margin-top: 45px;
+  color: #54272e;
+}
+
+/* =========================================
+   ENVELOPE STRUCTURE
+========================================= */
+
+.invite-envelope {
+  position: relative;
+
+  width: min(440px, 88vw);
+  margin-top: 55px;
+
   transform-origin: center center;
+  will-change: transform, opacity;
+}
+
+.invite-stage {
+  position: relative;
+
+  width: 100%;
+  aspect-ratio: 1.5;
+
+  perspective: 1400px;
+  transform-style: preserve-3d;
+
+  filter: drop-shadow(
+    0 18px 24px rgba(74, 43, 39, 0.2)
+  );
+}
+
+/* Mặt sau phong bì */
+
+.invite-back {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+
+  border: 1px solid #c8a995;
+  background: #dec5b1;
+}
+
+/* =========================================
+   WEDDING PHOTO PREVIEW
+========================================= */
+
+.invite-preview {
+  position: absolute;
+  inset: 2% 3%;
+  z-index: 2;
+
+  overflow: hidden;
+  background: #54272e;
+}
+
+.invite-preview-photo {
+  position: absolute;
+  inset: 0;
+
+  background: url("/images/DUY08901.JPG")
+    center / cover no-repeat;
+}
+
+.invite-preview-overlay {
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    180deg,
+    rgba(25, 20, 18, 0.08),
+    rgba(25, 20, 18, 0.35)
+  );
+}
+
+/* =========================================
+   TOP FLAP
+========================================= */
+
+.invite-flap {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+
+  background: linear-gradient(
+    180deg,
+    #f8e9dc 0%,
+    #e1c6b2 100%
+  );
+
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    50% 56%
+  );
+
+  transform-origin: center top;
   backface-visibility: hidden;
+
+  will-change: transform;
 }
 
-.invitation-letter {
-  transform-origin: center center;
+/* =========================================
+   LOWER ENVELOPE BODY
+========================================= */
+
+.invite-front {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+
+  background: linear-gradient(
+    155deg,
+    #f5e5d7 0%,
+    #e9d1c0 55%,
+    #d7b9a7 100%
+  );
+
+  clip-path: polygon(
+    0 0,
+    50% 56%,
+    100% 0,
+    100% 100%,
+    0 100%
+  );
+
+  will-change: transform, opacity;
 }
 
-.invitation-opening {
-  animation: invitation-open 1s cubic-bezier(.2, .8, .2, 1) forwards;
+/* =========================================
+   WAX SEAL
+========================================= */
+
+.invite-seal {
+  position: absolute;
+
+  top: 55%;
+  left: 50%;
+  z-index: 8;
+
+  display: flex;
+
+  width: clamp(54px, 14vw, 68px);
+  height: clamp(54px, 14vw, 68px);
+
+  align-items: center;
+  justify-content: center;
+
+  transform: translate(-50%, -50%);
+
+  border: 3px double #c78b90;
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle at 30% 25%,
+    #ad5864 0%,
+    #782f38 65%,
+    #54272e 100%
+  );
+
+  color: #ffe9de;
+
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: 20px;
+  font-style: italic;
+
+  box-shadow:
+    0 5px 13px rgba(65, 27, 33, 0.27),
+    inset 0 2px 5px rgba(255, 255, 255, 0.2);
+
+  cursor: pointer;
+
+  transition: scale 250ms ease;
 }
 
-.invitation-opening .invitation-letter {
-  animation: invitation-letter-open 1s ease forwards;
+.invite-seal:hover {
+  scale: 1.08;
 }
 
-@keyframes invitation-open {
+.invite-seal:disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Nếu sử dụng ảnh con dấu riêng */
+
+.invite-seal-image {
+  border: none;
+
+  background:
+    url("/images/wax-seal.png")
+    center / contain no-repeat;
+
+  box-shadow: none;
+
+  filter: drop-shadow(
+    0 5px 6px rgba(65, 27, 33, 0.3)
+  );
+}
+
+/* =========================================
+   STEP 1 - CON DẤU BIẾN MẤT
+   0s - 0.45s
+========================================= */
+
+.invite-opening .invite-seal {
+  pointer-events: none;
+
+  animation:
+    invite-seal-hide 450ms
+    ease-in-out forwards;
+}
+
+@keyframes invite-seal-hide {
   0% {
-    transform: perspective(1000px) rotateX(0) scale(1);
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  70% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.75);
+    visibility: hidden;
+  }
+}
+
+/* =========================================
+   STEP 2 - NẮP BÌ THƯ MỞ TỪ TỪ
+   0.45s - 2s
+========================================= */
+
+.invite-opening .invite-flap {
+  animation:
+    invite-flap-open 1550ms
+    cubic-bezier(0.42, 0, 0.25, 1)
+    450ms forwards;
+}
+
+@keyframes invite-flap-open {
+  0% {
+    transform: rotateX(0deg);
+  }
+
+  35% {
+    transform: rotateX(45deg);
+  }
+
+  70% {
+    transform: rotateX(125deg);
+  }
+
+  100% {
+    transform: rotateX(180deg);
+    visibility: hidden;
+  }
+}
+
+/* =========================================
+   STEP 3 - THÂN DƯỚI TRƯỢT XUỐNG
+   VÀ BIẾN MẤT TỪ TỪ
+   2.05s - 3.65s
+========================================= */
+
+.invite-opening .invite-front {
+  animation:
+    invite-front-disappear 1600ms
+    cubic-bezier(0.4, 0, 0.25, 1)
+    2050ms forwards;
+}
+
+@keyframes invite-front-disappear {
+  0% {
+    transform: translateY(0);
     opacity: 1;
   }
 
-  45% {
-    transform: perspective(1000px) rotateX(-12deg) scale(1.05);
+  25% {
+    transform: translateY(10%);
+    opacity: 1;
+  }
+
+  60% {
+    transform: translateY(45%);
+    opacity: 0.65;
+  }
+
+  85% {
+    transform: translateY(85%);
+    opacity: 0.2;
+  }
+
+  100% {
+    transform: translateY(115%);
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* =========================================
+   STEP 4 - ZOOM VÀO ẢNH CƯỚI
+   3.2s - 4.3s
+========================================= */
+
+.invite-opening .invite-envelope {
+  animation:
+    invite-zoom 1100ms
+    cubic-bezier(0.45, 0, 0.2, 1)
+    3200ms forwards;
+}
+
+@keyframes invite-zoom {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  65% {
+    transform: scale(2.2);
     opacity: 1;
   }
 
   100% {
-    transform: perspective(1000px) rotateX(0) scale(1.5);
+    transform: scale(5);
     opacity: 0;
   }
 }
 
-@keyframes invitation-letter-open {
-  0% {
-    transform: translateY(0);
-  }
+/* =========================================
+   STEP 5 - HIỆN TRANG CƯỚI PHÍA SAU
+   4.05s - 4.85s
+========================================= */
 
-  50% {
-    transform: translateY(-16px);
+.invite-opening.invite-cover {
+  animation:
+    invite-cover-disappear 800ms
+    ease-in-out 4050ms forwards;
+}
+
+@keyframes invite-cover-disappear {
+  0% {
+    opacity: 1;
   }
 
   100% {
-    transform: translateY(-50px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
   }
 }
 
+/* Ẩn chữ khi bắt đầu mở phong bì */
+
+.invite-opening .invite-eyebrow,
+.invite-opening .invite-heading,
+.invite-opening .invite-date,
+.invite-opening .invite-instruction {
+  animation:
+    invite-text-hide 500ms
+    ease-in-out forwards;
+}
+
+@keyframes invite-text-hide {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 640px) {
+  .invite-cover {
+    padding: 24px 16px;
+  }
+
+  .invite-envelope {
+    width: min(400px, 88vw);
+    margin-top: 42px;
+  }
+
+  .invite-instruction {
+    margin-top: 36px;
+  }
+
+  .invite-eyebrow {
+    font-size: 10px;
+  }
+
+  .invite-date {
+    font-size: 11px;
+  }
+}
+
+/* =========================================
+   REDUCED MOTION
+========================================= */
+
 @media (prefers-reduced-motion: reduce) {
-  .invitation-opening,
-  .invitation-opening .invitation-letter {
-    animation: none;
+  .invite-opening,
+  .invite-opening * {
+    animation: none !important;
+  }
+
+  .invite-opening.invite-cover {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
   }
 }
