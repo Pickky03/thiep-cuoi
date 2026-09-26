@@ -1,0 +1,526 @@
+'use client';
+
+import {
+  ArrowDownOutlined,
+  EnvironmentOutlined,
+} from '@ant-design/icons';
+
+import {
+  Button,
+  ConfigProvider,
+} from 'antd';
+
+import {
+  useEffect,
+  useState,
+} from 'react';
+
+import Gallery from './galerry';
+
+type Wedding = {
+  groom: string;
+  bride: string;
+
+  groomFamily: string[];
+  brideFamily: string[];
+
+  date: string;
+  time: string;
+
+  venue: string;
+  address: string;
+
+  countdownDate: string;
+};
+
+type GalleryPhoto = {
+  src: string;
+  alt: string;
+};
+
+interface WeddingPageProps {
+  wedding: Wedding;
+  gallery: GalleryPhoto[];
+  mapsUrl: string | null;
+}
+
+type Countdown = {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+};
+
+const EMPTY_COUNTDOWN: Countdown = {
+  days: 0,
+  hours: 0,
+  minutes: 0,
+  seconds: 0,
+};
+
+function calculateCountdown(
+  targetDate: string,
+): Countdown {
+  const target = new Date(targetDate).getTime();
+  const now = Date.now();
+
+  const distance = target - now;
+
+  if (distance <= 0) {
+    return EMPTY_COUNTDOWN;
+  }
+
+  return {
+    days: Math.floor(
+      distance / (1000 * 60 * 60 * 24),
+    ),
+
+    hours: Math.floor(
+      (distance / (1000 * 60 * 60)) % 24,
+    ),
+
+    minutes: Math.floor(
+      (distance / (1000 * 60)) % 60,
+    ),
+
+    seconds: Math.floor(
+      (distance / 1000) % 60,
+    ),
+  };
+}
+
+function CountdownItem({
+  value,
+  label,
+}: {
+  value: number | null;
+  label: string;
+}) {
+  return (
+    <div className="flex min-w-0 flex-1 flex-col items-start">
+      <strong className="font-[var(--font-be-vietnam)] text-[30px] leading-none font-light tracking-[-0.03em] text-white sm:text-4xl md:text-[40px]">
+        {value === null
+          ? '--'
+          : String(value).padStart(2, '0')}
+      </strong>
+
+      <span className="mt-3 text-[11px] font-normal text-white/90 sm:text-[13px]">
+        {label}
+      </span>
+    </div>
+  );
+}
+
+export default function WeddingPage({
+  wedding,
+  gallery,
+  mapsUrl,
+}: WeddingPageProps) {
+  const [countdown, setCountdown] =
+    useState<Countdown>(EMPTY_COUNTDOWN);
+
+  const [ready, setReady] =
+    useState(false);
+
+  useEffect(() => {
+    const update = () => {
+      setCountdown(
+        calculateCountdown(
+          wedding.countdownDate,
+        ),
+      );
+
+      setReady(true);
+    };
+
+    update();
+
+    const interval =
+      window.setInterval(
+        update,
+        1000,
+      );
+
+    return () => {
+      window.clearInterval(interval);
+    };
+  }, [wedding.countdownDate]);
+
+  return (
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: '#782f38',
+
+          fontFamily:
+            'var(--font-be-vietnam), Arial, sans-serif',
+
+          borderRadius: 2,
+        },
+      }}
+    >
+      <main className="overflow-x-hidden bg-[#faf7f0]">
+        {/* HERO */}
+
+        <section
+          className="relative isolate h-svh min-h-167.5 max-h-230 overflow-hidden text-white"
+          aria-label={`Thiệp cưới ${wedding.groom} và ${wedding.bride}`}
+        >
+          <div className="absolute inset-0 -z-20 scale-[1.01] bg-[url('/images/DUY08901.JPG')] bg-cover bg-[position:51%_center] md:bg-center" />
+
+          <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(25,20,18,.45)_0%,transparent_25%,rgba(25,20,18,.12)_44%,rgba(30,21,18,.78)_100%)]" />
+
+          {/* TOPLINE */}
+
+          <div className="absolute top-6 right-4.75 left-4.75 flex items-center justify-between border-b border-white/50 pb-4 text-[9px] font-semibold tracking-[0.14em] [text-shadow:0_1px_10px_rgba(0,0,0,.45)] md:top-7.75 md:right-[4vw] md:left-[4vw] md:pb-5.25 md:text-[11px] md:tracking-[0.28em]">
+            <span>
+              THE WEDDING OF
+            </span>
+
+            <span>
+              V · H & K · H
+            </span>
+          </div>
+
+          {/* HERO CONTENT */}
+
+          <div className="absolute right-[3%] bottom-19.5 left-[3%] text-center [text-shadow:0_2px_22px_rgba(29,21,18,.7)] sm:bottom-23.75 md:right-[6%] md:bottom-27.5 md:left-[6%]">
+            <div className="flex items-center justify-center gap-3 font-[var(--font-playfair)] text-[23px]">
+              <span className="h-px w-13.75 bg-white/60" />
+
+              <span>✦</span>
+
+              <span className="h-px w-13.75 bg-white/60" />
+            </div>
+
+            <p className="mt-3.5 mb-2.5 text-[11px] font-medium tracking-[0.18em] uppercase md:text-[15px]">
+              Trân trọng kính mời
+            </p>
+
+            <h1 className="m-0 font-[var(--font-playfair)] text-[clamp(52px,14vw,78px)] leading-[1.02] font-normal tracking-[-0.045em] md:text-[clamp(68px,9vw,134px)]">
+              {wedding.groom}
+
+              <em className="mx-2 text-[0.53em] font-normal">
+                &
+              </em>
+
+              <br />
+
+              {wedding.bride}
+            </h1>
+
+            <p className="mt-3.75 mb-4.5 font-[var(--font-playfair)] text-base leading-snug italic sm:text-[17px] md:mt-5 md:mb-5 md:text-[clamp(18px,2vw,24px)]">
+              Cùng chúng tôi viết tiếp câu chuyện yêu thương
+            </p>
+
+            {/* COUNTDOWN */}
+
+            <div
+              className="mx-auto mb-6 flex w-full max-w-145 items-stretch justify-between rounded-3xl border border-white/10 bg-white/20 px-4 py-5 shadow-[0_10px_40px_rgba(0,0,0,.12)] backdrop-blur-[10px] backdrop-saturate-150 sm:px-5 sm:py-6 md:mb-7 md:px-6"
+              aria-label="Bộ đếm ngược đến ngày cưới"
+            >
+              <CountdownItem
+                value={
+                  ready
+                    ? countdown.days
+                    : null
+                }
+                label="Ngày"
+              />
+
+              <CountdownItem
+                value={
+                  ready
+                    ? countdown.hours
+                    : null
+                }
+                label="Giờ"
+              />
+
+              <CountdownItem
+                value={
+                  ready
+                    ? countdown.minutes
+                    : null
+                }
+                label="Phút"
+              />
+
+              <CountdownItem
+                value={
+                  ready
+                    ? countdown.seconds
+                    : null
+                }
+                label="Giây"
+              />
+            </div>
+
+            <a
+              href="#loi-moi"
+              className="inline-flex items-center gap-4 border border-white px-4 py-3 text-[10px] font-medium tracking-[0.16em] uppercase transition-all duration-300 hover:bg-white hover:text-[#54272e] hover:[text-shadow:none] md:px-6 md:py-3.5 md:text-xs"
+            >
+              Khám phá thiệp mời
+
+              <ArrowDownOutlined />
+            </a>
+          </div>
+
+          {/* BOTTOM LINE */}
+
+          <div className="absolute right-4.75 bottom-4.5 left-4.75 flex items-center justify-between border-t border-white/50 pt-3 text-[9px] font-semibold tracking-[0.12em] [text-shadow:0_1px_10px_rgba(0,0,0,.45)] md:right-[4vw] md:bottom-7 md:left-[4vw] md:pt-4 md:text-[11px] md:tracking-[0.28em]">
+            <span>
+              LOVE IS IN THE AIR
+            </span>
+
+            <span className="text-lg font-normal md:text-2xl">
+              ♡
+            </span>
+
+            <span>
+              FOREVER BEGINS HERE
+            </span>
+          </div>
+        </section>
+
+        {/* INVITATION */}
+
+        <section
+          id="loi-moi"
+          className="mx-auto max-w-292.5 px-4.75 py-18.5 text-center md:px-6 md:py-27.5"
+        >
+          <div className="text-xs font-bold tracking-[0.3em] text-[#782f38]">
+            A CELEBRATION OF LOVE
+          </div>
+
+          <div className="my-5 font-[var(--font-playfair)] text-[42px] leading-none text-[#aa836f]">
+            ❧
+          </div>
+
+          <h2 className="mx-auto mb-7 font-[var(--font-playfair)] text-[clamp(39px,9vw,51px)] leading-tight font-normal tracking-[-0.04em] text-[#54272e] md:text-[clamp(42px,5vw,72px)]">
+            Ngày chúng mình{' '}
+
+            <em className="font-normal">
+              về chung một nhà
+            </em>
+          </h2>
+
+          <p className="mx-auto max-w-162.5 text-base leading-[1.85] text-[#6f625c] md:text-[17px]">
+            Có những khoảnh khắc sẽ đẹp hơn khi được sẻ chia
+            cùng những người thân thương. Chúng mình rất mong
+            được đón tiếp bạn trong ngày vui này.
+          </p>
+
+          {/* FAMILY */}
+
+          <div className="mx-auto my-10 grid max-w-205 grid-cols-1 items-center md:my-17.25 md:grid-cols-[1fr_80px_1fr]">
+            <div className="px-3 py-3 md:py-5.5">
+              <span className="text-xs font-bold tracking-[0.24em] text-[#782f38]">
+                NHÀ TRAI
+              </span>
+
+              <div className="mx-auto my-3.25 h-px w-9.5 bg-[#bc9385] md:my-5.5" />
+
+              <p className="m-0 font-[var(--font-playfair)] text-[19px] leading-[1.7] text-[#54272e] md:text-[21px]">
+                {wedding.groomFamily.map(
+                  (member, index) => (
+                    <span
+                      key={`${member}-${index}`}
+                    >
+                      {member}
+
+                      {index <
+                        wedding.groomFamily.length -
+                          1 && <br />}
+                    </span>
+                  ),
+                )}
+              </p>
+            </div>
+
+            <div
+              className="my-2.5 font-[var(--font-playfair)] text-[38px] leading-none italic text-[#a17c6d] md:my-0 md:text-[62px]"
+              aria-hidden="true"
+            >
+              &
+            </div>
+
+            <div className="px-3 py-3 md:py-5.5">
+              <span className="text-xs font-bold tracking-[0.24em] text-[#782f38]">
+                NHÀ GÁI
+              </span>
+
+              <div className="mx-auto my-3.25 h-px w-9.5 bg-[#bc9385] md:my-5.5" />
+
+              <p className="m-0 font-[var(--font-playfair)] text-[19px] leading-[1.7] text-[#54272e] md:text-[21px]">
+                {wedding.brideFamily.map(
+                  (member, index) => (
+                    <span
+                      key={`${member}-${index}`}
+                    >
+                      {member}
+
+                      {index <
+                        wedding.brideFamily.length -
+                          1 && <br />}
+                    </span>
+                  ),
+                )}
+              </p>
+            </div>
+          </div>
+
+          <p className="mb-3 font-[var(--font-playfair)] text-[19px] italic text-[#81756d]">
+            Thân mời đến dự hôn lễ của chúng mình!
+          </p>
+
+          <div className="flex items-center justify-center gap-2.5 font-[var(--font-playfair)] text-[clamp(31px,8vw,46px)] text-[#782f38] md:gap-6.5 md:text-[clamp(38px,5vw,58px)]">
+            <span>
+              {wedding.groom}
+            </span>
+
+            <i className="text-[17px] md:text-[23px]">
+              ♡
+            </i>
+
+            <span>
+              {wedding.bride}
+            </span>
+          </div>
+        </section>
+
+        {/* PORTRAIT */}
+
+        <section
+          className="relative h-120 overflow-hidden bg-[#d9cfbf] md:h-150"
+          aria-label={`Ảnh cưới của ${wedding.groom} và ${wedding.bride}`}
+        >
+          <div className="absolute inset-0 bg-[url('/images/DUY08867.JPG')] bg-cover bg-[position:39%_center] md:bg-[position:center_45%]" />
+
+          <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(39,25,19,.65),transparent_70%)] md:bg-[linear-gradient(90deg,transparent_35%,rgba(39,25,19,.48)_100%)]" />
+
+          <div className="absolute right-[5%] bottom-8.75 left-[5%] z-10 text-center text-white [text-shadow:0_2px_15px_rgba(0,0,0,.45)] md:top-1/2 md:right-[7%] md:bottom-auto md:left-auto md:-translate-y-1/2">
+            <span className="font-[var(--font-playfair)] text-[90px] leading-[0.6]">
+              “
+            </span>
+
+            <p className="my-3 font-[var(--font-playfair)] text-[25px] leading-[1.4] italic md:my-6 md:text-[clamp(27px,3vw,43px)]">
+              Và rồi giữa muôn vàn cuộc gặp gỡ,
+              <br />
+              chúng mình đã tìm thấy nhau.
+            </p>
+
+            <small className="text-[11px] tracking-[0.22em]">
+              {wedding.groom.toUpperCase()}
+              {' & '}
+              {wedding.bride.toUpperCase()}
+            </small>
+          </div>
+        </section>
+
+        {/* EVENT */}
+
+        <section
+          id="su-kien"
+          className="bg-[#f0eae0] px-4.75 py-18.5 text-center md:px-6 md:py-27.5"
+        >
+          <div className="text-xs font-bold tracking-[0.3em] text-[#782f38]">
+            SAVE THE DATE
+          </div>
+
+          <h2 className="mx-auto mt-4 mb-10.5 font-[var(--font-playfair)] text-[clamp(39px,9vw,51px)] leading-tight font-normal tracking-[-0.04em] text-[#54272e] md:text-[clamp(42px,5vw,72px)]">
+            Hẹn gặp bạn{' '}
+
+            <em className="font-normal">
+              trong ngày vui
+            </em>
+          </h2>
+
+          <div className="relative mx-auto max-w-170 border border-[#c8b3a3] bg-[#faf7f0] px-6 py-9.5 shadow-[0_20px_60px_rgba(114,95,82,.08)] md:px-10 md:py-11.5 md:pb-13.75">
+            <div className="pointer-events-none absolute inset-1.75 border border-[#decfc4] md:inset-2.25" />
+
+            <div className="mb-4.5 font-[var(--font-playfair)] text-[31px] text-[#782f38]">
+              ✦
+            </div>
+
+            <p className="mb-5.75 text-[13px] font-bold tracking-[0.27em] text-[#782f38]">
+              LỄ THÀNH HÔN
+            </p>
+
+            <div className="font-[var(--font-playfair)] text-[29px] leading-tight text-[#54272e] md:text-[clamp(30px,4vw,45px)]">
+              {wedding.date ||
+                'Ngày cưới sẽ được cập nhật'}
+            </div>
+
+            <div className="mx-auto my-6.25 h-px w-20.5 bg-[#c3a99b]" />
+
+            <p className="mb-5.5 text-[17px] text-[#5b4d46]">
+              {wedding.time ||
+                'Thời gian sẽ được cập nhật'}
+            </p>
+
+            <h3 className="mb-3.5 font-[var(--font-playfair)] text-[25px] font-normal text-[#54272e]">
+              {wedding.venue ||
+                'Địa điểm sẽ được cập nhật'}
+            </h3>
+
+            {wedding.address && (
+              <p className="text-base leading-relaxed text-[#6a5c55]">
+                {wedding.address}
+              </p>
+            )}
+
+            {mapsUrl ? (
+              <Button
+                type="primary"
+                icon={<EnvironmentOutlined />}
+                href={mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="map-button"
+              >
+                Xem chỉ đường Google Maps
+              </Button>
+            ) : (
+              <p className="mt-4.5 inline-flex items-center gap-2 text-[13px] leading-normal text-[#806e64] md:text-sm">
+                <EnvironmentOutlined />
+
+                <span>
+                  Link chỉ đường sẽ hiển thị khi có địa chỉ tổ chức.
+                </span>
+              </p>
+            )}
+          </div>
+        </section>
+
+        <Gallery gallery={gallery} />
+
+        {/* FOOTER */}
+
+        <footer className="bg-[#54272e] px-6 py-14.5 text-center text-[#fff6ed]">
+          <span className="font-[var(--font-playfair)] text-[42px] text-[#d2b3a1]">
+            ❧
+          </span>
+
+          <p className="my-4 font-[var(--font-playfair)] text-[22px] italic">
+            Rất mong được gặp bạn
+          </p>
+
+          <div className="font-[var(--font-playfair)] text-[clamp(34px,4vw,54px)]">
+            {wedding.groom}{' '}
+
+            <em className="text-[0.65em]">
+              &
+            </em>{' '}
+
+            {wedding.bride}
+          </div>
+
+          <small className="mt-7 block text-[10px] tracking-[0.23em] text-[#cfb8ad]">
+            THANK YOU FOR BEING PART OF OUR STORY
+          </small>
+        </footer>
+      </main>
+    </ConfigProvider>
+  );
+}

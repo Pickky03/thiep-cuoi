@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+:root {
+  --wine: #782f38;
+  --deep: #54272e;
+  --paper: #faf7f0;
+  --ink: #302923;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+
+  background: var(--paper);
+  color: var(--ink);
+
+  font-family: var(--font-be-vietnam), Arial, sans-serif;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #d3ad75;
+  outline-offset: 4px;
+}
+
+/* =========================
+   ANT DESIGN - MAP BUTTON
+   ========================= */
+
+.map-button.ant-btn {
+  height: auto;
+
+  margin-top: 15px;
+  padding: 13px 22px;
+
+  border-color: var(--wine);
+
+  background: var(--wine);
+  color: #fff;
+
+  font-weight: 600;
+}
+
+.map-button.ant-btn:hover,
+.map-button.ant-btn:focus {
+  border-color: var(--deep) !important;
+
+  background: var(--deep) !important;
+  color: #fff !important;
+}
+
+/* =========================
+   ANT DESIGN - PHOTO MODAL
+   ========================= */
+
+.photo-modal .ant-modal-content {
+  padding: 38px 16px 15px;
+
+  background: #f9f5ed;
+
+  border-radius: 18px;
+}
+
+.photo-modal .ant-modal-close {
+  color: var(--deep);
+}
+
+.photo-modal .ant-modal-close:hover {
+  background: rgb(120 47 56 / 8%);
+}
+
+.photo-modal .ant-btn {
+  border-color: #c8b3a3;
+
+  color: var(--deep);
+}
+
+.photo-modal .ant-btn:hover {
+  border-color: var(--wine) !important;
+
+  color: var(--wine) !important;
+}
+
+/* =========================
+   REDUCED MOTION
+   ========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+}
