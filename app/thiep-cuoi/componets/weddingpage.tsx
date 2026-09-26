@@ -5,7 +5,7 @@ import {
   EnvironmentOutlined,
 } from '@ant-design/icons';
 import SakuraPetals from './SakuraPetals';
-import MusicPlayer from './MusicPlayer';
+
 import {
   Button,
   ConfigProvider,
@@ -163,8 +163,7 @@ export default function WeddingPage({
         {/* Hiệu ứng hoa anh đào */}
     <SakuraPetals />
 
-    {/* Nhạc nền */}
-    <MusicPlayer />
+
       <main className="overflow-x-hidden bg-[#faf7f0]">
         {/* HERO */}
 

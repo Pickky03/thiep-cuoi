@@ -238,3 +238,62 @@ a:focus-visible {
     animation: none !important;
   }
 }
+
+/* =========================================
+   INVITATION OPENING ANIMATION
+========================================= */
+
+.invitation-envelope {
+  transform-origin: center center;
+  backface-visibility: hidden;
+}
+
+.invitation-letter {
+  transform-origin: center center;
+}
+
+.invitation-opening {
+  animation: invitation-open 1s cubic-bezier(.2, .8, .2, 1) forwards;
+}
+
+.invitation-opening .invitation-letter {
+  animation: invitation-letter-open 1s ease forwards;
+}
+
+@keyframes invitation-open {
+  0% {
+    transform: perspective(1000px) rotateX(0) scale(1);
+    opacity: 1;
+  }
+
+  45% {
+    transform: perspective(1000px) rotateX(-12deg) scale(1.05);
+    opacity: 1;
+  }
+
+  100% {
+    transform: perspective(1000px) rotateX(0) scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes invitation-letter-open {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-16px);
+  }
+
+  100% {
+    transform: translateY(-50px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .invitation-opening,
+  .invitation-opening .invitation-letter {
+    animation: none;
+  }
+}

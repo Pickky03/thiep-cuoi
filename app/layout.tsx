@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-
+import MusicProvider from './components/MusicProvider';
 import {
   Be_Vietnam_Pro,
   Playfair_Display,
@@ -60,7 +60,11 @@ export default function RootLayout({
       lang="vi"
       className={`${beVietnam.variable} ${playfair.variable} ${greatVibes.variable}`} 
     >
-      <body>{children}</body>
+      <body>
+        <MusicProvider>
+        {children}
+        </MusicProvider>
+        </body>
     </html>
   );
 }
