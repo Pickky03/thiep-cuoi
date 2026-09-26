@@ -106,18 +106,135 @@ a:focus-visible {
   color: var(--wine) !important;
 }
 
-/* =========================
-   REDUCED MOTION
-   ========================= */
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
+/* =========================================
+   SAKURA FALLING PETALS
+========================================= */
+
+.sakura-petal {
+  position: absolute;
+  top: -30px;
+
+  display: block;
+  pointer-events: none;
+
+  opacity: 0;
+
+  transform-origin: center;
+
+  will-change: transform, opacity;
+
+  animation-name: sakura-fall;
+  animation-duration: var(--duration, 12s);
+  animation-delay: var(--delay, 0s);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-fill-mode: both;
+}
+
+/* Hình dạng cánh hoa */
+
+.sakura-petal-shape {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  border-radius: 80% 0 80% 80%;
+
+  background: linear-gradient(
+    135deg,
+    #ffe4ed 0%,
+    #ffc1d5 50%,
+    #f49cbb 100%
+  );
+
+  border: 1px solid rgba(244, 143, 177, 0.35);
+
+  transform: rotate(-45deg);
+}
+
+/* =========================================
+   FALLING ANIMATION
+========================================= */
+
+@keyframes sakura-fall {
+  0% {
+    transform:
+      translate3d(0, -5vh, 0)
+      rotate(0deg);
+
+    opacity: 0;
   }
 
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
+  10% {
+    opacity: var(--petal-opacity, 0.8);
+  }
+
+  25% {
+    transform:
+      translate3d(
+        var(--sway, 40px),
+        30vh,
+        0
+      )
+      rotate(90deg);
+  }
+
+  50% {
+    transform:
+      translate3d(
+        var(--sway-back, -20px),
+        60vh,
+        0
+      )
+      rotate(180deg);
+  }
+
+  75% {
+    transform:
+      translate3d(
+        var(--sway, 40px),
+        90vh,
+        0
+      )
+      rotate(270deg);
+  }
+
+  90% {
+    opacity: var(--petal-opacity, 0.8);
+  }
+
+  100% {
+    transform:
+      translate3d(
+        var(--sway-back, -20px),
+        115vh,
+        0
+      )
+      rotate(var(--rotation, 540deg));
+
+    opacity: 0;
+  }
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 640px) {
+  .sakura-petal:nth-child(n + 14) {
+    display: none;
+  }
+}
+
+/* =========================================
+   REDUCED MOTION
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .sakura-petal {
+    display: none;
+    animation: none !important;
   }
 }

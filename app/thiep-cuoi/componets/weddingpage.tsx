@@ -4,7 +4,8 @@ import {
   ArrowDownOutlined,
   EnvironmentOutlined,
 } from '@ant-design/icons';
-
+import SakuraPetals from './SakuraPetals';
+import MusicPlayer from './MusicPlayer';
 import {
   Button,
   ConfigProvider,
@@ -159,6 +160,11 @@ export default function WeddingPage({
         },
       }}
     >
+        {/* Hiệu ứng hoa anh đào */}
+    <SakuraPetals />
+
+    {/* Nhạc nền */}
+    <MusicPlayer />
       <main className="overflow-x-hidden bg-[#faf7f0]">
         {/* HERO */}
 
@@ -491,7 +497,120 @@ export default function WeddingPage({
               </p>
             )}
           </div>
+{/* WEDDING TIMELINE */}
+
+<div className="relative mx-auto mt-10 max-w-170 border border-[#c8b3a3] bg-[#faf7f0] px-5 py-10 shadow-[0_20px_60px_rgba(114,95,82,.08)] sm:px-8 md:mt-14 md:px-12 md:py-14">
+
+  {/* Decorative border */}
+  <div className="pointer-events-none absolute inset-2 border border-[#decfc4]" />
+
+  {/* Heading */}
+  <div className="relative z-10 text-center">
+
+    <div className="mb-3 font-[var(--font-playfair)] text-3xl text-[#782f38]">
+      ✦
+    </div>
+
+    <p className="text-xs font-semibold tracking-[0.3em] text-[#782f38]">
+      WEDDING TIMELINE
+    </p>
+
+    <h3 className="mt-4 font-[var(--font-playfair)] text-3xl font-normal text-[#54272e] sm:text-4xl">
+      Lịch trình bữa tiệc
+    </h3>
+
+    <p className="mt-3 text-sm text-[#81756d]">
+      Cùng chúng mình tận hưởng từng khoảnh khắc nhé!
+    </p>
+
+  </div>
+
+  {/* Timeline */}
+  <div className="relative z-10 mx-auto mt-12 max-w-lg">
+
+    {/* Connecting line */}
+    <div className="absolute top-8 bottom-8 left-9 w-px bg-[#c8b3a3] sm:left-11" />
+
+    {[
+      {
+        time: '18:00',
+        title: 'Đón khách',
+        description:
+          'Chào đón khách mời và cùng nhau lưu giữ những khoảnh khắc đầu tiên.',
+        image: '/images/welcome.png',
+      },
+      {
+        time: '18:30',
+        title: 'Khai tiệc',
+        description:
+          'Cùng nâng ly chúc mừng và thưởng thức bữa tiệc chung vui.',
+        image: '/images/dinner.png',
+      },
+      {
+        time: 'Sau khai tiệc',
+        title: 'Nhậu tới bến!',
+        description:
+          'Ăn hết mình, vui hết nấc và cùng nhau tạo nên những kỷ niệm đáng nhớ.',
+        image: '/images/cheers.png',
+      },
+    ].map((item, index) => (
+      <div
+        key={item.title}
+        className={`relative flex items-start gap-5 sm:gap-7 ${
+          index !== 2 ? 'pb-12' : ''
+        }`}
+      >
+
+        {/* Illustration */}
+        <div className="relative z-10 flex size-18 shrink-0 items-center justify-center rounded-full border border-[#decfc4] bg-[#faf7f0] p-2 shadow-sm sm:size-22">
+
+          <img
+            src={item.image}
+            alt={item.title}
+            loading="lazy"
+            className="h-full w-full object-contain"
+          />
+
+        </div>
+
+        {/* Content */}
+        <div className="min-w-0 flex-1 pt-1 text-left">
+
+          <span className="text-xs font-semibold tracking-[0.15em] text-[#a17c6d] sm:text-sm">
+            {item.time}
+          </span>
+
+          <h4 className="mt-1 font-[var(--font-playfair)] text-2xl font-medium text-[#782f38] sm:text-[28px]">
+            {item.title}
+          </h4>
+
+          <p className="mt-2 text-[13px] leading-relaxed text-[#81756d] sm:text-sm">
+            {item.description}
+          </p>
+
+        </div>
+
+      </div>
+    ))}
+
+  </div>
+
+  {/* Bottom decoration */}
+  <div className="relative z-10 mt-10 text-center">
+
+    <span className="font-[var(--font-playfair)] text-2xl text-[#a17c6d]">
+      ❧
+    </span>
+
+    <p className="mt-2 font-[var(--font-playfair)] text-lg italic text-[#782f38]">
+      Hẹn gặp bạn trong ngày vui của chúng mình!
+    </p>
+
+  </div>
+
+</div>
         </section>
+        
 
         <Gallery gallery={gallery} />
 
