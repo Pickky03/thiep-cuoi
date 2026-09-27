@@ -164,7 +164,7 @@ export default function WeddingPage({
     <SakuraPetals />
 
 
-      <main className="wedding-page-enter overflow-x-hidden bg-[#faf7f0]">
+      <main className="overflow-x-hidden bg-[#faf7f0]">
         {/* HERO */}
 
         <section
@@ -198,21 +198,51 @@ export default function WeddingPage({
               <span className="h-px w-13.75 bg-white/60" />
             </div>
 
-            <p className="mt-3.5 mb-2.5 text-[11px] font-medium tracking-[0.18em] uppercase md:text-[15px]">
-              Trân trọng kính mời
-            </p>
+          
 
-            <h1 className="m-0 font-[var(--font-playfair)] text-[clamp(52px,14vw,78px)] leading-[1.02] font-normal tracking-[-0.045em] md:text-[clamp(68px,9vw,134px)]">
-              {wedding.groom}
+        
+<h1
+  className="
+    mx-auto my-0
+    flex w-full flex-col
+    items-center justify-center
+    font-[var(--font-playfair)]
+    text-[clamp(38px,10vw,54px)]
+    leading-[1.05]
+    font-normal
+    tracking-[-0.035em]
+    text-white
+    sm:text-[60px]
+    md:text-[clamp(68px,6vw,96px)]
+  "
+>
+  {/* Chú rể */}
+  <span className="block">
+    {wedding.groom}
+  </span>
 
-              <em className="mx-2 text-[0.53em] font-normal">
-                &
-              </em>
+  {/* Dấu & nằm chính giữa */}
+  <span
+    className="
+      my-1 block
+      font-[var(--font-playfair)]
+      text-[0.42em]
+      leading-none
+      font-normal
+      italic
+      text-white/90
+      md:my-2
+    "
+  >
+    &amp;
+  </span>
 
-              <br />
+  {/* Cô dâu */}
+  <span className="block">
+    {wedding.bride}
+  </span>
+</h1>
 
-              {wedding.bride}
-            </h1>
 
             <p className="mt-3.75 mb-4.5 font-[var(--font-playfair)] text-base leading-snug italic sm:text-[17px] md:mt-5 md:mb-5 md:text-[clamp(18px,2vw,24px)]">
               Cùng chúng tôi viết tiếp câu chuyện yêu thương

@@ -107,7 +107,7 @@ export default function MusicPlayer() {
             border
             border-white/50
 
-            bg-[#782f38]/90
+            
 
             px-4
             py-3
@@ -139,9 +139,9 @@ export default function MusicPlayer() {
           </span>
 
           {/* Text */}
-          <span className="text-xs font-medium tracking-wide sm:text-sm">
+          {/* <span className="text-xs font-medium tracking-wide sm:text-sm">
             {isPlaying ? 'Đang phát nhạc' : 'Bật nhạc'}
-          </span>
+          </span> */}
 
           {/* Playing indicator */}
           {isPlaying && (

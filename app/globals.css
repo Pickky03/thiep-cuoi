@@ -240,487 +240,638 @@ a:focus-visible {
 }
 
 
+
 /* =========================================
-   INVITATION - COVER
+   WEDDING INTRO - 17 SECONDS
 ========================================= */
 
-.invite-cover {
+/* Toàn bộ màn hình mở đầu */
+
+.intro-cover {
   position: fixed;
   inset: 0;
+
   z-index: 100;
 
-  display: flex;
-  min-height: 100svh;
+  overflow: hidden;
 
-  align-items: center;
-  justify-content: center;
+  background: #f9f6ef;
+  color: #687c96;
 
-  overflow-x: hidden;
-  overflow-y: auto;
-
-  padding: 35px 16px;
-
-  background: #eee4d9;
-
-  color: #54272e;
-  text-align: center;
+  isolation: isolate;
 }
 
-.invite-background {
+/* =========================================
+   SCENE 1 - ENVELOPE VIDEO
+========================================= */
+
+.intro-film {
   position: absolute;
   inset: 0;
 
-  background:
-    linear-gradient(
-      rgba(250, 247, 240, 0.9),
-      rgba(235, 220, 207, 0.92)
-    ),
-    url("/images/DUY08901.JPG") center / cover no-repeat;
-}
-
-.invite-content {
-  position: relative;
   z-index: 1;
 
-  display: flex;
-  width: 100%;
+  display: grid;
+  place-items: center;
 
-  flex-direction: column;
-  align-items: center;
+  background: #91a4bd;
 }
 
-/* =========================================
-   COVER TEXT
-========================================= */
-
-.invite-eyebrow {
-  font-size: 11px;
-  font-weight: 600;
-
-  letter-spacing: 0.3em;
-  color: #782f38;
-}
-
-.invite-heading {
-  margin-top: 18px;
-
-  font-family: var(--font-playfair), Georgia, serif;
-  font-size: clamp(30px, 8vw, 48px);
-  font-weight: 400;
-  line-height: 1.25;
-}
-
-.invite-date {
-  margin-top: 13px;
-
-  font-size: 12px;
-  letter-spacing: 0.2em;
-  color: #806e64;
-}
-
-.invite-instruction {
-  margin-top: 45px;
-  color: #54272e;
-}
-
-/* =========================================
-   ENVELOPE STRUCTURE
-========================================= */
-
-.invite-envelope {
+.intro-film-frame {
   position: relative;
 
-  width: min(440px, 88vw);
-  margin-top: 55px;
-
-  transform-origin: center center;
-  will-change: transform, opacity;
-}
-
-.invite-stage {
-  position: relative;
-
-  width: 100%;
-  aspect-ratio: 1.5;
-
-  perspective: 1400px;
-  transform-style: preserve-3d;
-
-  filter: drop-shadow(
-    0 18px 24px rgba(74, 43, 39, 0.2)
-  );
-}
-
-/* Mặt sau phong bì */
-
-.invite-back {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-
-  border: 1px solid #c8a995;
-  background: #dec5b1;
-}
-
-/* =========================================
-   WEDDING PHOTO PREVIEW
-========================================= */
-
-.invite-preview {
-  position: absolute;
-  inset: 2% 3%;
-  z-index: 2;
+  height: 100svh;
+  width: min(100vw, 56.25svh);
 
   overflow: hidden;
-  background: #54272e;
 }
 
-.invite-preview-photo {
-  position: absolute;
-  inset: 0;
+.intro-film-frame video {
+  display: block;
 
-  background: url("/images/DUY08901.JPG")
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  background:
+    url("/images/envelope-poster.jpg")
     center / cover no-repeat;
 }
 
-.invite-preview-overlay {
-  position: absolute;
-  inset: 0;
-
-  background: linear-gradient(
-    180deg,
-    rgba(25, 20, 18, 0.08),
-    rgba(25, 20, 18, 0.35)
-  );
-}
-
 /* =========================================
-   TOP FLAP
+   WAX SEAL HH
 ========================================= */
 
-.invite-flap {
+.intro-wax-button {
   position: absolute;
-  inset: 0;
-  z-index: 5;
 
-  background: linear-gradient(
-    180deg,
-    #f8e9dc 0%,
-    #e1c6b2 100%
-  );
-
-  clip-path: polygon(
-    0 0,
-    100% 0,
-    50% 56%
-  );
-
-  transform-origin: center top;
-  backface-visibility: hidden;
-
-  will-change: transform;
-}
-
-/* =========================================
-   LOWER ENVELOPE BODY
-========================================= */
-
-.invite-front {
-  position: absolute;
-  inset: 0;
   z-index: 4;
 
-  background: linear-gradient(
-    155deg,
-    #f5e5d7 0%,
-    #e9d1c0 55%,
-    #d7b9a7 100%
-  );
-
-  clip-path: polygon(
-    0 0,
-    50% 56%,
-    100% 0,
-    100% 100%,
-    0 100%
-  );
-
-  will-change: transform, opacity;
-}
-
-/* =========================================
-   WAX SEAL
-========================================= */
-
-.invite-seal {
-  position: absolute;
-
-  top: 55%;
+  top: 48%;
   left: 50%;
-  z-index: 8;
 
-  display: flex;
+  width: clamp(64px, 11vw, 92px);
 
-  width: clamp(54px, 14vw, 68px);
-  height: clamp(54px, 14vw, 68px);
+  aspect-ratio: 1;
 
-  align-items: center;
-  justify-content: center;
+  padding: 0;
 
-  transform: translate(-50%, -50%);
-
-  border: 3px double #c78b90;
-  border-radius: 50%;
-
-  background: radial-gradient(
-    circle at 30% 25%,
-    #ad5864 0%,
-    #782f38 65%,
-    #54272e 100%
-  );
-
-  color: #ffe9de;
-
-  font-family: var(--font-playfair), Georgia, serif;
-  font-size: 20px;
-  font-style: italic;
-
-  box-shadow:
-    0 5px 13px rgba(65, 27, 33, 0.27),
-    inset 0 2px 5px rgba(255, 255, 255, 0.2);
+  border: 0;
+  background: transparent;
 
   cursor: pointer;
 
-  transition: scale 250ms ease;
-}
-
-.invite-seal:hover {
-  scale: 1.08;
-}
-
-.invite-seal:disabled {
-  cursor: default;
-  pointer-events: none;
-}
-
-/* Nếu sử dụng ảnh con dấu riêng */
-
-.invite-seal-image {
-  border: none;
-
-  background:
-    url("/images/wax-seal.png")
-    center / contain no-repeat;
-
-  box-shadow: none;
+  transform: translate(-50%, -50%);
 
   filter: drop-shadow(
-    0 5px 6px rgba(65, 27, 33, 0.3)
+    0 5px 7px rgba(23, 35, 48, 0.27)
   );
+
+  animation:
+    intro-seal-breathe
+    2.4s ease-in-out infinite;
 }
 
+.intro-wax-button img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+}
+
+.intro-wax-button:focus-visible {
+  outline: 3px solid #f8e1b7;
+  outline-offset: 5px;
+
+  border-radius: 50%;
+}
+
+@keyframes intro-seal-breathe {
+  0%,
+  100% {
+    transform:
+      translate(-50%, -50%)
+      scale(1);
+  }
+
+  50% {
+    transform:
+      translate(-50%, -50%)
+      scale(1.07);
+  }
+}
+
+/* Hướng dẫn chạm con dấu */
+
+.intro-tap-hint {
+  position: absolute;
+
+  z-index: 5;
+
+  bottom: max(4.5svh, 18px);
+  left: 50%;
+
+  width: max-content;
+  max-width: 90vw;
+
+  transform: translateX(-50%);
+
+  color: #fff;
+
+  text-align: center;
+
+  font-size: 12px;
+  letter-spacing: 0.08em;
+
+  text-shadow:
+    0 1px 10px rgba(20, 35, 54, 0.8);
+}
+
+
+
 /* =========================================
-   STEP 1 - CON DẤU BIẾN MẤT
-   0s - 0.45s
+   SCENE 2 - PAPER BACKGROUND
+   GIỮ 2 BÊN NỀN XANH
 ========================================= */
 
-.invite-opening .invite-seal {
+.intro-paper {
+  position: absolute;
+  inset: 0;
+
+  z-index: 2;
+
+  overflow: hidden;
+
+  opacity: 0;
   pointer-events: none;
 
-  animation:
-    invite-seal-hide 450ms
-    ease-in-out forwards;
+  /* Hai bên nền xanh */
+  background: #95a9c4;
 }
 
-@keyframes invite-seal-hide {
-  0% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
+/* Tờ giấy dọc ở giữa */
 
-  70% {
-    opacity: 0.5;
-    transform: translate(-50%, -50%) scale(1.08);
-  }
+.intro-paper::before {
+  content: "";
 
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.75);
-    visibility: hidden;
-  }
+  position: absolute;
+
+  top: 0;
+  left: 50%;
+
+  width: min(100vw, 56.25svh);
+  height: 100svh;
+
+  transform: translateX(-50%);
+
+  background:
+    radial-gradient(
+      ellipse 70% 10% at 50% 4%,
+      rgba(211, 195, 185, 0.24),
+      transparent 80%
+    ),
+    radial-gradient(
+      ellipse 75% 12% at 50% 92%,
+      rgba(234, 214, 206, 0.35),
+      transparent 82%
+    ),
+    linear-gradient(
+      180deg,
+      #f8f4ec 0%,
+      #fcf8f1 58%,
+      #f7efe7 100%
+    );
+
+  box-shadow:
+    0 0 0 1px rgba(201, 191, 181, 0.22),
+    0 14px 40px rgba(72, 67, 62, 0.10);
+}
+
+/* Vân giấy nhẹ nằm trên tờ giấy giữa */
+
+.intro-paper::after {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 50%;
+
+  width: min(100vw, 56.25svh);
+  height: 100svh;
+
+  transform: translateX(-50%);
+
+  opacity: 0.18;
+  pointer-events: none;
+
+  background-image:
+    radial-gradient(
+      #cdbeb2 0.45px,
+      transparent 0.45px
+    );
+
+  background-size: 6px 6px;
 }
 
 /* =========================================
-   STEP 2 - NẮP BÌ THƯ MỞ TỪ TỪ
-   0.45s - 2s
+   BUTTERFLY - GIỐNG KHUNG HÌNH 2 HƠN
 ========================================= */
 
-.invite-opening .invite-flap {
+.intro-butterfly {
+  position: absolute;
+
+  z-index: 3;
+
+  top: 16%;
+  left: 50%;
+
+  width: min(28vw, 170px);
+  aspect-ratio: 488 / 319;
+
+  transform: translateX(-50%);
+  transform-origin: 50% 55%;
+
+  transform-style: preserve-3d;
+
+  filter: drop-shadow(
+    10px 14px 10px rgba(84, 67, 48, 0.18)
+  );
+
   animation:
-    invite-flap-open 1550ms
-    cubic-bezier(0.42, 0, 0.25, 1)
-    450ms forwards;
+    butterfly-float 4.8s ease-in-out infinite;
 }
 
-@keyframes invite-flap-open {
-  0% {
-    transform: rotateX(0deg);
-  }
+.intro-wing {
+  position: absolute;
 
-  35% {
-    transform: rotateX(45deg);
-  }
+  top: 0;
 
-  70% {
-    transform: rotateX(125deg);
-  }
+  width: 50%;
+  height: 100%;
 
+  background-image: url("/images/butterfly.png");
+  background-repeat: no-repeat;
+  background-size: 200% 100%;
+
+  backface-visibility: visible;
+  will-change: transform;
+}
+
+/* Cánh trái */
+
+.intro-wing-left {
+  left: 0;
+
+  background-position: left center;
+  transform-origin: right center;
+
+  animation:
+    butterfly-left 1.65s
+    cubic-bezier(0.42, 0, 0.58, 1)
+    infinite;
+}
+
+/* Cánh phải */
+
+.intro-wing-right {
+  right: 0;
+
+  background-position: right center;
+  transform-origin: left center;
+
+  animation:
+    butterfly-right 1.65s
+    cubic-bezier(0.42, 0, 0.58, 1)
+    infinite;
+}
+
+/* Bướm bay nhẹ */
+
+@keyframes butterfly-float {
+  0%,
   100% {
-    transform: rotateX(180deg);
-    visibility: hidden;
-  }
-}
-
-/* =========================================
-   STEP 3 - THÂN DƯỚI TRƯỢT XUỐNG
-   VÀ BIẾN MẤT TỪ TỪ
-   2.05s - 3.65s
-========================================= */
-
-.invite-opening .invite-front {
-  animation:
-    invite-front-disappear 1600ms
-    cubic-bezier(0.4, 0, 0.25, 1)
-    2050ms forwards;
-}
-
-@keyframes invite-front-disappear {
-  0% {
-    transform: translateY(0);
-    opacity: 1;
+    transform:
+      translate(-50%, 0)
+      rotate(-1deg);
   }
 
   25% {
-    transform: translateY(10%);
-    opacity: 1;
+    transform:
+      translate(-49.5%, -4px)
+      rotate(0deg);
   }
 
-  60% {
-    transform: translateY(45%);
-    opacity: 0.65;
+  50% {
+    transform:
+      translate(-50%, -9px)
+      rotate(1deg);
   }
 
-  85% {
-    transform: translateY(85%);
-    opacity: 0.2;
+  75% {
+    transform:
+      translate(-50.5%, -4px)
+      rotate(0deg);
   }
+}
 
+/* Nhịp cánh chậm hơn, mềm hơn */
+
+@keyframes butterfly-left {
+  0%,
   100% {
-    transform: translateY(115%);
-    opacity: 0;
-    visibility: hidden;
+    transform:
+      perspective(900px)
+      rotateY(-10deg)
+      rotateZ(-1deg);
+  }
+
+  42% {
+    transform:
+      perspective(900px)
+      rotateY(-54deg)
+      rotateZ(2deg);
+  }
+
+  70% {
+    transform:
+      perspective(900px)
+      rotateY(-22deg)
+      rotateZ(0deg);
+  }
+}
+
+@keyframes butterfly-right {
+  0%,
+  100% {
+    transform:
+      perspective(900px)
+      rotateY(10deg)
+      rotateZ(1deg);
+  }
+
+  42% {
+    transform:
+      perspective(900px)
+      rotateY(54deg)
+      rotateZ(-2deg);
+  }
+
+  70% {
+    transform:
+      perspective(900px)
+      rotateY(22deg)
+      rotateZ(0deg);
   }
 }
 
 /* =========================================
-   STEP 4 - ZOOM VÀO ẢNH CƯỚI
-   3.2s - 4.3s
+   INVITATION TEXT
 ========================================= */
 
-.invite-opening .invite-envelope {
-  animation:
-    invite-zoom 1100ms
-    cubic-bezier(0.45, 0, 0.2, 1)
-    3200ms forwards;
+.intro-copy {
+  position: absolute;
+  z-index: 3;
+
+  top: 52%;
+  left: 50%;
+
+  /* Không để chữ vượt khỏi tờ giấy */
+  width: min(
+    420px,
+    calc(56.25svh - 36px),
+    calc(100vw - 36px)
+  );
+
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  gap: 10px;
+  text-align: center;
+
+  opacity: 0;
+  transform: translate(-50%, 12px);
 }
 
-@keyframes invite-zoom {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
+/* Trân trọng kính mời */
 
-  65% {
-    transform: scale(2.2);
-    opacity: 1;
-  }
+.intro-copy-invite span {
+  font-size: clamp(12px, 2vw, 17px);
 
-  100% {
-    transform: scale(5);
-    opacity: 0;
-  }
+  font-weight: 400;
+
+  letter-spacing: 0.25em;
+}
+
+.intro-copy-invite strong {
+  font-family: var(--font-playfair), Georgia, serif;
+
+  font-size: clamp(28px, 4.3svh, 36px);
+  font-weight: 400;
+
+  letter-spacing: 0.06em;
+}
+
+/* Tên cô dâu chú rể */
+
+.intro-copy-names p {
+  margin: 0;
+
+  font-size: clamp(10px, 1.8vw, 13px);
+
+  letter-spacing: 0.19em;
+
+  line-height: 1.8;
+}
+
+.intro-copy-names {
+  top: 49%;
+}
+
+.intro-copy-names h1 {
+  margin: 14px 0;
+
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  gap: 4px;
+
+  font-family:
+    var(--font-playfair),
+    var(--font-be-vietnam),
+    serif;
+
+  /* Giảm cỡ chữ và tính theo chiều cao màn hình */
+  font-size: clamp(30px, 4.8svh, 46px);
+
+  font-weight: 400;
+  line-height: 1.08;
+
+  white-space: nowrap;
+}
+
+.intro-copy-names h1 em {
+  font-size: 0.5em;
+  color: #a6b2c1;
+  line-height: 1;
+}
+
+.intro-copy-names p {
+  margin: 0;
+
+  font-size: clamp(9px, 1.5svh, 12px);
+  letter-spacing: 0.12em;
+
+  line-height: 1.6;
+  text-align: center;
+}
+
+.intro-copy-names h1 em {
+  font-size: 0.55em;
+
+  color: #a6b2c1;
+
+  line-height: 1;
 }
 
 /* =========================================
-   STEP 5 - HIỆN TRANG CƯỚI PHÍA SAU
-   4.05s - 4.85s
+   ANIMATION TIMELINE - 17 SECONDS
 ========================================= */
 
-.invite-opening.invite-cover {
+/*
+  0.00 - 3.70s:
+  Video mở phong bì
+
+  3.15 - 3.95s:
+  Chuyển cảnh sang nền giấy và bướm
+
+  4.25 - 8.90s:
+  Lời mời xuất hiện
+
+  9.20 - 15.85s:
+  Tên Văn Hải & Kim Hường
+
+  16.05 - 17.00s:
+  Mờ dần để hiện trang thiệp cưới
+*/
+
+/* Cảnh phong bì biến mất */
+
+.intro-opening .intro-film {
   animation:
-    invite-cover-disappear 800ms
-    ease-in-out 4050ms forwards;
+    intro-film-out
+    0.8s ease
+    3.15s forwards;
 }
 
-@keyframes invite-cover-disappear {
-  0% {
-    opacity: 1;
-  }
+/* Nền giấy và bướm hiện ra */
 
-  100% {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-  }
-}
-
-/* Ẩn chữ khi bắt đầu mở phong bì */
-
-.invite-opening .invite-eyebrow,
-.invite-opening .invite-heading,
-.invite-opening .invite-date,
-.invite-opening .invite-instruction {
+.intro-opening .intro-paper {
   animation:
-    invite-text-hide 500ms
-    ease-in-out forwards;
+    intro-paper-in
+    0.8s ease
+    3.15s forwards;
 }
 
-@keyframes invite-text-hide {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Lời mời */
 
+.intro-opening .intro-copy-invite {
+  animation:
+    intro-invite-copy
+    4.65s ease
+    4.25s both;
+}
+
+/* Tên cô dâu chú rể */
+
+.intro-opening .intro-copy-names {
+  animation:
+    intro-names-copy
+    6.65s ease
+    9.2s both;
+}
+
+/* Mờ dần toàn bộ cảnh mở đầu */
+
+.intro-cover.intro-opening {
+  animation:
+    intro-cover-out
+    0.95s ease-in-out
+    16.05s forwards;
+}
+
+/* =========================================
+   TRANSITION KEYFRAMES
+========================================= */
+
+@keyframes intro-film-out {
   to {
     opacity: 0;
-    transform: translateY(-8px);
+    visibility: hidden;
   }
 }
 
-/* =========================================
-   MOBILE
-========================================= */
+@keyframes intro-paper-in {
+  to {
+    opacity: 1;
+  }
+}
 
-@media (max-width: 640px) {
-  .invite-cover {
-    padding: 24px 16px;
+@keyframes intro-invite-copy {
+  0%,
+  5% {
+    opacity: 0;
+
+    transform:
+      translate(-50%, 12px);
   }
 
-  .invite-envelope {
-    width: min(400px, 88vw);
-    margin-top: 42px;
+  19%,
+  77% {
+    opacity: 1;
+
+    transform:
+      translate(-50%, 0);
   }
 
-  .invite-instruction {
-    margin-top: 36px;
+  100% {
+    opacity: 0;
+
+    transform:
+      translate(-50%, -10px);
+  }
+}
+
+@keyframes intro-names-copy {
+  0%,
+  6% {
+    opacity: 0;
+
+    transform:
+      translate(-50%, 12px);
   }
 
-  .invite-eyebrow {
-    font-size: 10px;
-  }
+  22%,
+  100% {
+    opacity: 1;
 
-  .invite-date {
-    font-size: 11px;
+    transform:
+      translate(-50%, 0);
+  }
+}
+
+@keyframes intro-cover-out {
+  to {
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
   }
 }
 
@@ -729,12 +880,15 @@ a:focus-visible {
 ========================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .invite-opening,
-  .invite-opening * {
+  .intro-wax-button,
+  .intro-butterfly,
+  .intro-wing,
+  .intro-cover.intro-opening,
+  .intro-opening * {
     animation: none !important;
   }
 
-  .invite-opening.invite-cover {
+  .intro-cover.intro-opening {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;

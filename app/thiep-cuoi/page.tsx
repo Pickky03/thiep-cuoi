@@ -1,18 +1,26 @@
-'use client'
-import WeddingPage from './componets/weddingpage';
+
+import WeddingPage from '../thiep-cuoi/componets/weddingpage';
 
 import {
+  wedding,
   gallery,
   mapsUrl,
-  wedding,
 } from '../data/wedding';
 
-export default function ThiepCuoiPage() {
+import EnvelopeCover from '../components/EnvelopeCover';
+
+export default function HomePage() {
   return (
-    <WeddingPage
-      wedding={wedding}
-      gallery={gallery}
-      mapsUrl={mapsUrl}
-    />
+    <>
+      {/* Trang cưới thật nằm phía sau */}
+      <WeddingPage
+        wedding={wedding}
+        gallery={gallery}
+        mapsUrl={mapsUrl}
+      />
+
+      {/* Hiệu ứng mở đầu 17 giây */}
+      <EnvelopeCover />
+    </>
   );
 }

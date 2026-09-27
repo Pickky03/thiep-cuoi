@@ -2,29 +2,33 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-
 import { useMusic } from './MusicProvider';
 
+const INTRO_LENGTH_MS = 17000;
+function unlockPageScroll() {
+  document.body.style.removeProperty('overflow');
+  document.documentElement.style.removeProperty('overflow');
+}
 export default function EnvelopeCover() {
   const router = useRouter();
   const { startMusic } = useMusic();
-
-  const [opening, setOpening] = useState(false);
-
+  const videoRef = useRef<HTMLVideoElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [opening, setOpening] = useState(false);
 
   useEffect(() => {
     router.prefetch('/thiep-cuoi');
-
-    // Đưa trang về đầu và khóa cuộn khi chưa mở thiệp.
+  
     window.scrollTo(0, 0);
-
-    const previousOverflow = document.body.style.overflow;
+  
+    // Khóa cuộn trong lúc hiển thị cảnh mở đầu.
     document.body.style.overflow = 'hidden';
-
+    document.documentElement.style.overflow = 'hidden';
+  
     return () => {
-      document.body.style.overflow = previousOverflow;
-
+      // Mở khóa khi component bị hủy hoặc chuyển trang.
+      unlockPageScroll();
+  
       if (timerRef.current) {
         clearTimeout(timerRef.current);
       }
@@ -34,95 +38,95 @@ export default function EnvelopeCover() {
   const handleOpen = () => {
     if (opening) return;
 
-    // Phát nhạc trực tiếp từ thao tác chạm con dấu.
+    // Must remain in this actual user-initiated click handler.
     startMusic();
-
     setOpening(true);
 
     const reducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches;
 
-    // Chờ hiệu ứng hoàn thành rồi đổi URL.
+    if (!reducedMotion) {
+      const video = videoRef.current;
+      if (video) {
+        try { video.currentTime = 0; } catch { /* metadata not loaded yet */ }
+        void video.play().catch(() => {
+          // CSS fallback still reveals the butterfly and invitation.
+        });
+      }
+    }
+
     timerRef.current = setTimeout(
       () => {
+        // Bắt buộc mở khóa trước khi điều hướng.
+        unlockPageScroll();
+    
         router.replace('/thiep-cuoi');
       },
-      reducedMotion ? 80 : 5000,
+      reducedMotion ? 100 : INTRO_LENGTH_MS,
     );
   };
 
   return (
     <div
+      className={`intro-cover ${opening ? 'intro-opening' : ''}`}
       role="dialog"
       aria-modal="true"
-      aria-label="Phong bì thiệp cưới Văn Hải và Kim Hường"
-      className={`invite-cover ${opening ? 'invite-opening' : ''}`}
+      aria-label="Mở thiệp cưới Văn Hải và Kim Hường"
     >
-      {/* Nền trang mở đầu */}
-      <div className="invite-background" />
+      {/* Original envelope-opening footage: 0–3.7 seconds only. */}
+      <div className="intro-film">
+        <div className="intro-film-frame">
+          <video
+            ref={videoRef}
+            src="/videos/envelope-open.mp4"
+            poster="/images/envelope-poster.jpg"
+            playsInline
+            muted
+            preload="auto"
+            aria-hidden="true"
+          />
 
-      <div className="invite-content">
-
-        <p className="invite-eyebrow">
-          THE WEDDING INVITATION
-        </p>
-
-        <h1 className="invite-heading">
-          Văn Hải
-          <span className="mx-3 italic text-[#ae8778]">&</span>
-          Kim Hường
-        </h1>
-
-        <p className="invite-date">
-          06 · 11 · 2026
-        </p>
-
-        {/* Phong bì */}
-        <div className="invite-envelope">
-
-          <div className="invite-stage">
-
-            {/* Mặt sau */}
-            <div className="invite-back" />
-
-            {/* Ảnh Hero nằm trong phong bì */}
-            <div className="invite-preview">
-              <div className="invite-preview-photo" />
-              <div className="invite-preview-overlay" />
-            </div>
-
-            {/* Nắp phong bì */}
-            <div className="invite-flap" />
-
-            {/* Thân phong bì phía dưới */}
-            <div className="invite-front" />
-
-            {/* Con dấu sáp */}
+          {!opening && (
             <button
               type="button"
+              className="intro-wax-button"
               onClick={handleOpen}
-              disabled={opening}
-              aria-label="Chạm để mở thiệp cưới và phát nhạc"
-              className="invite-seal invite-seal-image"
+              aria-label="Chạm con dấu để mở thiệp và phát nhạc"
             >
-           
+              <img src="/images/wax-seal.png" alt="" width={92} height={92} />
             </button>
-
-          </div>
+          )}
         </div>
-
-        <div className="invite-instruction">
-          <p className="font-[var(--font-playfair)] text-xl italic">
-            Một lời mời gửi đến bạn
-          </p>
-
-          <p className="mt-3 text-xs tracking-widest">
-            Chạm con dấu sáp để mở thiệp ♡
-          </p>
-        </div>
-
       </div>
+
+      {/* Personalized scene: butterfly and Vietnamese wedding copy. */}
+      <div className="intro-paper" aria-hidden={!opening}>
+      <div className="intro-butterfly" aria-hidden="true">
+  <span className="intro-wing intro-wing-left" />
+  <span className="intro-wing intro-wing-right" />
+</div>
+
+        <div className="intro-copy intro-copy-invite">
+          <span>TRÂN TRỌNG</span>
+          <strong>KÍNH MỜI</strong>
+          <span>ĐẾN CHUNG VUI</span>
+        </div>
+
+        <div className="intro-copy intro-copy-names">
+          <p>CHÚNG MÌNH SẮP VỀ CHUNG MỘT NHÀ</p>
+          <h1>
+            <span>Văn Hải</span>
+            <em>&amp;</em>
+            <span>Kim Hường</span>
+          </h1>
+          <p>06 · 11 · 2026</p>
+        </div>
+      </div>
+
+      {!opening && (
+        <p className="intro-tap-hint">Chạm vào con dấu để mở thiệp ♪</p>
+      )}
     </div>
   );
 }

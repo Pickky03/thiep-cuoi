@@ -87,13 +87,13 @@ export default function MusicProvider({
           onClick={toggleMusic}
           aria-label={isPlaying ? 'Tắt nhạc nền' : 'Bật nhạc nền'}
           aria-pressed={isPlaying}
-          className="fixed right-4 bottom-5 z-50 flex items-center gap-2 rounded-full border border-white/50 bg-[#782f38] px-4 py-3 text-sm text-white shadow-lg transition-transform hover:scale-105 sm:right-6 sm:bottom-6"
+          className="fixed right-4 bottom-5 z-50 flex items-center gap-2 rounded-full border border-white/50  px-4 py-3 text-sm text-white shadow-lg transition-transform hover:scale-105 sm:right-6 sm:bottom-6"
         >
           {isPlaying ? <SoundOutlined /> : <MutedOutlined />}
 
-          <span>
+          {/* <span>
             {isPlaying ? 'Đang phát nhạc' : 'Bật nhạc'}
-          </span>
+          </span> */}
         </button>
       )}
     </MusicContext.Provider>
