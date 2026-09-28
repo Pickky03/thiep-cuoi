@@ -19,7 +19,7 @@ export const wedding = {
     time: '18:00',
   
     // Ví dụ: 'Trung tâm Tiệc cưới ABC'
-    venue: 'Quán Nhậu Ngộ Quán',
+    venue: 'Ngộ Quán',
   
     // Nhập địa chỉ đầy đủ để Google Maps dẫn đường chính xác.
     address: '179 - 181 Đ. 30/4, Hòa Cường, Đà Nẵng 550000, Việt Nam',

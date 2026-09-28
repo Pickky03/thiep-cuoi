@@ -83,12 +83,10 @@ export default function Gallery({
           OUR LITTLE MOMENTS
         </div>
 
-        <h2 className="mx-auto mt-4.5 mb-2.5 font-[var(--font-playfair)] text-[clamp(39px,9vw,51px)] leading-tight font-normal tracking-[-0.04em] text-[#54272e] md:text-[clamp(42px,5vw,72px)]">
-          Một chút{' '}
-          <em className="font-normal">
-            chuyện của chúng mình
-          </em>
-        </h2>
+        <h5 className="mx-auto mt-4.5 mb-2.5 font-[var(--font-playfair)] text-[clamp(29px,9vw,31px)] leading-tight font-normal tracking-[-0.04em] text-[#54272e] md:text-[clamp(32px,5vw,52px)]">
+          Một chút chuyện của chúng mình{' '}
+          
+        </h5>
 
         <p className="mx-auto max-w-162.5 text-base leading-[1.85] text-[#6f625c] md:text-[17px]">
           Những khung hình lưu lại hành trình trước ngày chung đôi.

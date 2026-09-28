@@ -1,5 +1,9 @@
 
-import WeddingPage from '../thiep-cuoi/componets/weddingpage';
+'use client';
+
+import { useEffect, useState } from 'react';
+
+import WeddingPage from './componets/weddingpage';
 
 import {
   wedding,
@@ -7,20 +11,31 @@ import {
   mapsUrl,
 } from '../data/wedding';
 
-import EnvelopeCover from '../components/EnvelopeCover';
+export default function ThiepCuoiPage() {
+  const [guestName, setGuestName] = useState<string | null>(null);
 
-export default function HomePage() {
+  useEffect(() => {
+    // Đọc tên khách từ đường link
+    const params = new URLSearchParams(window.location.search);
+
+    const guest = params.get('guest')?.trim();
+
+    setGuestName(
+      guest ? guest.slice(0, 80) : 'Quý khách'
+    );
+  }, []);
+
+  // Chờ đọc URL để tránh hiển thị sai tên khách
+  if (guestName === null) {
+    return <main className="min-h-svh bg-[#faf7f0]" />;
+  }
+
   return (
-    <>
-      {/* Trang cưới thật nằm phía sau */}
-      <WeddingPage
-        wedding={wedding}
-        gallery={gallery}
-        mapsUrl={mapsUrl}
-      />
-
-      {/* Hiệu ứng mở đầu 17 giây */}
-      <EnvelopeCover />
-    </>
+    <WeddingPage
+      wedding={wedding}
+      gallery={gallery}
+      mapsUrl={mapsUrl}
+      guestName={guestName}
+    />
   );
 }

@@ -9,7 +9,11 @@ function unlockPageScroll() {
   document.body.style.removeProperty('overflow');
   document.documentElement.style.removeProperty('overflow');
 }
-export default function EnvelopeCover() {
+export default function EnvelopeCover({
+  guestName,
+}: {
+  guestName: string;
+}) {
   const router = useRouter();
   const { startMusic } = useMusic();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -61,7 +65,9 @@ export default function EnvelopeCover() {
         // Bắt buộc mở khóa trước khi điều hướng.
         unlockPageScroll();
     
-        router.replace('/thiep-cuoi');
+        router.replace(
+          `/thiep-cuoi?guest=${encodeURIComponent(guestName)}`
+        );
       },
       reducedMotion ? 100 : INTRO_LENGTH_MS,
     );
@@ -107,11 +113,19 @@ export default function EnvelopeCover() {
   <span className="intro-wing intro-wing-right" />
 </div>
 
-        <div className="intro-copy intro-copy-invite">
-          <span>TRÂN TRỌNG</span>
-          <strong>KÍNH MỜI</strong>
-          <span>ĐẾN CHUNG VUI</span>
-        </div>
+<div className="intro-copy intro-copy-invite">
+  <p className="intro-invite-line">
+    TRÂN TRỌNG KÍNH MỜI
+  </p>
+
+  <h5 className="intro-guest-name">
+    {guestName}
+  </h5>
+
+  <p className="intro-invite-line">
+    ĐẾN CHUNG VUI
+  </p>
+</div>
 
         <div className="intro-copy intro-copy-names">
           <p>CHÚNG MÌNH SẮP VỀ CHUNG MỘT NHÀ</p>

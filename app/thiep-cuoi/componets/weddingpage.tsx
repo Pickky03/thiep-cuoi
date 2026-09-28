@@ -43,6 +43,7 @@ interface WeddingPageProps {
   wedding: Wedding;
   gallery: GalleryPhoto[];
   mapsUrl: string | null;
+  guestName?: string;
 }
 
 type Countdown = {
@@ -116,6 +117,7 @@ export default function WeddingPage({
   wedding,
   gallery,
   mapsUrl,
+  guestName = 'Quý khách',
 }: WeddingPageProps) {
   const [countdown, setCountdown] =
     useState<Countdown>(EMPTY_COUNTDOWN);
@@ -209,7 +211,7 @@ export default function WeddingPage({
     font-[var(--font-playfair)]
     text-[clamp(38px,10vw,54px)]
     leading-[1.05]
-    font-normal
+    font-medium
     tracking-[-0.035em]
     text-white
     sm:text-[60px]
@@ -228,7 +230,7 @@ export default function WeddingPage({
       font-[var(--font-playfair)]
       text-[0.42em]
       leading-none
-      font-normal
+      font-medium
       italic
       text-white/90
       md:my-2
@@ -332,19 +334,23 @@ export default function WeddingPage({
             ❧
           </div>
 
-          <h2 className="mx-auto mb-7 font-[var(--font-playfair)] text-[clamp(39px,9vw,51px)] leading-tight font-normal tracking-[-0.04em] text-[#54272e] md:text-[clamp(42px,5vw,72px)]">
-            Ngày chúng mình{' '}
+          {/* <span className="mx-auto mb-7 font-[var(--font-playfair)] text-[clamp(10px,9vw,22px)] leading-tight font-semibold tracking-[-0.04em] text-[#54272e] md:text-[clamp(20px,5vw,22px)]">
+            Ngày chúng mình về chung một nhà{' '}
 
-            <em className="font-normal">
-              về chung một nhà
-            </em>
-          </h2>
+            
+          </span> */}
 
-          <p className="mx-auto max-w-162.5 text-base leading-[1.85] text-[#6f625c] md:text-[17px]">
-            Có những khoảnh khắc sẽ đẹp hơn khi được sẻ chia
-            cùng những người thân thương. Chúng mình rất mong
-            được đón tiếp bạn trong ngày vui này.
-          </p>
+          <div className="mx-auto mt-8 max-w-lg text-center">
+  <p className="text-xs font-semibold tracking-[0.22em] text-[#a17c6d]">
+    Trân Trọng Kính Mời
+  </p>
+
+  <h3 className="mt-3 font-[var(--font-playfair)] text-[clamp(25px,6vw,38px)] font-normal leading-snug text-[#782f38] wrap-break-word">
+    {guestName}
+  </h3>
+
+  <div className="mx-auto mt-5 h-px w-16 bg-[#c8b3a3]" />
+</div>
 
           {/* FAMILY */}
 
@@ -409,7 +415,7 @@ export default function WeddingPage({
             Thân mời đến dự hôn lễ của chúng mình!
           </p>
 
-          <div className="flex items-center justify-center gap-2.5 font-[var(--font-playfair)] text-[clamp(31px,8vw,46px)] text-[#782f38] md:gap-6.5 md:text-[clamp(38px,5vw,58px)]">
+          <div className="flex items-center justify-center gap-2.5 font-[var(--font-playfair)] font-medium text-[clamp(31px,8vw,46px)] text-[#782f38] md:gap-6.5 md:text-[clamp(28px,5vw,48px)]">
             <span>
               {wedding.groom}
             </span>
@@ -430,7 +436,7 @@ export default function WeddingPage({
           className="relative h-120 overflow-hidden bg-[#d9cfbf] md:h-150"
           aria-label={`Ảnh cưới của ${wedding.groom} và ${wedding.bride}`}
         >
-          <div className="absolute inset-0 bg-[url('/images/DUY08867.JPG')] bg-cover bg-[position:39%_center] md:bg-[position:center_45%]" />
+          <div className="absolute inset-0 bg-[url('/images/DUY08862.JPG')] bg-cover bg-[position:79%_center] md:bg-[position:center_65%]" />
 
           <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(39,25,19,.65),transparent_70%)] md:bg-[linear-gradient(90deg,transparent_35%,rgba(39,25,19,.48)_100%)]" />
 
@@ -463,12 +469,10 @@ export default function WeddingPage({
             SAVE THE DATE
           </div>
 
-          <h2 className="mx-auto mt-4 mb-10.5 font-[var(--font-playfair)] text-[clamp(39px,9vw,51px)] leading-tight font-normal tracking-[-0.04em] text-[#54272e] md:text-[clamp(42px,5vw,72px)]">
-            Hẹn gặp bạn{' '}
+          <h2 className="mx-auto mt-4 mb-10.5 font-[var(--font-playfair)] text-[clamp(29px,9vw,41px)] leading-tight font-normal tracking-[-0.04em] text-[#54272e] md:text-[clamp(32px,5vw,52px)]">
+            Hẹn gặp bạn trong ngày vui{' '}
 
-            <em className="font-normal">
-              trong ngày vui
-            </em>
+            
           </h2>
 
           <div className="relative mx-auto max-w-170 border border-[#c8b3a3] bg-[#faf7f0] px-6 py-9.5 shadow-[0_20px_60px_rgba(114,95,82,.08)] md:px-10 md:py-11.5 md:pb-13.75">
@@ -482,7 +486,7 @@ export default function WeddingPage({
               LỄ THÀNH HÔN
             </p>
 
-            <div className="font-[var(--font-playfair)] text-[29px] leading-tight text-[#54272e] md:text-[clamp(30px,4vw,45px)]">
+            <div className="font-[var(--font-playfair)] text-[29px] leading-tight text-[#54272e] md:text-[clamp(20px,4vw,35px)]">
               {wedding.date ||
                 'Ngày cưới sẽ được cập nhật'}
             </div>
@@ -654,7 +658,7 @@ export default function WeddingPage({
             Rất mong được gặp bạn
           </p>
 
-          <div className="font-[var(--font-playfair)] text-[clamp(34px,4vw,54px)]">
+          <div className="font-[var(--font-playfair)] font-stretch-50% text-[clamp(24px,4vw,44px)]">
             {wedding.groom}{' '}
 
             <em className="text-[0.65em]">
