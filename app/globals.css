@@ -801,10 +801,7 @@ a:focus-visible {
 /* Tên cô dâu chú rể */
 
 .intro-opening .intro-copy-names {
-  animation:
-    intro-names-copy
-    6.65s ease
-    9.2s both;
+  animation: intro-names-copy 3.3s ease 9.2s both;
 }
 
 /* Mờ dần toàn bộ cảnh mở đầu */
@@ -813,7 +810,7 @@ a:focus-visible {
   animation:
     intro-cover-out
     0.95s ease-in-out
-    16.05s forwards;
+    12.7s forwards;
 }
 
 /* =========================================
@@ -859,20 +856,24 @@ a:focus-visible {
 }
 
 @keyframes intro-names-copy {
-  0%,
-  6% {
+  0% {
     opacity: 0;
-
-    transform:
-      translate(-50%, 12px);
+    transform: translate(-50%, 12px);
   }
 
-  22%,
-  100% {
+  20% {
     opacity: 1;
+    transform: translate(-50%, 0);
+  }
 
-    transform:
-      translate(-50%, 0);
+  75% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -10px);
   }
 }
 

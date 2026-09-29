@@ -324,7 +324,7 @@ export default function WeddingPage({
 
         <section
           id="loi-moi"
-          className="mx-auto max-w-292.5 px-4.75 py-18.5 text-center md:px-6 md:py-27.5"
+          className="mx-auto max-w-292.5 px-4.75 py-10 text-center md:px-6 md:py-15"
         >
           <div className="text-xs font-bold tracking-[0.3em] text-[#782f38]">
             A CELEBRATION OF LOVE
@@ -411,7 +411,7 @@ export default function WeddingPage({
             </div>
           </div>
 
-          <p className="mb-3 font-[var(--font-playfair)] text-[19px] italic text-[#81756d]">
+          <p className="mb-3 font-[var(--font-playfair)] text-[16px] italic text-[#81756d]">
             Thân mời đến dự hôn lễ của chúng mình!
           </p>
 
@@ -436,7 +436,7 @@ export default function WeddingPage({
           className="relative h-120 overflow-hidden bg-[#d9cfbf] md:h-150"
           aria-label={`Ảnh cưới của ${wedding.groom} và ${wedding.bride}`}
         >
-          <div className="absolute inset-0 bg-[url('/images/DUY08862.JPG')] bg-cover bg-[position:79%_center] md:bg-[position:center_65%]" />
+          <div className="absolute inset-0 bg-[url('/images/DUY08862.JPG')] bg-cover bg-[position:19%_center] md:bg-[position:center_65%]" />
 
           <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(39,25,19,.65),transparent_70%)] md:bg-[linear-gradient(90deg,transparent_35%,rgba(39,25,19,.48)_100%)]" />
 
@@ -445,7 +445,7 @@ export default function WeddingPage({
               “
             </span>
 
-            <p className="my-3 font-[var(--font-playfair)] text-[25px] leading-[1.4] italic md:my-6 md:text-[clamp(27px,3vw,43px)]">
+            <p className="my-3 font-[var(--font-playfair)] text-[20px] leading-[1.4] italic md:my-6 md:text-[clamp(27px,3vw,43px)]">
               Và rồi giữa muôn vàn cuộc gặp gỡ,
               <br />
               chúng mình đã tìm thấy nhau.

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMusic } from './MusicProvider';
 
-const INTRO_LENGTH_MS = 17000;
+const INTRO_LENGTH_MS = 13650;
 function unlockPageScroll() {
   document.body.style.removeProperty('overflow');
   document.documentElement.style.removeProperty('overflow');
@@ -19,6 +19,7 @@ export default function EnvelopeCover({
   const videoRef = useRef<HTMLVideoElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [opening, setOpening] = useState(false);
+  const [finished, setFinished] = useState(false);
 
   useEffect(() => {
     router.prefetch('/thiep-cuoi');
@@ -62,17 +63,30 @@ export default function EnvelopeCover({
 
     timerRef.current = setTimeout(
       () => {
-        // Bắt buộc mở khóa trước khi điều hướng.
+        // Mở lại khả năng cuộn trang.
         unlockPageScroll();
     
-        router.replace(
-          `/thiep-cuoi?guest=${encodeURIComponent(guestName)}`
+        // Chỉ cập nhật đường dẫn, không điều hướng sang
+        // một bản WeddingPage khác.
+        const url = new URL('/thiep-cuoi', window.location.origin);
+    
+        if (guestName !== 'Quý khách') {
+          url.searchParams.set('guest', guestName);
+        }
+    
+        window.history.replaceState(
+          null,
+          '',
+          `${url.pathname}${url.search}`
         );
+    
+        // Xóa lớp mở đầu, để lộ WeddingPage đã render phía sau.
+        setFinished(true);
       },
       reducedMotion ? 100 : INTRO_LENGTH_MS,
     );
   };
-
+  if (finished) return null;
   return (
     <div
       className={`intro-cover ${opening ? 'intro-opening' : ''}`}

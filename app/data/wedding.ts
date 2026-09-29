@@ -59,6 +59,23 @@ export const wedding = {
       src: '/images/DUY09430.JPG',
       alt: 'Cặp đôi trong khung cảnh lãng mạn',
     },
+    {
+      src: '/images/DUY0811.JPG',
+      alt: 'Cặp đôi cười bên bó hoa',
+    },
+    {
+      src: '/images/DUY08862.JPG',
+      alt: 'Cặp đôi cười bên bó hoa',
+    },
+    {
+      src: '/images/DUY08901.JPG',
+      alt: 'Cặp đôi cười bên bó hoa',
+    },
+    {
+      src: '/images/DUY09399.JPG',
+      alt: 'Cặp đôi cười bên bó hoa',
+    },
+
   ];
   
   export const mapsUrl = wedding.address
