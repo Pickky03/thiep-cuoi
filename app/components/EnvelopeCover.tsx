@@ -20,7 +20,7 @@ export default function EnvelopeCover({
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [opening, setOpening] = useState(false);
   const [finished, setFinished] = useState(false);
-
+  const [paperScene, setPaperScene] = useState(false);
   useEffect(() => {
     router.prefetch('/thiep-cuoi');
   
@@ -46,45 +46,45 @@ export default function EnvelopeCover({
     // Must remain in this actual user-initiated click handler.
     startMusic();
     setOpening(true);
+    setPaperScene(true);
+    // const reducedMotion = window.matchMedia(
+    //   '(prefers-reduced-motion: reduce)',
+    // ).matches;
 
-    const reducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches;
+    // if (!reducedMotion) {
+    //   const video = videoRef.current;
+    //   if (video) {
+    //     try { video.currentTime = 0; } catch { /* metadata not loaded yet */ }
+    //     void video.play().catch(() => {
+    //       // CSS fallback still reveals the butterfly and invitation.
+    //     });
+    //   }
+    // }
 
-    if (!reducedMotion) {
-      const video = videoRef.current;
-      if (video) {
-        try { video.currentTime = 0; } catch { /* metadata not loaded yet */ }
-        void video.play().catch(() => {
-          // CSS fallback still reveals the butterfly and invitation.
-        });
-      }
-    }
-
-    timerRef.current = setTimeout(
-      () => {
-        // Mở lại khả năng cuộn trang.
-        unlockPageScroll();
+    // timerRef.current = setTimeout(
+    //   () => {
+    //     // Mở lại khả năng cuộn trang.
+    //     unlockPageScroll();
     
-        // Chỉ cập nhật đường dẫn, không điều hướng sang
-        // một bản WeddingPage khác.
-        const url = new URL('/thiep-cuoi', window.location.origin);
+    //     // Chỉ cập nhật đường dẫn, không điều hướng sang
+    //     // một bản WeddingPage khác.
+    //     const url = new URL('/thiep-cuoi', window.location.origin);
     
-        if (guestName !== 'Quý khách') {
-          url.searchParams.set('guest', guestName);
-        }
+    //     if (guestName !== 'Quý khách') {
+    //       url.searchParams.set('guest', guestName);
+    //     }
     
-        window.history.replaceState(
-          null,
-          '',
-          `${url.pathname}${url.search}`
-        );
+    //     window.history.replaceState(
+    //       null,
+    //       '',
+    //       `${url.pathname}${url.search}`
+    //     );
     
-        // Xóa lớp mở đầu, để lộ WeddingPage đã render phía sau.
-        setFinished(true);
-      },
-      reducedMotion ? 100 : INTRO_LENGTH_MS,
-    );
+    //     // Xóa lớp mở đầu, để lộ WeddingPage đã render phía sau.
+    //     setFinished(true);
+    //   },
+    //   reducedMotion ? 100 : INTRO_LENGTH_MS,
+    // );
   };
   if (finished) return null;
   return (
