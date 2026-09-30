@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import type { ReactNode } from 'react';
+
 
 import {
   Be_Vietnam_Pro,
@@ -43,62 +43,11 @@ const playfair = Playfair_Display({
 ========================= */
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    'https://thiep-cuoi-one-iota.vercel.app'
-  ),
-
-  title: {
-    default: 'Thiệp cưới Văn Hải & Kim Hường',
-    template: '%s | Văn Hải & Kim Hường',
-  },
-
+  title: 'Văn Hải & Kim Hường | Thiệp cưới',
   description:
-    'Trân trọng kính mời bạn đến chung vui cùng Văn Hải & Kim Hường.',
-
-  alternates: {
-    canonical: '/',
-  },
-
-  openGraph: {
-    type: 'website',
-
-    locale: 'vi_VN',
-
-    url: '/',
-
-    siteName: 'Văn Hải & Kim Hường',
-
-    title: 'Thiệp cưới Văn Hải & Kim Hường',
-
-    description:
-      'Trân trọng kính mời bạn đến chung vui cùng Văn Hải & Kim Hường.',
-
-    images: [
-      {
-        url: '/images/preview.png',
-        width: 1200,
-        height: 630,
-        alt: 'Thiệp cưới Văn Hải và Kim Hường',
-      },
-    ],
-  },
-
-  twitter: {
-    card: 'summary_large_image',
-
-    title: 'Thiệp cưới Văn Hải & Kim Hường',
-
-    description:
-      'Trân trọng kính mời bạn đến chung vui cùng Văn Hải & Kim Hường.',
-
-    images: ['/images/preview.png'],
-  },
-
-  robots: {
-    index: true,
-    follow: true,
-  },
+    'Trân trọng kính mời bạn chung vui trong ngày cưới của Văn Hải và Kim Hường.',
 };
+
 
 /* =========================
    ROOT LAYOUT
@@ -107,7 +56,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: ReactNode;
+  children: React.ReactNode;
 }>) {
   return (
     <html
