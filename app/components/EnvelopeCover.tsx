@@ -1,23 +1,29 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+
 import { useRouter } from 'next/navigation';
 
 import { useMusic } from './MusicProvider';
 
 /*
-  Video ~3.7s
-  Paper scene ~9.95s
-  Tổng vẫn gần 13.65s như bản cũ.
+  Animated WebP dài khoảng 3.7 giây.
+
+  Sau ~3.1 giây bắt đầu crossfade sang paper,
+  tức vẫn còn khoảng 0.6 giây animation để
+  hai scene chồng lên nhau mượt hơn.
 */
-const PAPER_SCENE_LENGTH_MS = 9950;
+const WEBP_TO_PAPER_MS = 3100;
 
 /*
-  Safety fallback:
-  nếu WebView/Zalo không bắn onEnded,
-  sau khi JS hoạt động lại vẫn có đường thoát.
+  Paper scene sau khi bắt đầu:
+  invitation -> names -> fade cover.
 */
-const VIDEO_FALLBACK_MS = 6000;
+const PAPER_SCENE_LENGTH_MS = 9950;
 
 function unlockPageScroll() {
   document.body.style.removeProperty('overflow');
@@ -30,23 +36,50 @@ export default function EnvelopeCover({
   guestName: string;
 }) {
   const router = useRouter();
+
   const { startMusic } = useMusic();
 
-  const videoRef = useRef<HTMLVideoElement>(null);
+  /*
+    URL Blob của animated WebP.
 
-  const paperTimerRef =
-    useRef<ReturnType<typeof setTimeout> | null>(null);
+    Ta preload bằng fetch() nhưng chưa tạo <img>
+    hiển thị, vì vậy animation chưa chạy.
 
-  const videoFallbackTimerRef =
-    useRef<ReturnType<typeof setTimeout> | null>(null);
+    Khi user click seal thì <img> mới mount.
+  */
+  const [animationSrc, setAnimationSrc] =
+    useState<string>(
+      '/videos/envelope-open.webp',
+    );
 
-  const paperStartedRef = useRef(false);
+  const [opening, setOpening] =
+    useState(false);
 
-  const openingRef = useRef(false);
+  const [paperScene, setPaperScene] =
+    useState(false);
 
-  const [opening, setOpening] = useState(false);
-  const [paperScene, setPaperScene] = useState(false);
-  const [finished, setFinished] = useState(false);
+  const [finished, setFinished] =
+    useState(false);
+
+  /*
+    Ngăn timeline bị bắt đầu nhiều lần
+    nếu onLoad chạy lại.
+  */
+  const timelineStartedRef =
+    useRef(false);
+
+  const transitionTimerRef =
+    useRef<ReturnType<typeof setTimeout> | null>(
+      null,
+    );
+
+  const finishTimerRef =
+    useRef<ReturnType<typeof setTimeout> | null>(
+      null,
+    );
+
+  const blobUrlRef =
+    useRef<string | null>(null);
 
   /* =========================================
      INITIAL
@@ -58,48 +91,87 @@ export default function EnvelopeCover({
     window.scrollTo(0, 0);
 
     document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
+
+    document.documentElement.style.overflow =
+      'hidden';
 
     return () => {
       unlockPageScroll();
 
-      if (paperTimerRef.current) {
-        clearTimeout(paperTimerRef.current);
+      if (transitionTimerRef.current) {
+        clearTimeout(
+          transitionTimerRef.current,
+        );
       }
 
-      if (videoFallbackTimerRef.current) {
-        clearTimeout(videoFallbackTimerRef.current);
+      if (finishTimerRef.current) {
+        clearTimeout(
+          finishTimerRef.current,
+        );
       }
     };
   }, [router]);
 
   /* =========================================
-     FORCE VIDEO INLINE
+     PRELOAD ANIMATED WEBP
+
+     Download trước nhưng chưa render,
+     tránh click xong mới tải 2-3 MB.
   ========================================= */
 
   useEffect(() => {
-    const video = videoRef.current;
+    let cancelled = false;
 
-    if (!video) return;
+    const preloadAnimation = async () => {
+      try {
+        const response = await fetch(
+          '/videos/envelope-open.webp',
+          {
+            cache: 'force-cache',
+          },
+        );
 
-    video.muted = true;
-    video.defaultMuted = true;
-    video.playsInline = true;
+        if (!response.ok) {
+          return;
+        }
 
-    /*
-      Safari / WebView
-    */
-    video.setAttribute('playsinline', '');
-    video.setAttribute('webkit-playsinline', '');
+        const blob = await response.blob();
 
-    /*
-      Tencent/X5 compatibility trên Android.
-    */
-    video.setAttribute('x5-playsinline', 'true');
+        if (cancelled) {
+          return;
+        }
+
+        const blobUrl =
+          URL.createObjectURL(blob);
+
+        blobUrlRef.current = blobUrl;
+
+        setAnimationSrc(blobUrl);
+      } catch {
+        /*
+          Nếu preload lỗi vẫn dùng URL public
+          ban đầu, website không bị hỏng.
+        */
+      }
+    };
+
+    void preloadAnimation();
+
+    return () => {
+      cancelled = true;
+
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(
+          blobUrlRef.current,
+        );
+
+        blobUrlRef.current = null;
+      }
+    };
   }, []);
 
   /* =========================================
-     FINISH WHOLE INTRO
+     FINISH INTRO
   ========================================= */
 
   const finishIntro = () => {
@@ -118,9 +190,8 @@ export default function EnvelopeCover({
     }
 
     /*
-      Không navigation.
-      Chỉ đổi URL để WeddingPage phía sau
-      không bị remount/reload.
+      Chỉ đổi URL.
+      Không navigation / reload WeddingPage.
     */
     window.history.replaceState(
       null,
@@ -132,34 +203,30 @@ export default function EnvelopeCover({
   };
 
   /* =========================================
-     VIDEO -> PAPER
+     START WEBP TIMELINE
+
+     Bắt đầu từ onLoad của <img>, không bắt đầu
+     ngay từ click. Như vậy nếu Zalo load ảnh
+     chậm một chút, timeline vẫn không lệch.
   ========================================= */
 
-  const startPaperScene = () => {
-    /*
-      onEnded + timeupdate + fallback có thể
-      cùng gọi hàm này.
-    */
-    if (paperStartedRef.current) {
+  const startAnimationTimeline = () => {
+    if (timelineStartedRef.current) {
       return;
     }
 
-    paperStartedRef.current = true;
+    timelineStartedRef.current = true;
 
-    if (videoFallbackTimerRef.current) {
-      clearTimeout(
-        videoFallbackTimerRef.current,
-      );
+    transitionTimerRef.current =
+      setTimeout(() => {
+        setPaperScene(true);
 
-      videoFallbackTimerRef.current = null;
-    }
-
-    setPaperScene(true);
-
-    paperTimerRef.current = setTimeout(
-      finishIntro,
-      PAPER_SCENE_LENGTH_MS,
-    );
+        finishTimerRef.current =
+          setTimeout(
+            finishIntro,
+            PAPER_SCENE_LENGTH_MS,
+          );
+      }, WEBP_TO_PAPER_MS);
   };
 
   /* =========================================
@@ -167,150 +234,18 @@ export default function EnvelopeCover({
   ========================================= */
 
   const handleOpen = () => {
-    if (openingRef.current) return;
-
-    openingRef.current = true;
+    if (opening) {
+      return;
+    }
 
     /*
-      Phải gọi trực tiếp từ thao tác click
-      để audio được phép phát.
+      Phải gọi trực tiếp trong user click
+      để Safari/Zalo cho phép audio.play().
     */
     startMusic();
 
     setOpening(true);
-
-    const reducedMotion =
-      window.matchMedia(
-        '(prefers-reduced-motion: reduce)',
-      ).matches;
-
-    if (reducedMotion) {
-      startPaperScene();
-      return;
-    }
-
-    const video = videoRef.current;
-
-    if (!video) {
-      startPaperScene();
-      return;
-    }
-
-    try {
-      video.currentTime = 0;
-    } catch {
-      // Metadata chưa load.
-    }
-
-    /*
-      Nếu Zalo/WebView không cho phát,
-      bỏ video và tiếp tục scene giấy.
-    */
-    void video.play().catch(() => {
-      startPaperScene();
-    });
-
-    /*
-      Fallback cuối cùng nếu onEnded không chạy.
-    */
-    videoFallbackTimerRef.current =
-      setTimeout(
-        startPaperScene,
-        VIDEO_FALLBACK_MS,
-      );
   };
-
-  /* =========================================
-     WEBVIEW FALLBACK
-  ========================================= */
-
-  const handleVideoTimeUpdate = () => {
-    const video = videoRef.current;
-
-    if (
-      !video ||
-      paperStartedRef.current ||
-      !Number.isFinite(video.duration) ||
-      video.duration <= 0
-    ) {
-      return;
-    }
-
-    /*
-      Một số WebView đôi khi không gọi onEnded.
-      Chuyển scene khi còn khoảng 0.12s.
-    */
-    if (
-      video.currentTime >=
-      video.duration - 0.12
-    ) {
-      startPaperScene();
-    }
-  };
-
-  /*
-    Nếu Zalo đẩy video sang native player,
-    khi quay lại WebView kiểm tra video đã hết chưa.
-  */
-  useEffect(() => {
-    const checkVideoState = () => {
-      if (
-        !openingRef.current ||
-        paperStartedRef.current
-      ) {
-        return;
-      }
-
-      const video = videoRef.current;
-
-      if (!video) return;
-
-      if (video.ended) {
-        startPaperScene();
-        return;
-      }
-
-      if (
-        Number.isFinite(video.duration) &&
-        video.duration > 0 &&
-        video.currentTime >=
-          video.duration - 0.2
-      ) {
-        startPaperScene();
-      }
-    };
-
-    const handleVisibilityChange = () => {
-      if (
-        document.visibilityState ===
-        'visible'
-      ) {
-        checkVideoState();
-      }
-    };
-
-    document.addEventListener(
-      'visibilitychange',
-      handleVisibilityChange,
-    );
-
-    window.addEventListener(
-      'pageshow',
-      checkVideoState,
-    );
-
-    return () => {
-      document.removeEventListener(
-        'visibilitychange',
-        handleVisibilityChange,
-      );
-
-      window.removeEventListener(
-        'pageshow',
-        checkVideoState,
-      );
-    };
-  }, []);
 
   /* =========================================
      REMOVE COVER
@@ -336,55 +271,69 @@ export default function EnvelopeCover({
       aria-label="Mở thiệp cưới Văn Hải và Kim Hường"
     >
       {/* =====================================
-          VIDEO
+          ENVELOPE ANIMATION
       ===================================== */}
 
       <div className="intro-film">
         <div className="intro-film-frame">
-          <video
-            ref={videoRef}
-            src="/videos/envelope-open.mp4"
-            poster="/images/envelope-poster.jpg"
-            playsInline
-            muted
-            preload="metadata"
-            controls={false}
-            disablePictureInPicture
-            onEnded={startPaperScene}
-            onTimeUpdate={
-              handleVideoTimeUpdate
-            }
-            aria-hidden="true"
-          />
+          {!opening ? (
+            <>
+              {/* Poster đứng yên trước khi click */}
 
-          {!opening && (
-            <button
-              type="button"
-              className="intro-wax-button"
-              onClick={handleOpen}
-              aria-label="Chạm con dấu để mở thiệp và phát nhạc"
-            >
               <img
-                src="/images/wax-seal.png"
+                src="/images/envelope-poster.jpg"
                 alt=""
-                width={92}
-                height={92}
+                className="intro-envelope-poster"
                 draggable={false}
+                aria-hidden="true"
               />
-            </button>
+
+              {/* Seal */}
+
+              <button
+                type="button"
+                className="intro-wax-button"
+                onClick={handleOpen}
+                aria-label="Chạm con dấu để mở thiệp và phát nhạc"
+              >
+                <img
+                  src="/images/wax-seal.png"
+                  alt=""
+                  width={92}
+                  height={92}
+                  draggable={false}
+                />
+              </button>
+            </>
+          ) : (
+            /*
+              Animated WebP chỉ được mount
+              sau khi click -> animation bắt đầu.
+            */
+            <img
+              src={animationSrc}
+              alt=""
+              className="intro-envelope-animation"
+              draggable={false}
+              aria-hidden="true"
+              onLoad={
+                startAnimationTimeline
+              }
+            />
           )}
         </div>
       </div>
 
       {/* =====================================
-          PAPER
+          PAPER SCENE
+          GIỮ NGUYÊN DESIGN CŨ
       ===================================== */}
 
       <div
         className="intro-paper"
         aria-hidden={!paperScene}
       >
-        {/* BUTTERFLY - GIỮ NGUYÊN BẢN CŨ */}
+        {/* BUTTERFLY */}
 
         <div
           className="intro-butterfly"
@@ -433,7 +382,7 @@ export default function EnvelopeCover({
           </p>
         </div>
 
-        {/* NAMES */}
+        {/* COUPLE */}
 
         <div className="intro-copy intro-copy-names">
           <p>
