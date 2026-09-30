@@ -77,7 +77,6 @@ export const metadata: Metadata = {
         url: 'https://thiep-cuoi-one-iota.vercel.app/images/preview.png',
         width: 1200,
         height: 630,
-        type: 'image/png',
         alt: 'Thiệp cưới Văn Hải và Kim Hường',
       },
     ],

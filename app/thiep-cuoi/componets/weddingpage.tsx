@@ -408,12 +408,12 @@ export default function WeddingPage({
       object-cover
       object-[40%_65%]
 
-      scale-[5]
-      min-[390px]:scale-[1.6]
-      sm:scale-[1.45]
-      md:scale-[1.25]
-      lg:scale-[2]
-      xl:scale-100
+      scale-[4.8]
+      min-[390px]:scale-[3.8]
+      sm:scale-[3]
+      md:scale-[2]
+      lg:scale-[2.5]
+      xl:scale-[1]
     "
   />
 </div>
