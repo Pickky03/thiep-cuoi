@@ -22,7 +22,7 @@ export const wedding = {
     venue: 'Ngộ Quán',
   
     // Nhập địa chỉ đầy đủ để Google Maps dẫn đường chính xác.
-    address: '179 - 181 Đ. 30/4, Hòa Cường, Đà Nẵng 550000, Việt Nam',
+    address: '179 - 181 Đ. 30/4, Hòa Cường, Đà Nẵng',
      /**
    * ISO datetime dùng cho bộ đếm ngược.
    * +07:00 = múi giờ Việt Nam.
@@ -60,7 +60,7 @@ export const wedding = {
       alt: 'Cặp đôi trong khung cảnh lãng mạn',
     },
     {
-      src: '/images/DUY0811.JPG',
+      src: '/images/DUY0811.jpg',
       alt: 'Cặp đôi cười bên bó hoa',
     },
     {
@@ -72,7 +72,7 @@ export const wedding = {
       alt: 'Cặp đôi cười bên bó hoa',
     },
     {
-      src: '/images/DUY09399.JPG',
+      src: '/images/DUY08602.JPG',
       alt: 'Cặp đôi cười bên bó hoa',
     },
 

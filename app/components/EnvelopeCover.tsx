@@ -128,17 +128,25 @@ export default function EnvelopeCover({
 </div>
 
 <div className="intro-copy intro-copy-invite">
-  <p className="intro-invite-line">
-    TRÂN TRỌNG KÍNH MỜI
-  </p>
+  <span className="intro-invite-flourish" aria-hidden="true" />
 
-  <h5 className="intro-guest-name">
-    {guestName}
-  </h5>
+  <p className="intro-invite-line">Thân mời</p>
 
-  <p className="intro-invite-line">
-    ĐẾN CHUNG VUI
-  </p>
+  <div className="intro-invite-rule" aria-hidden="true">
+    <span />
+    <i />
+    <span />
+  </div>
+
+  <h5 className="intro-guest-name">{guestName}</h5>
+
+  <div className="intro-invite-rule intro-invite-rule-soft" aria-hidden="true">
+    <span />
+    <i />
+    <span />
+  </div>
+
+  <p className="intro-invite-sub">đến tham dự bữa tiệc</p>
 </div>
 
         <div className="intro-copy intro-copy-names">

@@ -48,6 +48,69 @@ a:focus-visible {
   outline-offset: 4px;
 }
 
+.wedding-skip {
+  position: fixed;
+  left: 16px;
+  top: 12px;
+  z-index: 80;
+
+  padding: 10px 14px;
+
+  background: #fff6ed;
+  color: #54272e;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  transform: translateY(-160%);
+}
+
+.wedding-skip:focus {
+  transform: translateY(0);
+}
+
+.wedding-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.75s ease,
+    transform 0.75s ease;
+}
+
+.wedding-reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.hero-explore-icon {
+  display: inline-flex;
+  animation: hero-nudge 1.8s ease-in-out infinite;
+}
+
+@keyframes hero-nudge {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wedding-reveal,
+  .wedding-reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .hero-explore-icon {
+    animation: none;
+  }
+}
+
 /* =========================
    ANT DESIGN - MAP BUTTON
    ========================= */
@@ -657,35 +720,99 @@ a:focus-visible {
   transform: translate(-50%, 12px);
 }
 .intro-copy-invite {
-  top: 53%;
-  gap: 8px;
-}
-/* Trân trọng kính mời */
+  top: 45.5%;
+  gap: 0;
+  padding: 0 4px;
 
-.intro-copy-invite span {
-  font-size: clamp(12px, 2vw, 17px);
-
-  font-weight: 400;
-
-  letter-spacing: 0.25em;
+  width: min(
+    460px,
+    calc(56.25svh - 24px),
+    calc(100vw - 28px)
+  );
 }
 
-.intro-copy-invite strong {
-  font-family: var(--font-playfair), Georgia, serif;
-
-  font-size: clamp(28px, 4.3svh, 36px);
-  font-weight: 400;
-
-  letter-spacing: 0.06em;
+@media (max-width: 640px) {
+  .intro-copy-invite {
+    top: 44.5%;
+  }
 }
-/* đến chung vui*/
+
+.intro-invite-flourish {
+  display: block;
+  width: 52px;
+  height: 34px;
+  margin: 0 auto 10px;
+
+  background:
+    radial-gradient(circle at 50% 70%, #8fa3bc 1.4px, transparent 1.6px),
+    radial-gradient(circle at 28% 48%, #8fa3bc 1.1px, transparent 1.3px),
+    radial-gradient(circle at 72% 48%, #8fa3bc 1.1px, transparent 1.3px),
+    radial-gradient(ellipse 55% 35% at 50% 38%, transparent 42%, rgba(143, 163, 188, 0.55) 43%, transparent 48%),
+    radial-gradient(ellipse 38% 55% at 32% 52%, transparent 40%, rgba(143, 163, 188, 0.45) 41%, transparent 48%),
+    radial-gradient(ellipse 38% 55% at 68% 52%, transparent 40%, rgba(143, 163, 188, 0.45) 41%, transparent 48%);
+  opacity: 0.85;
+}
+
+.intro-invite-rule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: min(280px, 78%);
+  margin: 14px auto;
+}
+
+.intro-invite-rule span {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(111, 132, 162, 0.55),
+    rgba(111, 132, 162, 0.55)
+  );
+}
+
+.intro-invite-rule span:last-of-type {
+  background: linear-gradient(
+    90deg,
+    rgba(111, 132, 162, 0.55),
+    rgba(111, 132, 162, 0.55),
+    transparent
+  );
+}
+
+.intro-invite-rule i {
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  border: 1px solid rgba(111, 132, 162, 0.7);
+  transform: rotate(45deg);
+  background: rgba(248, 244, 236, 0.9);
+  font-style: normal;
+}
+
+.intro-invite-rule-soft {
+  margin: 16px auto 12px;
+  opacity: 0.72;
+  width: min(200px, 58%);
+}
+
+.intro-invite-rule-soft i {
+  width: 5px;
+  height: 5px;
+}
+
 .intro-invite-sub {
-  font-size: clamp(10px, 1.45svh, 12px);
-  font-weight: 500;
-  letter-spacing: 0.28em;
+  margin: 0;
+
+  font-size: clamp(13px, 1.9svh, 16px);
+  font-weight: 400;
+  letter-spacing: 0.2em;
   line-height: 1.7;
   text-align: center;
-  color: #6f84a2;
+  text-transform: lowercase;
+  color: #7a8fab;
 }
 /* Tên cô dâu chú rể */
 
@@ -914,11 +1041,12 @@ a:focus-visible {
 .intro-invite-line {
   margin: 0;
 
-  font-size: clamp(10px, 1.45svh, 12px);
+  font-size: clamp(15px, 2.2svh, 18px);
   font-weight: 500;
-  letter-spacing: 0.28em;
-  line-height: 1.7;
+  letter-spacing: 0.38em;
+  line-height: 1.5;
   text-align: center;
+  text-transform: uppercase;
   color: #6f84a2;
 }
 
@@ -927,17 +1055,18 @@ a:focus-visible {
 
   max-width: 100%;
 
-  margin: 2px 0;
+  margin: 0;
+  padding: 4px 4px;
 
-  font-family: var(--font-playfair), Georgia, serif;
-  font-size: clamp(16px, 2.2svh, 22px);
+  font-family: var(--font-luxury-script), var(--font-playfair), Georgia, cursive;
+  font-size: clamp(40px, 6.4svh, 58px);
   font-weight: 400;
-  line-height: 1.35;
+  line-height: 1.2;
 
-  letter-spacing: 0;
+  letter-spacing: 0.02em;
   text-align: center;
 
-  color: #6f84a2;
+  color: #5a6f8c;
 
   overflow-wrap: anywhere;
 }
