@@ -40,62 +40,125 @@ export default function EnvelopeCover({
     };
   }, [router]);
 
+  // const handleOpen = () => {
+  //   if (opening) return;
+
+  //   // Must remain in this actual user-initiated click handler.
+  //   startMusic();
+  //   setOpening(true);
+  //   setPaperScene(true);
+  //   // const reducedMotion = window.matchMedia(
+  //   //   '(prefers-reduced-motion: reduce)',
+  //   // ).matches;
+
+  //   // if (!reducedMotion) {
+  //   //   const video = videoRef.current;
+  //   //   if (video) {
+  //   //     try { video.currentTime = 0; } catch { /* metadata not loaded yet */ }
+  //   //     void video.play().catch(() => {
+  //   //       // CSS fallback still reveals the butterfly and invitation.
+  //   //     });
+  //   //   }
+  //   // }
+
+  //   // timerRef.current = setTimeout(
+  //   //   () => {
+  //   //     // Mở lại khả năng cuộn trang.
+  //   //     unlockPageScroll();
+    
+  //   //     // Chỉ cập nhật đường dẫn, không điều hướng sang
+  //   //     // một bản WeddingPage khác.
+  //   //     const url = new URL('/thiep-cuoi', window.location.origin);
+    
+  //   //     if (guestName !== 'Quý khách') {
+  //   //       url.searchParams.set('guest', guestName);
+  //   //     }
+    
+  //   //     window.history.replaceState(
+  //   //       null,
+  //   //       '',
+  //   //       `${url.pathname}${url.search}`
+  //   //     );
+    
+  //   //     // Xóa lớp mở đầu, để lộ WeddingPage đã render phía sau.
+  //   //     setFinished(true);
+  //   //   },
+  //   //   reducedMotion ? 100 : INTRO_LENGTH_MS,
+  //   // );
+  // };
   const handleOpen = () => {
     if (opening) return;
-
-    // Must remain in this actual user-initiated click handler.
+  
     startMusic();
+  
     setOpening(true);
     setPaperScene(true);
-    // const reducedMotion = window.matchMedia(
-    //   '(prefers-reduced-motion: reduce)',
-    // ).matches;
-
-    // if (!reducedMotion) {
-    //   const video = videoRef.current;
-    //   if (video) {
-    //     try { video.currentTime = 0; } catch { /* metadata not loaded yet */ }
-    //     void video.play().catch(() => {
-    //       // CSS fallback still reveals the butterfly and invitation.
-    //     });
-    //   }
-    // }
-
-    // timerRef.current = setTimeout(
-    //   () => {
-    //     // Mở lại khả năng cuộn trang.
-    //     unlockPageScroll();
-    
-    //     // Chỉ cập nhật đường dẫn, không điều hướng sang
-    //     // một bản WeddingPage khác.
-    //     const url = new URL('/thiep-cuoi', window.location.origin);
-    
-    //     if (guestName !== 'Quý khách') {
-    //       url.searchParams.set('guest', guestName);
-    //     }
-    
-    //     window.history.replaceState(
-    //       null,
-    //       '',
-    //       `${url.pathname}${url.search}`
-    //     );
-    
-    //     // Xóa lớp mở đầu, để lộ WeddingPage đã render phía sau.
-    //     setFinished(true);
-    //   },
-    //   reducedMotion ? 100 : INTRO_LENGTH_MS,
-    // );
+  
+    timerRef.current = setTimeout(() => {
+      unlockPageScroll();
+  
+      const url = new URL(
+        '/thiep-cuoi',
+        window.location.origin,
+      );
+  
+      if (guestName !== 'Quý khách') {
+        url.searchParams.set('guest', guestName);
+      }
+  
+      window.history.replaceState(
+        null,
+        '',
+        `${url.pathname}${url.search}`,
+      );
+  
+      setFinished(true);
+    }, 9950);
   };
   if (finished) return null;
   return (
     <div
-      className={`intro-cover ${opening ? 'intro-opening' : ''}`}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Mở thiệp cưới Văn Hải và Kim Hường"
+      // className={`intro-cover ${opening ? 'intro-opening' : ''}`}
+      // role="dialog"
+      // aria-modal="true"
+      // aria-label="Mở thiệp cưới Văn Hải và Kim Hường"
+      className={[
+        'intro-cover',
+        opening ? 'intro-opening' : '',
+        paperScene ? 'intro-paper-scene' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
     >
       {/* Original envelope-opening footage: 0–3.7 seconds only. */}
-      <div className="intro-film">
+      {/* TEST: bỏ video, chỉ dùng poster + con dấu */}
+<div className="intro-film">
+  <div className="intro-film-frame">
+    <img
+      src="/images/envelope-poster.jpg"
+      alt=""
+      className="h-full w-full object-cover"
+      aria-hidden="true"
+    />
+
+    {!opening && (
+      <button
+        type="button"
+        className="intro-wax-button"
+        onClick={handleOpen}
+        aria-label="Chạm con dấu để mở thiệp và phát nhạc"
+      >
+        <img
+          src="/images/wax-seal.png"
+          alt=""
+          width={92}
+          height={92}
+        />
+      </button>
+    )}
+  </div>
+</div>
+      {/* <div className="intro-film">
         <div className="intro-film-frame">
           <video
             ref={videoRef}
@@ -118,7 +181,7 @@ export default function EnvelopeCover({
             </button>
           )}
         </div>
-      </div>
+      </div> */}
 
       {/* Personalized scene: butterfly and Vietnamese wedding copy. */}
       <div className="intro-paper" aria-hidden={!opening}>
