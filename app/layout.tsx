@@ -61,10 +61,9 @@ export const metadata: Metadata = {
 
   openGraph: {
     type: 'website',
-
     locale: 'vi_VN',
 
-    url: '/',
+    url: 'https://thiep-cuoi-one-iota.vercel.app',
 
     siteName: 'Văn Hải & Kim Hường',
 
@@ -75,9 +74,10 @@ export const metadata: Metadata = {
 
     images: [
       {
-        url: '/images/preview.png',
+        url: 'https://thiep-cuoi-one-iota.vercel.app/images/preview.png',
         width: 1200,
         height: 630,
+        type: 'image/png',
         alt: 'Thiệp cưới Văn Hải và Kim Hường',
       },
     ],
@@ -91,7 +91,9 @@ export const metadata: Metadata = {
     description:
       'Trân trọng kính mời bạn đến chung vui cùng Văn Hải & Kim Hường.',
 
-    images: ['/images/preview.png'],
+    images: [
+      'https://thiep-cuoi-one-iota.vercel.app/images/preview.png',
+    ],
   },
 
   robots: {
