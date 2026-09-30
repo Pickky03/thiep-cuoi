@@ -900,46 +900,68 @@ a:focus-visible {
 
 /* Cảnh phong bì biến mất */
 
-.intro-opening .intro-film {
+/* =========================================
+   VIDEO -> PAPER
+   Video kết thúc thật mới chạy các animation này
+========================================= */
+
+.intro-paper-scene .intro-film {
   animation:
     intro-film-out
-    0.8s ease
-    3.15s forwards;
+    0.65s
+    ease
+    forwards;
 }
 
-/* Nền giấy và bướm hiện ra */
-
-.intro-opening .intro-paper {
+.intro-paper-scene .intro-paper {
   animation:
     intro-paper-in
-    0.8s ease
-    3.15s forwards;
+    0.65s
+    ease
+    forwards;
 }
 
-/* Lời mời */
 
-.intro-opening .intro-copy-invite {
+/* =========================================
+   INVITATION
+========================================= */
+
+.intro-paper-scene .intro-copy-invite {
   animation:
     intro-invite-copy
-    4.65s ease
-    4.25s both;
+    4.65s
+    ease
+    0.75s
+    both;
 }
 
-/* Tên cô dâu chú rể */
 
-.intro-opening .intro-copy-names {
-  animation: intro-names-copy 3.3s ease 9.2s both;
+/* =========================================
+   COUPLE NAMES
+========================================= */
+
+.intro-paper-scene .intro-copy-names {
+  animation:
+    intro-names-copy
+    3.3s
+    ease
+    5.7s
+    both;
 }
 
-/* Mờ dần toàn bộ cảnh mở đầu */
 
-.intro-cover.intro-opening {
+/* =========================================
+   END INTRO
+========================================= */
+
+.intro-cover.intro-paper-scene {
   animation:
     intro-cover-out
-    0.95s ease-in-out
-    12.7s forwards;
+    0.95s
+    ease-in-out
+    9s
+    forwards;
 }
-
 /* =========================================
    TRANSITION KEYFRAMES
 ========================================= */
