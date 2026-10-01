@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-
 :root {
 
   --wine: #782f38;
@@ -13,7 +12,6 @@
 
 }
 
-
 *,
 
 *::before,
@@ -24,13 +22,11 @@
 
 }
 
-
 html {
 
   scroll-behavior: smooth;
 
 }
-
 
 body {
 
@@ -38,21 +34,17 @@ body {
 
   min-width: 320px;
 
-
   background: var(--paper);
 
   color: var(--ink);
 
-
   font-family: var(--font-be-vietnam), Arial, sans-serif;
-
 
   -webkit-font-smoothing: antialiased;
 
   -moz-osx-font-smoothing: grayscale;
 
 }
-
 
 button,
 
@@ -66,7 +58,6 @@ select {
 
 }
 
-
 button,
 
 a {
@@ -74,7 +65,6 @@ a {
   -webkit-tap-highlight-color: transparent;
 
 }
-
 
 button:focus-visible,
 
@@ -86,7 +76,6 @@ a:focus-visible {
 
 }
 
-
 .wedding-skip {
 
   position: fixed;
@@ -97,31 +86,25 @@ a:focus-visible {
 
   z-index: 80;
 
-
   padding: 10px 14px;
-
 
   background: #fff6ed;
 
   color: #54272e;
 
-
   font-size: 13px;
 
   font-weight: 600;
 
-
   transform: translateY(-160%);
 
 }
-
 
 .wedding-skip:focus {
 
   transform: translateY(0);
 
 }
-
 
 .wedding-reveal {
 
@@ -137,7 +120,6 @@ a:focus-visible {
 
 }
 
-
 .wedding-reveal.is-visible {
 
   opacity: 1;
@@ -146,7 +128,6 @@ a:focus-visible {
 
 }
 
-
 .hero-explore-icon {
 
   display: inline-flex;
@@ -154,7 +135,6 @@ a:focus-visible {
   animation: hero-nudge 1.8s ease-in-out infinite;
 
 }
-
 
 @keyframes hero-nudge {
 
@@ -166,7 +146,6 @@ a:focus-visible {
 
   }
 
-
   50% {
 
     transform: translateY(4px);
@@ -174,7 +153,6 @@ a:focus-visible {
   }
 
 }
-
 
 @media (prefers-reduced-motion: reduce) {
 
@@ -190,7 +168,6 @@ a:focus-visible {
 
   }
 
-
   .hero-explore-icon {
 
     animation: none;
@@ -199,36 +176,29 @@ a:focus-visible {
 
 }
 
-
 /*
  * =========================
  * ANT DESIGN - MAP BUTTON
  * =========================
  */
 
-
 .map-button.ant-btn {
 
   height: auto;
-
 
   margin-top: 15px;
 
   padding: 13px 22px;
 
-
   border-color: var(--wine);
-
 
   background: var(--wine);
 
   color: #fff;
 
-
   font-weight: 600;
 
 }
-
 
 .map-button.ant-btn:hover,
 
@@ -236,13 +206,11 @@ a:focus-visible {
 
   border-color: var(--deep) !important;
 
-
   background: var(--deep) !important;
 
   color: #fff !important;
 
 }
-
 
 /*
  * =========================
@@ -250,19 +218,15 @@ a:focus-visible {
  * =========================
  */
 
-
 .photo-modal .ant-modal-content {
 
   padding: 38px 16px 15px;
 
-
   background: #f9f5ed;
-
 
   border-radius: 18px;
 
 }
-
 
 .photo-modal .ant-modal-close {
 
@@ -270,33 +234,27 @@ a:focus-visible {
 
 }
 
-
 .photo-modal .ant-modal-close:hover {
 
   background: rgb(120 47 56 / 8%);
 
 }
 
-
 .photo-modal .ant-btn {
 
   border-color: #c8b3a3;
-
 
   color: var(--deep);
 
 }
 
-
 .photo-modal .ant-btn:hover {
 
   border-color: var(--wine) !important;
 
-
   color: var(--wine) !important;
 
 }
-
 
 /*
  * =========================================
@@ -304,27 +262,21 @@ a:focus-visible {
  * =========================================
  */
 
-
 .sakura-petal {
 
   position: absolute;
 
   top: -30px;
 
-
   display: block;
 
   pointer-events: none;
 
-
   opacity: 0;
-
 
   transform-origin: center;
 
-
   will-change: transform, opacity;
-
 
   animation-name: sakura-fall;
 
@@ -340,22 +292,17 @@ a:focus-visible {
 
 }
 
-
 /* Hình dạng cánh hoa */
-
 
 .sakura-petal-shape {
 
   display: block;
 
-
   width: 100%;
 
   height: 100%;
 
-
   border-radius: 80% 0 80% 80%;
-
 
   background: linear-gradient(
 
@@ -369,21 +316,17 @@ a:focus-visible {
 
   );
 
-
   border: 1px solid rgba(244, 143, 177, 0.35);
-
 
   transform: rotate(-45deg);
 
 }
-
 
 /*
  * =========================================
  * FALLING ANIMATION
  * =========================================
  */
-
 
 @keyframes sakura-fall {
 
@@ -395,18 +338,15 @@ a:focus-visible {
 
       rotate(0deg);
 
-
     opacity: 0;
 
   }
-
 
   10% {
 
     opacity: var(--petal-opacity, 0.8);
 
   }
-
 
   25% {
 
@@ -426,7 +366,6 @@ a:focus-visible {
 
   }
 
-
   50% {
 
     transform:
@@ -444,7 +383,6 @@ a:focus-visible {
       rotate(180deg);
 
   }
-
 
   75% {
 
@@ -464,13 +402,11 @@ a:focus-visible {
 
   }
 
-
   90% {
 
     opacity: var(--petal-opacity, 0.8);
 
   }
-
 
   100% {
 
@@ -488,20 +424,17 @@ a:focus-visible {
 
       rotate(var(--rotation, 540deg));
 
-
     opacity: 0;
 
   }
 
 }
 
-
 /*
  * =========================================
  * MOBILE
  * =========================================
  */
-
 
 @media (max-width: 640px) {
 
@@ -513,13 +446,11 @@ a:focus-visible {
 
 }
 
-
 /*
  * =========================================
  * REDUCED MOTION
  * =========================================
  */
-
 
 @media (prefers-reduced-motion: reduce) {
 
@@ -533,16 +464,13 @@ a:focus-visible {
 
 }
 
-
 /*
  * =========================================
  * WEDDING INTRO - 14.2 SECONDS
  * =========================================
  */
 
-
 /* Toàn bộ màn hình mở đầu */
-
 
 .intro-cover {
 
@@ -550,29 +478,23 @@ a:focus-visible {
 
   inset: 0;
 
-
   z-index: 100;
 
-
   overflow: hidden;
-
 
   background: #f9f6ef;
 
   color: #687c96;
 
-
   isolation: isolate;
 
 }
 
-
 /*
  * =========================================
- * SCENE 1 - ENVELOPE ANIMATED WEBP
+ * SCENE 1 - MP4 / ZALO ANIMATED WEBP
  * =========================================
  */
-
 
 .intro-film {
 
@@ -580,35 +502,29 @@ a:focus-visible {
 
   inset: 0;
 
-
   z-index: 1;
-
 
   display: grid;
 
   place-items: center;
 
-
   background: #91a4bd;
 
 }
-
 
 .intro-film-frame {
 
   position: relative;
 
-
   height: 100svh;
 
   width: min(100vw, 56.25svh);
-
 
   overflow: hidden;
 
 }
 
-
+.intro-film-frame video,
 .intro-envelope-poster,
 .intro-envelope-animation {
   display: block;
@@ -627,10 +543,14 @@ a:focus-visible {
     center / cover no-repeat;
 }
 
-.intro-envelope-animation {
+.intro-envelope-animation,
+.intro-envelope-poster {
   pointer-events: none;
 }
 
+.intro-wax-button:disabled {
+  cursor: default;
+}
 
 /*
  * =========================================
@@ -638,46 +558,35 @@ a:focus-visible {
  * =========================================
  */
 
-
 .intro-wax-button {
 
   position: absolute;
 
-
   z-index: 4;
-
 
   top: 48%;
 
   left: 50%;
 
-
   width: clamp(64px, 11vw, 92px);
-
 
   aspect-ratio: 1;
 
-
   padding: 0;
-
 
   border: 0;
 
   background: transparent;
 
-
   cursor: pointer;
 
-
   transform: translate(-50%, -50%);
-
 
   filter: drop-shadow(
 
     0 5px 7px rgba(23, 35, 48, 0.27)
 
   );
-
 
   animation:
 
@@ -687,21 +596,17 @@ a:focus-visible {
 
 }
 
-
 .intro-wax-button img {
 
   display: block;
-
 
   width: 100%;
 
   height: 100%;
 
-
   object-fit: contain;
 
 }
-
 
 .intro-wax-button:focus-visible {
 
@@ -709,11 +614,9 @@ a:focus-visible {
 
   outline-offset: 5px;
 
-
   border-radius: 50%;
 
 }
-
 
 @keyframes intro-seal-breathe {
 
@@ -729,7 +632,6 @@ a:focus-visible {
 
   }
 
-
   50% {
 
     transform:
@@ -742,48 +644,37 @@ a:focus-visible {
 
 }
 
-
 /* Hướng dẫn chạm con dấu */
-
 
 .intro-tap-hint {
 
   position: absolute;
 
-
   z-index: 5;
-
 
   bottom: max(4.5svh, 18px);
 
   left: 50%;
 
-
   width: max-content;
 
   max-width: 90vw;
 
-
   transform: translateX(-50%);
-
 
   color: #fff;
 
-
   text-align: center;
-
 
   font-size: 12px;
 
   letter-spacing: 0.08em;
-
 
   text-shadow:
 
     0 1px 10px rgba(20, 35, 54, 0.8);
 
 }
-
 
 /*
  * =========================================
@@ -792,24 +683,19 @@ a:focus-visible {
  * =========================================
  */
 
-
 .intro-paper {
 
   position: absolute;
 
   inset: 0;
 
-
   z-index: 2;
 
-
   overflow: hidden;
-
 
   opacity: 0;
 
   pointer-events: none;
-
 
   /* Hai bên nền xanh */
 
@@ -817,30 +703,23 @@ a:focus-visible {
 
 }
 
-
 /* Tờ giấy dọc ở giữa */
-
 
 .intro-paper::before {
 
   content: "";
 
-
   position: absolute;
-
 
   top: 0;
 
   left: 50%;
 
-
   width: min(100vw, 56.25svh);
 
   height: 100svh;
 
-
   transform: translateX(-50%);
-
 
   background:
 
@@ -876,7 +755,6 @@ a:focus-visible {
 
     );
 
-
   box-shadow:
 
     0 0 0 1px rgba(201, 191, 181, 0.22),
@@ -885,35 +763,27 @@ a:focus-visible {
 
 }
 
-
 /* Vân giấy nhẹ nằm trên tờ giấy giữa */
-
 
 .intro-paper::after {
 
   content: "";
 
-
   position: absolute;
-
 
   top: 0;
 
   left: 50%;
 
-
   width: min(100vw, 56.25svh);
 
   height: 100svh;
 
-
   transform: translateX(-50%);
-
 
   opacity: 0.18;
 
   pointer-events: none;
-
 
   background-image:
 
@@ -925,11 +795,9 @@ a:focus-visible {
 
     );
 
-
   background-size: 6px 6px;
 
 }
-
 
 /*
  * =========================================
@@ -937,32 +805,25 @@ a:focus-visible {
  * =========================================
  */
 
-
 .intro-butterfly {
 
   position: absolute;
 
-
   z-index: 3;
-
 
   top: 16%;
 
   left: 50%;
 
-
   width: min(28vw, 170px);
 
   aspect-ratio: 488 / 319;
-
 
   transform: translateX(-50%);
 
   transform-origin: 50% 55%;
 
-
   transform-style: preserve-3d;
-
 
   filter: drop-shadow(
 
@@ -970,26 +831,21 @@ a:focus-visible {
 
   );
 
-
   animation:
 
     butterfly-float 4.8s ease-in-out infinite;
 
 }
 
-
 .intro-wing {
 
   position: absolute;
 
-
   top: 0;
-
 
   width: 50%;
 
   height: 100%;
-
 
   background-image: url("/images/butterfly.png");
 
@@ -997,26 +853,21 @@ a:focus-visible {
 
   background-size: 200% 100%;
 
-
   backface-visibility: visible;
 
   will-change: transform;
 
 }
 
-
 /* Cánh trái */
-
 
 .intro-wing-left {
 
   left: 0;
 
-
   background-position: left center;
 
   transform-origin: right center;
-
 
   animation:
 
@@ -1028,19 +879,15 @@ a:focus-visible {
 
 }
 
-
 /* Cánh phải */
-
 
 .intro-wing-right {
 
   right: 0;
 
-
   background-position: right center;
 
   transform-origin: left center;
-
 
   animation:
 
@@ -1052,9 +899,7 @@ a:focus-visible {
 
 }
 
-
 /* Bướm bay nhẹ */
-
 
 @keyframes butterfly-float {
 
@@ -1070,7 +915,6 @@ a:focus-visible {
 
   }
 
-
   25% {
 
     transform:
@@ -1081,7 +925,6 @@ a:focus-visible {
 
   }
 
-
   50% {
 
     transform:
@@ -1091,7 +934,6 @@ a:focus-visible {
       rotate(1deg);
 
   }
-
 
   75% {
 
@@ -1105,9 +947,7 @@ a:focus-visible {
 
 }
 
-
 /* Nhịp cánh chậm hơn, mềm hơn */
-
 
 @keyframes butterfly-left {
 
@@ -1125,7 +965,6 @@ a:focus-visible {
 
   }
 
-
   42% {
 
     transform:
@@ -1137,7 +976,6 @@ a:focus-visible {
       rotateZ(2deg);
 
   }
-
 
   70% {
 
@@ -1152,7 +990,6 @@ a:focus-visible {
   }
 
 }
-
 
 @keyframes butterfly-right {
 
@@ -1170,7 +1007,6 @@ a:focus-visible {
 
   }
 
-
   42% {
 
     transform:
@@ -1182,7 +1018,6 @@ a:focus-visible {
       rotateZ(-2deg);
 
   }
-
 
   70% {
 
@@ -1198,13 +1033,11 @@ a:focus-visible {
 
 }
 
-
 /*
  * =========================================
  * INVITATION TEXT
  * =========================================
  */
-
 
 .intro-copy {
 
@@ -1212,11 +1045,9 @@ a:focus-visible {
 
   z-index: 3;
 
-
   top: 52%;
 
   left: 50%;
-
 
   /* Không để chữ vượt khỏi tờ giấy */
 
@@ -1230,18 +1061,15 @@ a:focus-visible {
 
   );
 
-
   display: flex;
 
   align-items: center;
 
   flex-direction: column;
 
-
   gap: 10px;
 
   text-align: center;
-
 
   opacity: 0;
 
@@ -1257,7 +1085,6 @@ a:focus-visible {
 
   padding: 0 4px;
 
-
   width: min(
 
     460px,
@@ -1270,7 +1097,6 @@ a:focus-visible {
 
 }
 
-
 @media (max-width: 640px) {
 
   .intro-copy-invite {
@@ -1281,7 +1107,6 @@ a:focus-visible {
 
 }
 
-
 .intro-invite-flourish {
 
   display: block;
@@ -1291,7 +1116,6 @@ a:focus-visible {
   height: 34px;
 
   margin: 0 auto 10px;
-
 
   background:
 
@@ -1311,7 +1135,6 @@ a:focus-visible {
 
 }
 
-
 .intro-invite-rule {
 
   display: flex;
@@ -1327,7 +1150,6 @@ a:focus-visible {
   margin: 14px auto;
 
 }
-
 
 .intro-invite-rule span {
 
@@ -1349,7 +1171,6 @@ a:focus-visible {
 
 }
 
-
 .intro-invite-rule span:last-of-type {
 
   background: linear-gradient(
@@ -1365,7 +1186,6 @@ a:focus-visible {
   );
 
 }
-
 
 .intro-invite-rule i {
 
@@ -1385,7 +1205,6 @@ a:focus-visible {
 
 }
 
-
 .intro-invite-rule-soft {
 
   margin: 16px auto 12px;
@@ -1396,7 +1215,6 @@ a:focus-visible {
 
 }
 
-
 .intro-invite-rule-soft i {
 
   width: 5px;
@@ -1405,11 +1223,9 @@ a:focus-visible {
 
 }
 
-
 .intro-invite-sub {
 
   margin: 0;
-
 
   font-size: clamp(13px, 1.9svh, 16px);
 
@@ -1429,22 +1245,17 @@ a:focus-visible {
 
 /* Tên cô dâu chú rể */
 
-
 .intro-copy-names p {
 
   margin: 0;
 
-
   font-size: clamp(10px, 1.8vw, 13px);
 
-
   letter-spacing: 0.19em;
-
 
   line-height: 1.8;
 
 }
-
 
 .intro-copy-names {
 
@@ -1452,11 +1263,9 @@ a:focus-visible {
 
 }
 
-
 .intro-copy-names h1 {
 
   margin: 14px 0;
-
 
   display: flex;
 
@@ -1464,9 +1273,7 @@ a:focus-visible {
 
   flex-direction: column;
 
-
   gap: 4px;
-
 
   font-family:
 
@@ -1476,21 +1283,17 @@ a:focus-visible {
 
     serif;
 
-
   /* Giảm cỡ chữ và tính theo chiều cao màn hình */
 
   font-size: clamp(30px, 4.8svh, 46px);
-
 
   font-weight: 400;
 
   line-height: 1.08;
 
-
   white-space: nowrap;
 
 }
-
 
 .intro-copy-names h1 em {
 
@@ -1502,16 +1305,13 @@ a:focus-visible {
 
 }
 
-
 .intro-copy-names p {
 
   margin: 0;
 
-
   font-size: clamp(9px, 1.5svh, 12px);
 
   letter-spacing: 0.12em;
-
 
   line-height: 1.6;
 
@@ -1519,19 +1319,15 @@ a:focus-visible {
 
 }
 
-
 .intro-copy-names h1 em {
 
   font-size: 0.55em;
 
-
   color: #a6b2c1;
-
 
   line-height: 1;
 
 }
-
 
 /*
  * =========================================
@@ -1539,70 +1335,86 @@ a:focus-visible {
  * =========================================
  */
 
-
 /*
  * 0.00 - 3.70s:
- * Animated WebP mở phong bì
- *
+ * MP4 / Animated WebP mở phong bì
  * 3.70 - 4.50s:
  * Chuyển cảnh sang nền giấy và bướm
- *
  * 4.80 - 9.45s:
  * Lời mời xuất hiện
- *
  * 9.75 - 13.05s:
  * Tên Văn Hải & Kim Hường
- *
  * 13.25 - 14.20s:
  * Mờ dần để hiện trang thiệp cưới
  */
 
-
 /* Cảnh phong bì biến mất */
 
-
 .intro-opening .intro-film {
+
   animation:
+
     intro-film-out
+
     0.8s ease
+
     3.7s forwards;
+
 }
 
 .intro-opening .intro-paper {
+
   animation:
+
     intro-paper-in
+
     0.8s ease
+
     3.7s forwards;
+
 }
 
 .intro-opening .intro-copy-invite {
+
   animation:
+
     intro-invite-copy
+
     4.65s ease
+
     4.8s both;
+
 }
 
 .intro-opening .intro-copy-names {
+
   animation:
+
     intro-names-copy
+
     3.3s ease
+
     9.75s both;
+
 }
 
 .intro-cover.intro-opening {
-  animation:
-    intro-cover-out
-    0.95s ease-in-out
-    13.25s forwards;
-}
 
+  animation:
+
+    intro-cover-out
+
+    0.95s ease-in-out
+
+    13.25s forwards;
+
+}
 
 /*
  * =========================================
  * TRANSITION KEYFRAMES
  * =========================================
  */
-
 
 @keyframes intro-film-out {
 
@@ -1616,7 +1428,6 @@ a:focus-visible {
 
 }
 
-
 @keyframes intro-paper-in {
 
   to {
@@ -1627,7 +1438,6 @@ a:focus-visible {
 
 }
 
-
 @keyframes intro-invite-copy {
 
   0%,
@@ -1636,13 +1446,11 @@ a:focus-visible {
 
     opacity: 0;
 
-
     transform:
 
       translate(-50%, 12px);
 
   }
-
 
   19%,
 
@@ -1650,18 +1458,15 @@ a:focus-visible {
 
     opacity: 1;
 
-
     transform:
 
       translate(-50%, 0);
 
   }
 
-
   100% {
 
     opacity: 0;
-
 
     transform:
 
@@ -1670,7 +1475,6 @@ a:focus-visible {
   }
 
 }
-
 
 @keyframes intro-names-copy {
 
@@ -1682,7 +1486,6 @@ a:focus-visible {
 
   }
 
-
   20% {
 
     opacity: 1;
@@ -1691,7 +1494,6 @@ a:focus-visible {
 
   }
 
-
   75% {
 
     opacity: 1;
@@ -1699,7 +1501,6 @@ a:focus-visible {
     transform: translate(-50%, 0);
 
   }
-
 
   100% {
 
@@ -1711,16 +1512,13 @@ a:focus-visible {
 
 }
 
-
 @keyframes intro-cover-out {
 
   to {
 
     opacity: 0;
 
-
     visibility: hidden;
-
 
     pointer-events: none;
 
@@ -1728,13 +1526,11 @@ a:focus-visible {
 
 }
 
-
 /*
  * =========================================
  * REDUCED MOTION
  * =========================================
  */
-
 
 @media (prefers-reduced-motion: reduce) {
 
@@ -1752,7 +1548,6 @@ a:focus-visible {
 
   }
 
-
   .intro-cover.intro-opening {
 
     opacity: 0;
@@ -1765,18 +1560,15 @@ a:focus-visible {
 
 }
 
-
 /*
  * =========================================
  * PERSONALIZED GUEST NAME
  * =========================================
  */
 
-
 .intro-invite-line {
 
   margin: 0;
-
 
   font-size: clamp(15px, 2.2svh, 18px);
 
@@ -1794,19 +1586,15 @@ a:focus-visible {
 
 }
 
-
 .intro-copy-invite .intro-guest-name {
 
   display: block;
 
-
   max-width: 100%;
-
 
   margin: 0;
 
   padding: 4px 4px;
-
 
   font-family: var(--font-luxury-script), var(--font-playfair), Georgia, cursive;
 
@@ -1816,32 +1604,61 @@ a:focus-visible {
 
   line-height: 1.2;
 
-
   letter-spacing: 0.02em;
 
   text-align: center;
 
-
   color: #5a6f8c;
-
 
   overflow-wrap: anywhere;
 
 }
-.intro-film-frame video,
-.intro-envelope-animation {
-  display: block;
 
-  width: 100%;
-  height: 100%;
+/* =========================================
+ * ZALO WEBVIEW - ANIMATED WEBP TIMING
+ * =========================================
+ *
+ * Browser thường / Messenger:
+ *   MP4 và timeline mặc định (3.70s -> paper).
+ *
+ * Zalo:
+ *   /videos/preview-zalo.webp
+ *   WebP khoảng 44 frame / 12 FPS.
+ *   Cho WebP thêm thời gian hiển thị trước khi đổi cảnh,
+ *   vì Zalo WebView có thể decode chậm hơn thời gian thực.
+ */
 
-  object-fit: cover;
-
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-user-drag: none;
+.intro-zalo.intro-opening .intro-film {
+  animation:
+    intro-film-out
+    0.8s ease
+    4.3s forwards;
 }
 
-.intro-envelope-animation {
-  pointer-events: none;
+.intro-zalo.intro-opening .intro-paper {
+  animation:
+    intro-paper-in
+    0.8s ease
+    4.3s forwards;
+}
+
+.intro-zalo.intro-opening .intro-copy-invite {
+  animation:
+    intro-invite-copy
+    4.65s ease
+    5.4s both;
+}
+
+.intro-zalo.intro-opening .intro-copy-names {
+  animation:
+    intro-names-copy
+    3.3s ease
+    10.35s both;
+}
+
+.intro-cover.intro-zalo.intro-opening {
+  animation:
+    intro-cover-out
+    0.95s ease-in-out
+    13.85s forwards;
 }
