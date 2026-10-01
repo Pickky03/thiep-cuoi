@@ -544,7 +544,8 @@ a:focus-visible {
 }
 
 .intro-envelope-animation,
-.intro-envelope-poster {
+.intro-envelope-poster,
+.intro-film-frame video {
   pointer-events: none;
 }
 

@@ -47,6 +47,9 @@ export default function EnvelopeCover({
   const [mediaMode, setMediaMode] =
     useState<MediaMode>('unknown');
 
+  const [useWebp, setUseWebp] =
+    useState(false);
+
   const [opening, setOpening] =
     useState(false);
 
@@ -59,6 +62,19 @@ export default function EnvelopeCover({
   const [finished, setFinished] =
     useState(false);
 
+  const triggerWebpFallback = () => {
+    setUseWebp(true);
+    startTimeline(true);
+
+    if (webpTimerRef.current) {
+      clearTimeout(webpTimerRef.current);
+    }
+
+    webpTimerRef.current = setTimeout(() => {
+      setWebpFinished(true);
+    }, ZALO_WEBP_DURATION_MS);
+  };
+
   useEffect(() => {
     document.body.classList.add('wedding-intro-active');
 
@@ -69,11 +85,7 @@ export default function EnvelopeCover({
     );
 
     /*
-      Preload WebP trên Zalo.
-
-      Mục đích:
-      tải/decode trước khi người dùng bấm con dấu,
-      giúp giảm giật ở frame đầu.
+      Preload WebP trên Zalo để sẵn sàng fallback nếu video gặp hạn chế.
     */
     if (zalo) {
       const preloadWebp = new Image();
@@ -111,6 +123,47 @@ export default function EnvelopeCover({
       }
     };
   }, []);
+
+  /*
+    Thiết lập toàn diện cho thẻ <video> nhằm chống bung Native Player trên Zalo / iOS WKWebView / Android WebView:
+    1. Ép DOM property muted và defaultMuted = true (sửa React muted bug).
+    2. Gán các cờ inline bắt buộc: playsinline, webkit-playsinline, x5-playsinline, x5-video-player-type="h5-page".
+    3. Bắt sự kiện webkitbeginfullscreen để lập tức thoát nếu iOS cố tình kích hoạt AVPlayerViewController.
+  */
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.muted = true;
+    video.defaultMuted = true;
+    video.playsInline = true;
+
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', 'true');
+    video.setAttribute('x5-playsinline', 'true');
+    video.setAttribute('x5-video-player-type', 'h5-page');
+    video.setAttribute('x5-video-player-fullscreen', 'false');
+    video.setAttribute('x5-video-orientation', 'portrait');
+
+    const handleBeginFullscreen = (e: Event) => {
+      e.preventDefault();
+      const videoEl = video as HTMLVideoElement & {
+        webkitExitFullscreen?: () => void;
+      };
+      if (typeof videoEl.webkitExitFullscreen === 'function') {
+        videoEl.webkitExitFullscreen();
+      }
+      if (mediaMode === 'zalo') {
+        video.pause();
+        triggerWebpFallback();
+      }
+    };
+
+    video.addEventListener('webkitbeginfullscreen', handleBeginFullscreen);
+    return () => {
+      video.removeEventListener('webkitbeginfullscreen', handleBeginFullscreen);
+    };
+  }, [mediaMode]);
 
   const finishIntro = () => {
     document.body.classList.remove('wedding-intro-active');
@@ -193,53 +246,49 @@ export default function EnvelopeCover({
     }
 
     /*
-      ==============================
-      ZALO
-      ==============================
-
-      Không dùng video.
-      Chỉ chạy Animated WebP.
-
-      Sau 8.2 giây:
-      đánh dấu WebP đã hoàn thành,
-      lúc đó CSS mới chạy paper,
-      butterfly và text.
+      Nếu đang ở chế độ WebP (fallback)
     */
-    if (mediaMode === 'zalo') {
-      startTimeline(true);
-
-      webpTimerRef.current =
-        setTimeout(() => {
-          setWebpFinished(true);
-        }, ZALO_WEBP_DURATION_MS);
-
+    if (useWebp) {
+      triggerWebpFallback();
       return;
     }
 
     /*
       ==============================
-      BROWSER THƯỜNG / MESSENGER
+      PHÁT VIDEO INLINE (CHỐNG NATIVE PLAYER)
       ==============================
+      Hỗ trợ phát mượt mà cả trên Zalo lẫn Browser thường.
+      Nếu WebView không hỗ trợ hoặc chặn inline video, tự động fallback sang WebP.
     */
-
     const video =
       videoRef.current;
 
     if (!video) {
-      startTimeline(false);
+      if (mediaMode === 'zalo') {
+        triggerWebpFallback();
+      } else {
+        startTimeline(false);
+      }
       return;
     }
 
     try {
       video.currentTime = 0;
+      video.muted = true;
+      video.defaultMuted = true;
     } catch {
       // Metadata chưa sẵn sàng.
     }
 
     void video
       .play()
-      .catch(() => {
-        startTimeline(false);
+      .catch((err) => {
+        console.warn('Video inline play fallback:', err);
+        if (mediaMode === 'zalo') {
+          triggerWebpFallback();
+        } else {
+          startTimeline(false);
+        }
       });
   };
 
@@ -258,7 +307,7 @@ export default function EnvelopeCover({
       className={[
         'intro-cover',
 
-        isZalo
+        isZalo && useWebp
           ? 'intro-zalo'
           : '',
 
@@ -280,10 +329,10 @@ export default function EnvelopeCover({
         <div className="intro-film-frame">
 
           {/* =========================
-              ZALO → WEBP
+              ANIMATION: VIDEO MP4 INLINE HOẶC WEBP FALLBACK
           ========================= */}
 
-          {isZalo ? (
+          {useWebp ? (
             opening ? (
               <img
                 src="/videos/zalo4.webp"
@@ -301,13 +350,7 @@ export default function EnvelopeCover({
                 aria-hidden="true"
               />
             )
-          ) : mediaMode ===
-            'browser' ? (
-
-            /* =========================
-               BROWSER → MP4
-            ========================= */
-
+          ) : mediaMode !== 'unknown' ? (
             <video
               ref={videoRef}
               src="/videos/envelope-open.mp4"
@@ -316,18 +359,27 @@ export default function EnvelopeCover({
               playsInline
               preload="auto"
               aria-hidden="true"
+              disablePictureInPicture
+              controlsList="nodownload nofullscreen noremoteplayback"
               onPlaying={() =>
                 startTimeline(false)
               }
+              onError={() => {
+                if (isZalo) {
+                  triggerWebpFallback();
+                } else {
+                  startTimeline(false);
+                }
+              }}
+              {...{
+                'webkit-playsinline': 'true',
+                'x5-playsinline': 'true',
+                'x5-video-player-type': 'h5-page',
+                'x5-video-player-fullscreen': 'false',
+                'x5-video-orientation': 'portrait',
+              }}
             />
           ) : (
-
-            /*
-              Chờ detect browser.
-              Chỉ hiện poster,
-              chưa mount video.
-            */
-
             <img
               src="/images/envelope-poster.jpg"
               alt=""
@@ -360,13 +412,11 @@ export default function EnvelopeCover({
 
       {/* =========================
           PAPER
-
-          Trên Zalo: KHÔNG mount phần này trong lúc WebP chạy.
-          Chỉ mount sau khi webpFinished=true để giảm layout,
-          animation và paint cạnh tranh tài nguyên với Animated WebP.
+          Nếu ở chế độ WebP: chỉ mount sau khi webpFinished=true.
+          Nếu ở chế độ Video MP4: mount theo timeline chuẩn.
       ========================= */}
 
-      {(!isZalo || webpFinished) && (
+      {(!isZalo || !useWebp || webpFinished) && (
         <div
           className="intro-paper"
           aria-hidden={!timelineStarted}
