@@ -13,14 +13,14 @@ import {
 
 export default function HomePage() {
   const [guestName, setGuestName] = useState<string | null>(null);
+  const [introFinished, setIntroFinished] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-
     const guest = params.get('guest')?.trim();
 
     setGuestName(
-      guest ? guest.slice(0, 80) : 'Quý khách'
+      guest ? guest.slice(0, 80) : 'Quý khách',
     );
   }, []);
 
@@ -29,16 +29,32 @@ export default function HomePage() {
     return <main className="min-h-svh bg-[#faf7f0]" />;
   }
 
-  return (
-    <>
-      <WeddingPage
-        wedding={wedding}
-        gallery={gallery}
-        mapsUrl={mapsUrl}
-        guestName={guestName}
-      />
+  /*
+    Quan trọng cho Zalo:
+    Không mount WeddingPage trong lúc intro đang chạy.
 
-      <EnvelopeCover guestName={guestName} />
-    </>
+    Như vậy:
+    - Sakura chưa chạy
+    - countdown chưa setInterval
+    - ảnh lớn của WeddingPage chưa decode/render
+    - Reveal/IntersectionObserver chưa khởi tạo
+    - Ant Design/Gallery chưa phải render cùng lúc với WebP
+  */
+  if (!introFinished) {
+    return (
+      <EnvelopeCover
+        guestName={guestName}
+        onFinished={() => setIntroFinished(true)}
+      />
+    );
+  }
+
+  return (
+    <WeddingPage
+      wedding={wedding}
+      gallery={gallery}
+      mapsUrl={mapsUrl}
+      guestName={guestName}
+    />
   );
 }
