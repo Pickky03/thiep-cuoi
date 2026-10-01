@@ -97,15 +97,21 @@ export default function EnvelopeCover({
       {/* Original envelope-opening footage: 0–3.7 seconds only. */}
       <div className="intro-film">
         <div className="intro-film-frame">
-          <video
-            ref={videoRef}
-            src="/videos/envelope-open.mp4"
-            poster="/images/envelope-poster.jpg"
-            playsInline
-            muted
-            preload="auto"
-            aria-hidden="true"
-          />
+        <video
+  ref={videoRef}
+  src="/videos/envelope-open.mp4"
+  poster="/images/envelope-poster.jpg"
+  muted
+  preload="auto"
+  aria-hidden="true"
+  playsInline // Viết chuẩn camelCase cho React
+  {...{
+    'x5-playsinline': 'true',
+    'x5-video-player-type': 'h5-page',
+    'x5-video-orientation': 'portrait'
+  }}
+/>
+
 
           {!opening && (
             <button
