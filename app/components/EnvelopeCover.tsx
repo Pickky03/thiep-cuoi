@@ -75,31 +75,26 @@ export default function EnvelopeCover({
     );
   };
 
-  const handleOpen = async () => {
+  const handleOpen = () => {
     if (opening) return;
   
     // 1. Phát nhạc
     startMusic();
   
-    const video = videoRef.current;
-  
-    if (video) {
-      try {
-        video.currentTime = 0;
-        // Bắt buộc gọi play() trực tiếp trong sự kiện click để vượt qua cơ chế chặn của Zalo/iOS
-        const playPromise = video.play();
-        if (playPromise !== undefined) {
-          playPromise.catch((error) => {
-            console.log("Lỗi khi ép phát video trên Zalo:", error);
-          });
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  
+    // 2. Kích hoạt giao diện mở thiệp ngay lập tức để video hiển thị khung hình
     setOpening(true);
     startTimeline();
+
+    // 3. Gọi play video sau khi state đã chuyển đổi (giúp DOM nhận diện video đang hiện diện)
+    setTimeout(() => {
+      const video = videoRef.current;
+      if (video) {
+        video.currentTime = 0;
+        video.play().catch((error) => {
+          console.log("Không thể tự phát video:", error);
+        });
+      }
+    }, 50);
   };
 
   if (finished) {
@@ -125,11 +120,14 @@ export default function EnvelopeCover({
             autoplay + muted + loop + playsInline,
             không gọi video.play() bằng JavaScript.
           */}
-<video
+        <video
   ref={videoRef}
   muted
+  loop
   playsInline
-  preload="auto" // Giúp trình duyệt tải trước dữ liệu video
+  // @ts-ignore (nếu TypeScript báo lỗi thuộc tính webkit cho phép bỏ qua)
+  webkit-playsinline="true"
+  preload="auto"
   aria-hidden="true"
   className="intro-envelope-video"
 >
