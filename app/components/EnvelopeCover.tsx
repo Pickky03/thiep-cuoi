@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMusic } from './MusicProvider';
 
-const INTRO_LENGTH_MS = 13650;
+const INTRO_LENGTH_MS = 14200;
 
 function unlockPageScroll() {
   document.body.style.removeProperty('overflow');
@@ -19,9 +19,13 @@ export default function EnvelopeCover({
   const router = useRouter();
   const { startMusic } = useMusic();
 
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const finishTimerRef =
+    useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const animationStartedRef = useRef(false);
 
   const [opening, setOpening] = useState(false);
+  const [animationStarted, setAnimationStarted] = useState(false);
   const [finished, setFinished] = useState(false);
 
   useEffect(() => {
@@ -29,58 +33,66 @@ export default function EnvelopeCover({
 
     window.scrollTo(0, 0);
 
-    // Khóa cuộn trong lúc intro đang hiển thị.
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
 
     return () => {
       unlockPageScroll();
 
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
+      if (finishTimerRef.current) {
+        clearTimeout(finishTimerRef.current);
       }
     };
   }, [router]);
 
+  const finishIntro = () => {
+    unlockPageScroll();
+
+    const url = new URL('/thiep-cuoi', window.location.origin);
+
+    if (guestName !== 'Quý khách') {
+      url.searchParams.set('guest', guestName);
+    }
+
+    window.history.replaceState(
+      null,
+      '',
+      `${url.pathname}${url.search}`,
+    );
+
+    setFinished(true);
+  };
+
+  const startAnimationTimeline = () => {
+    if (animationStartedRef.current) return;
+
+    animationStartedRef.current = true;
+    setAnimationStarted(true);
+
+    finishTimerRef.current = setTimeout(
+      finishIntro,
+      INTRO_LENGTH_MS,
+    );
+  };
+
   const handleOpen = () => {
     if (opening) return;
 
-    // Nhạc phải được gọi trực tiếp từ thao tác click.
+    // Phải gọi trực tiếp trong thao tác click để tránh autoplay restriction.
     startMusic();
-
-    // Khi opening = true:
-    // poster biến mất và animated WebP mới được mount.
-    setOpening(true);
 
     const reducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches;
 
-    timerRef.current = setTimeout(
-      () => {
-        unlockPageScroll();
+    setOpening(true);
 
-        const url = new URL(
-          '/thiep-cuoi',
-          window.location.origin,
-        );
-
-        if (guestName !== 'Quý khách') {
-          url.searchParams.set('guest', guestName);
-        }
-
-        // Chỉ đổi URL, không reload/chuyển sang WeddingPage khác.
-        window.history.replaceState(
-          null,
-          '',
-          `${url.pathname}${url.search}`,
-        );
-
-        // WeddingPage phía sau đã render sẵn.
-        setFinished(true);
-      },
-      reducedMotion ? 100 : INTRO_LENGTH_MS,
-    );
+    if (reducedMotion) {
+      finishTimerRef.current = setTimeout(
+        finishIntro,
+        100,
+      );
+    }
   };
 
   if (finished) {
@@ -89,15 +101,16 @@ export default function EnvelopeCover({
 
   return (
     <div
-      className={`intro-cover ${opening ? 'intro-opening' : ''}`}
+      className={[
+        'intro-cover',
+        animationStarted ? 'intro-opening' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
       role="dialog"
       aria-modal="true"
       aria-label="Mở thiệp cưới Văn Hải và Kim Hường"
     >
-      {/* =========================
-          ENVELOPE INTRO
-      ========================= */}
-
       <div className="intro-film">
         <div className="intro-film-frame">
           {!opening ? (
@@ -132,18 +145,16 @@ export default function EnvelopeCover({
               className="intro-envelope-animation"
               draggable={false}
               aria-hidden="true"
+              onLoad={startAnimationTimeline}
+              onError={startAnimationTimeline}
             />
           )}
         </div>
       </div>
 
-      {/* =========================
-          PAPER / BUTTERFLY
-      ========================= */}
-
       <div
         className="intro-paper"
-        aria-hidden={!opening}
+        aria-hidden={!animationStarted}
       >
         <div
           className="intro-butterfly"
