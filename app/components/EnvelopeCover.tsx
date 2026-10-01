@@ -6,7 +6,8 @@ import { useMusic } from './MusicProvider';
 
 const NORMAL_INTRO_LENGTH_MS = 14200;
 const ZALO_INTRO_LENGTH_MS = 18500;
-
+const ZALO_WEBP_DURATION_MS = 8200;
+const [webpFinished, setWebpFinished] = useState(false);
 type MediaMode = 'unknown' | 'zalo' | 'browser';
 
 function unlockPageScroll() {
@@ -137,9 +138,15 @@ export default function EnvelopeCover({
       Khi opening=true, Animated WebP mới được mount.
       onLoad của WebP sẽ bắt đầu timeline.
     */
-    if (mediaMode === 'zalo') {
-      return;
-    }
+      if (mediaMode === 'zalo') {
+        startTimeline(true);
+      
+        window.setTimeout(() => {
+          setWebpFinished(true);
+        }, ZALO_WEBP_DURATION_MS);
+      
+        return;
+      }
 
     /*
       BROWSER THƯỜNG / MESSENGER:
@@ -173,30 +180,26 @@ export default function EnvelopeCover({
 
   return (
     <div
-      className={[
-        'intro-cover',
-        isZalo ? 'intro-zalo' : '',
-        timelineStarted ? 'intro-opening' : '',
-      ]
-        .filter(Boolean)
-        .join(' ')}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Mở thiệp cưới Văn Hải và Kim Hường"
+    className={[
+      'intro-cover',
+      isZalo ? 'intro-zalo' : '',
+      timelineStarted ? 'intro-opening' : '',
+      webpFinished ? 'intro-webp-finished' : '',
+    ]
+      .filter(Boolean)
+      .join(' ')}
     >
       <div className="intro-film">
         <div className="intro-film-frame">
           {isZalo ? (
             opening ? (
               <img
-                src="/videos/preview-zalo.webp"
-                alt=""
-                className="intro-envelope-animation"
-                draggable={false}
-                aria-hidden="true"
-                onLoad={() => startTimeline(true)}
-                onError={() => startTimeline(true)}
-              />
+              src="/videos/preview-zalo.webp"
+              alt=""
+              className="intro-envelope-animation"
+              draggable={false}
+              aria-hidden="true"
+            />
             ) : (
               <img
                 src="/images/envelope-poster.jpg"
