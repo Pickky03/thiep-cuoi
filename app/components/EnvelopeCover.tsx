@@ -182,7 +182,7 @@ export default function EnvelopeCover({
           {isZalo ? (
             opening ? (
               <img
-                src="/videos/preview-zalo2.webp"
+                src="/videos/preview-zalo.webp"
                 alt=""
                 className="intro-envelope-animation"
                 draggable={false}
