@@ -1632,33 +1632,33 @@ a:focus-visible {
   animation:
     intro-film-out
     0.8s ease
-    4.3s forwards;
+    5.2s forwards;
 }
 
 .intro-zalo.intro-opening .intro-paper {
   animation:
     intro-paper-in
     0.8s ease
-    4.3s forwards;
+    5.2s forwards;
 }
 
 .intro-zalo.intro-opening .intro-copy-invite {
   animation:
     intro-invite-copy
     4.65s ease
-    5.4s both;
+    6.3s both;
 }
 
 .intro-zalo.intro-opening .intro-copy-names {
   animation:
     intro-names-copy
     3.3s ease
-    10.35s both;
+    11.25s both;
 }
 
 .intro-cover.intro-zalo.intro-opening {
   animation:
     intro-cover-out
     0.95s ease-in-out
-    13.85s forwards;
+    14.75s forwards;
 }

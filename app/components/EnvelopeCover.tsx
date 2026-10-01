@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useMusic } from './MusicProvider';
 
 const NORMAL_INTRO_LENGTH_MS = 14200;
-const ZALO_INTRO_LENGTH_MS = 14800;
+const ZALO_INTRO_LENGTH_MS = 15700;
 
 type MediaMode = 'unknown' | 'zalo' | 'browser';
 
@@ -182,7 +182,7 @@ export default function EnvelopeCover({
           {isZalo ? (
             opening ? (
               <img
-                src="/videos/preview-zalo.webp"
+                src="/videos/preview-zalo2.webp"
                 alt=""
                 className="intro-envelope-animation"
                 draggable={false}
