@@ -7,7 +7,7 @@ import { useMusic } from './MusicProvider';
 const NORMAL_INTRO_LENGTH_MS = 14200;
 const ZALO_INTRO_LENGTH_MS = 18500;
 const ZALO_WEBP_DURATION_MS = 8200;
-const [webpFinished, setWebpFinished] = useState(false);
+
 type MediaMode = 'unknown' | 'zalo' | 'browser';
 
 function unlockPageScroll() {
@@ -35,7 +35,11 @@ export default function EnvelopeCover({
   const { startMusic } = useMusic();
 
   const videoRef = useRef<HTMLVideoElement>(null);
+
   const finishTimerRef =
+    useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const webpTimerRef =
     useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const timelineStartedRef = useRef(false);
@@ -43,36 +47,66 @@ export default function EnvelopeCover({
   const [mediaMode, setMediaMode] =
     useState<MediaMode>('unknown');
 
-  const [opening, setOpening] = useState(false);
+  const [opening, setOpening] =
+    useState(false);
+
   const [timelineStarted, setTimelineStarted] =
     useState(false);
-  const [finished, setFinished] = useState(false);
+
+  const [webpFinished, setWebpFinished] =
+    useState(false);
+
+  const [finished, setFinished] =
+    useState(false);
 
   useEffect(() => {
     const zalo = detectZaloWebView();
-  
-    setMediaMode(zalo ? 'zalo' : 'browser');
-  
+
+    setMediaMode(
+      zalo ? 'zalo' : 'browser',
+    );
+
+    /*
+      Preload WebP trên Zalo.
+
+      Mục đích:
+      tải/decode trước khi người dùng bấm con dấu,
+      giúp giảm giật ở frame đầu.
+    */
     if (zalo) {
       const preloadWebp = new Image();
-  
-      preloadWebp.src = '/videos/preview-zalo.webp';
-  
-      preloadWebp.decode?.().catch(() => {});
+
+      preloadWebp.src =
+        '/videos/preview-zalo.webp';
+
+      preloadWebp
+        .decode?.()
+        .catch(() => {});
     }
-  
+
     router.prefetch('/thiep-cuoi');
-  
+
     window.scrollTo(0, 0);
-  
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
-  
+
+    document.body.style.overflow =
+      'hidden';
+
+    document.documentElement.style.overflow =
+      'hidden';
+
     return () => {
       unlockPageScroll();
-  
+
       if (finishTimerRef.current) {
-        clearTimeout(finishTimerRef.current);
+        clearTimeout(
+          finishTimerRef.current,
+        );
+      }
+
+      if (webpTimerRef.current) {
+        clearTimeout(
+          webpTimerRef.current,
+        );
       }
     };
   }, [router]);
@@ -86,7 +120,10 @@ export default function EnvelopeCover({
     );
 
     if (guestName !== 'Quý khách') {
-      url.searchParams.set('guest', guestName);
+      url.searchParams.set(
+        'guest',
+        guestName,
+      );
     }
 
     window.history.replaceState(
@@ -98,61 +135,92 @@ export default function EnvelopeCover({
     setFinished(true);
   };
 
-  const startTimeline = (zaloMode: boolean) => {
-    if (timelineStartedRef.current) return;
+  const startTimeline = (
+    zaloMode: boolean,
+  ) => {
+    if (
+      timelineStartedRef.current
+    ) {
+      return;
+    }
 
-    timelineStartedRef.current = true;
+    timelineStartedRef.current =
+      true;
+
     setTimelineStarted(true);
 
-    finishTimerRef.current = setTimeout(
-      finishIntro,
-      zaloMode
-        ? ZALO_INTRO_LENGTH_MS
-        : NORMAL_INTRO_LENGTH_MS,
-    );
+    finishTimerRef.current =
+      setTimeout(
+        finishIntro,
+        zaloMode
+          ? ZALO_INTRO_LENGTH_MS
+          : NORMAL_INTRO_LENGTH_MS,
+      );
   };
 
   const handleOpen = () => {
-    if (opening || mediaMode === 'unknown') return;
-
-    // Phải nằm trực tiếp trong click để nhạc được phép phát.
-    startMusic();
-
-    const reducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches;
-
-    setOpening(true);
-
-    if (reducedMotion) {
-      finishTimerRef.current = setTimeout(
-        finishIntro,
-        100,
-      );
+    if (
+      opening ||
+      mediaMode === 'unknown'
+    ) {
       return;
     }
 
     /*
-      ZALO:
-      Không có <video> trong DOM.
-      Khi opening=true, Animated WebP mới được mount.
-      onLoad của WebP sẽ bắt đầu timeline.
+      startMusic phải nằm trực tiếp
+      trong thao tác click của user.
     */
-      if (mediaMode === 'zalo') {
-        startTimeline(true);
-      
-        window.setTimeout(() => {
-          setWebpFinished(true);
-        }, ZALO_WEBP_DURATION_MS);
-      
-        return;
-      }
+    startMusic();
+
+    const reducedMotion =
+      window.matchMedia(
+        '(prefers-reduced-motion: reduce)',
+      ).matches;
+
+    setOpening(true);
+
+    if (reducedMotion) {
+      finishTimerRef.current =
+        setTimeout(
+          finishIntro,
+          100,
+        );
+
+      return;
+    }
 
     /*
-      BROWSER THƯỜNG / MESSENGER:
-      Giữ MP4 vì mượt hơn Animated WebP.
+      ==============================
+      ZALO
+      ==============================
+
+      Không dùng video.
+      Chỉ chạy Animated WebP.
+
+      Sau 8.2 giây:
+      đánh dấu WebP đã hoàn thành,
+      lúc đó CSS mới chạy paper,
+      butterfly và text.
     */
-    const video = videoRef.current;
+    if (mediaMode === 'zalo') {
+      startTimeline(true);
+
+      webpTimerRef.current =
+        setTimeout(() => {
+          setWebpFinished(true);
+        }, ZALO_WEBP_DURATION_MS);
+
+      return;
+    }
+
+    /*
+      ==============================
+      BROWSER THƯỜNG / MESSENGER
+      ==============================
+    */
+
+    const video =
+      videoRef.current;
 
     if (!video) {
       startTimeline(false);
@@ -162,44 +230,65 @@ export default function EnvelopeCover({
     try {
       video.currentTime = 0;
     } catch {
-      // Metadata có thể chưa load xong.
+      // Metadata chưa sẵn sàng.
     }
 
-    void video.play().catch(() => {
-      // Không để intro bị treo nếu browser từ chối play.
-      startTimeline(false);
-    });
+    void video
+      .play()
+      .catch(() => {
+        startTimeline(false);
+      });
   };
 
   if (finished) {
     return null;
   }
 
-  const isZalo = mediaMode === 'zalo';
-  const isReady = mediaMode !== 'unknown';
+  const isZalo =
+    mediaMode === 'zalo';
+
+  const isReady =
+    mediaMode !== 'unknown';
 
   return (
     <div
-    className={[
-      'intro-cover',
-      isZalo ? 'intro-zalo' : '',
-      timelineStarted ? 'intro-opening' : '',
-      webpFinished ? 'intro-webp-finished' : '',
-    ]
-      .filter(Boolean)
-      .join(' ')}
+      className={[
+        'intro-cover',
+
+        isZalo
+          ? 'intro-zalo'
+          : '',
+
+        timelineStarted
+          ? 'intro-opening'
+          : '',
+
+        webpFinished
+          ? 'intro-webp-finished'
+          : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Mở thiệp cưới Văn Hải và Kim Hường"
     >
       <div className="intro-film">
         <div className="intro-film-frame">
+
+          {/* =========================
+              ZALO → WEBP
+          ========================= */}
+
           {isZalo ? (
             opening ? (
               <img
-              src="/videos/preview-zalo.webp"
-              alt=""
-              className="intro-envelope-animation"
-              draggable={false}
-              aria-hidden="true"
-            />
+                src="/videos/preview-zalo.webp"
+                alt=""
+                className="intro-envelope-animation"
+                draggable={false}
+                aria-hidden="true"
+              />
             ) : (
               <img
                 src="/images/envelope-poster.jpg"
@@ -209,7 +298,13 @@ export default function EnvelopeCover({
                 aria-hidden="true"
               />
             )
-          ) : mediaMode === 'browser' ? (
+          ) : mediaMode ===
+            'browser' ? (
+
+            /* =========================
+               BROWSER → MP4
+            ========================= */
+
             <video
               ref={videoRef}
               src="/videos/envelope-open.mp4"
@@ -218,9 +313,18 @@ export default function EnvelopeCover({
               playsInline
               preload="auto"
               aria-hidden="true"
-              onPlaying={() => startTimeline(false)}
+              onPlaying={() =>
+                startTimeline(false)
+              }
             />
           ) : (
+
+            /*
+              Chờ detect browser.
+              Chỉ hiện poster,
+              chưa mount video.
+            */
+
             <img
               src="/images/envelope-poster.jpg"
               alt=""
@@ -251,9 +355,15 @@ export default function EnvelopeCover({
         </div>
       </div>
 
+      {/* =========================
+          PAPER
+      ========================= */}
+
       <div
         className="intro-paper"
-        aria-hidden={!timelineStarted}
+        aria-hidden={
+          !timelineStarted
+        }
       >
         <div
           className="intro-butterfly"
@@ -279,22 +389,30 @@ export default function EnvelopeCover({
 
         <div className="intro-copy intro-copy-names">
           <p>
-            CHÚNG MÌNH SẮP VỀ CHUNG MỘT NHÀ
+            CHÚNG MÌNH SẮP VỀ CHUNG
+            MỘT NHÀ
           </p>
 
           <h1>
             <span>Văn Hải</span>
+
             <em>&amp;</em>
-            <span>Kim Hường</span>
+
+            <span>
+              Kim Hường
+            </span>
           </h1>
 
-          <p>06 · 11 · 2026</p>
+          <p>
+            06 · 11 · 2026
+          </p>
         </div>
       </div>
 
       {!opening && (
         <p className="intro-tap-hint">
-          Chạm vào con dấu để mở thiệp ♪
+          Chạm vào con dấu để mở
+          thiệp ♪
         </p>
       )}
     </div>
