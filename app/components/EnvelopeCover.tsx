@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useMusic } from './MusicProvider';
 
 const NORMAL_INTRO_LENGTH_MS = 14200;
-const ZALO_INTRO_LENGTH_MS = 15000;
-const ZALO_WEBP_DURATION_MS = 4800;
+const ZALO_INTRO_LENGTH_MS = 16800;
+const ZALO_WEBP_DURATION_MS = 6000;
 
 type MediaMode = 'unknown' | 'zalo' | 'browser';
 
@@ -286,7 +286,7 @@ export default function EnvelopeCover({
           {isZalo ? (
             opening ? (
               <img
-                src="/videos/zalo3.webp"
+                src="/videos/zalo4.webp"
                 alt=""
                 className="intro-envelope-animation"
                 draggable={false}
