@@ -1615,50 +1615,54 @@ a:focus-visible {
 }
 
 /* =========================================
- * ZALO WEBVIEW - ANIMATED WEBP TIMING
- * =========================================
- *
- * Browser thường / Messenger:
- *   MP4 và timeline mặc định (3.70s -> paper).
- *
- * Zalo:
- *   /videos/preview-zalo.webp
- *   WebP khoảng 44 frame / 12 FPS.
- *   Cho WebP thêm thời gian hiển thị trước khi đổi cảnh,
- *   vì Zalo WebView có thể decode chậm hơn thời gian thực.
- */
+   ZALO WEBVIEW - LONG WEBP TIMELINE
+   ========================================= */
+
+/*
+  Giữ WebP nguyên vẹn trong 8 giây.
+  Sau 8 giây mới bắt đầu fade sang paper.
+*/
 
 .intro-zalo.intro-opening .intro-film {
   animation:
     intro-film-out
     0.8s ease
-    5.2s forwards;
+    8s forwards;
 }
 
 .intro-zalo.intro-opening .intro-paper {
   animation:
     intro-paper-in
     0.8s ease
-    5.2s forwards;
+    8s forwards;
 }
 
+/*
+  Sau khi paper gần hiện xong mới bắt đầu lời mời.
+*/
 .intro-zalo.intro-opening .intro-copy-invite {
   animation:
     intro-invite-copy
     4.65s ease
-    6.3s both;
+    9.1s both;
 }
 
+/*
+  Dời phần tên theo cùng khoảng thời gian.
+*/
 .intro-zalo.intro-opening .intro-copy-names {
   animation:
     intro-names-copy
     3.3s ease
-    11.25s both;
+    14.05s both;
 }
 
+/*
+  Fade toàn intro ở cuối.
+*/
 .intro-cover.intro-zalo.intro-opening {
   animation:
     intro-cover-out
     0.95s ease-in-out
-    14.75s forwards;
+    17.55s forwards;
 }
