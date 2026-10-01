@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMusic } from './MusicProvider';
 
-const INTRO_LENGTH_MS = 14200;
+const NORMAL_INTRO_LENGTH_MS = 14200;
+const ZALO_INTRO_LENGTH_MS = 14800;
 
 function unlockPageScroll() {
   document.body.style.removeProperty('overflow');
@@ -31,23 +32,19 @@ export default function EnvelopeCover({
   const { startMusic } = useMusic();
 
   const videoRef = useRef<HTMLVideoElement>(null);
-
   const finishTimerRef =
     useRef<ReturnType<typeof setTimeout> | null>(null);
-
   const timelineStartedRef = useRef(false);
 
   const [opening, setOpening] = useState(false);
   const [isZalo, setIsZalo] = useState(false);
-  const [timelineStarted, setTimelineStarted] =
-    useState(false);
+  const [timelineStarted, setTimelineStarted] = useState(false);
   const [finished, setFinished] = useState(false);
 
   useEffect(() => {
     setIsZalo(detectZaloWebView());
 
     router.prefetch('/thiep-cuoi');
-
     window.scrollTo(0, 0);
 
     document.body.style.overflow = 'hidden';
@@ -65,16 +62,10 @@ export default function EnvelopeCover({
   const finishIntro = () => {
     unlockPageScroll();
 
-    const url = new URL(
-      '/thiep-cuoi',
-      window.location.origin,
-    );
+    const url = new URL('/thiep-cuoi', window.location.origin);
 
     if (guestName !== 'Quý khách') {
-      url.searchParams.set(
-        'guest',
-        guestName,
-      );
+      url.searchParams.set('guest', guestName);
     }
 
     window.history.replaceState(
@@ -86,7 +77,7 @@ export default function EnvelopeCover({
     setFinished(true);
   };
 
-  const startTimeline = () => {
+  const startTimeline = (zaloMode: boolean) => {
     if (timelineStartedRef.current) return;
 
     timelineStartedRef.current = true;
@@ -94,19 +85,19 @@ export default function EnvelopeCover({
 
     finishTimerRef.current = setTimeout(
       finishIntro,
-      INTRO_LENGTH_MS,
+      zaloMode
+        ? ZALO_INTRO_LENGTH_MS
+        : NORMAL_INTRO_LENGTH_MS,
     );
   };
 
   const handleOpen = () => {
     if (opening) return;
 
-    // Kiểm tra lại ngay tại thời điểm click.
     const zalo = detectZaloWebView();
-
     setIsZalo(zalo);
 
-    // Phải gọi trực tiếp trong thao tác của người dùng.
+    // Giữ trong click handler để audio được phép phát.
     startMusic();
 
     const reducedMotion = window.matchMedia(
@@ -120,32 +111,31 @@ export default function EnvelopeCover({
         finishIntro,
         100,
       );
-
       return;
     }
 
-    // Zalo KHÔNG được gọi video.play().
-    // Sau khi state render lại, WebP sẽ được mount.
+    // Zalo dùng Animated WebP, tuyệt đối không gọi video.play().
     if (zalo) {
       return;
     }
 
-    // Các trình duyệt bình thường sử dụng MP4.
+    // Browser khác dùng MP4.
     const video = videoRef.current;
 
     if (!video) {
-      startTimeline();
+      startTimeline(false);
       return;
     }
 
     try {
       video.currentTime = 0;
-    } catch {}
+    } catch {
+      // Metadata có thể chưa sẵn sàng.
+    }
 
     void video.play().catch(() => {
-      // Nếu browser từ chối play,
-      // vẫn tiếp tục intro thay vì treo.
-      startTimeline();
+      // Không để intro bị treo nếu browser từ chối phát video.
+      startTimeline(false);
     });
   };
 
@@ -157,6 +147,7 @@ export default function EnvelopeCover({
     <div
       className={[
         'intro-cover',
+        isZalo ? 'intro-zalo' : '',
         timelineStarted ? 'intro-opening' : '',
       ]
         .filter(Boolean)
@@ -167,11 +158,6 @@ export default function EnvelopeCover({
     >
       <div className="intro-film">
         <div className="intro-film-frame">
-
-          {/* =========================
-              ZALO → ANIMATED WEBP
-          ========================= */}
-
           {opening && isZalo ? (
             <img
               src="/videos/preview-zalo.webp"
@@ -179,24 +165,20 @@ export default function EnvelopeCover({
               className="intro-envelope-animation"
               draggable={false}
               aria-hidden="true"
-              onLoad={startTimeline}
-              onError={startTimeline}
+              onLoad={() => startTimeline(true)}
+              onError={() => startTimeline(true)}
             />
           ) : (
             <>
-              {/* =========================
-                  BROWSER THƯỜNG → MP4
-              ========================= */}
-
               <video
                 ref={videoRef}
                 src="/videos/envelope-open.mp4"
                 poster="/images/envelope-poster.jpg"
-                muted
                 playsInline
+                muted
                 preload="auto"
                 aria-hidden="true"
-                onPlaying={startTimeline}
+                onPlaying={() => startTimeline(false)}
               />
 
               {!opening && (
@@ -219,8 +201,6 @@ export default function EnvelopeCover({
           )}
         </div>
       </div>
-
-      {/* PAPER */}
 
       <div
         className="intro-paper"

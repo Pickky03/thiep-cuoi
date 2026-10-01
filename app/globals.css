@@ -609,6 +609,7 @@ a:focus-visible {
 }
 
 
+.intro-film-frame video,
 .intro-envelope-poster,
 .intro-envelope-animation {
   display: block;
@@ -1562,38 +1563,73 @@ a:focus-visible {
 
 
 .intro-opening .intro-film {
+
   animation:
+
     intro-film-out
+
     0.8s ease
-    3.7s forwards;
+
+    3.70s forwards;
+
 }
+
+
+/* Nền giấy và bướm hiện ra */
+
 
 .intro-opening .intro-paper {
+
   animation:
+
     intro-paper-in
+
     0.8s ease
-    3.7s forwards;
+
+    3.70s forwards;
+
 }
+
+
+/* Lời mời */
+
 
 .intro-opening .intro-copy-invite {
+
   animation:
+
     intro-invite-copy
+
     4.65s ease
-    4.8s both;
+
+    4.80s both;
+
 }
+
+
+/* Tên cô dâu chú rể */
+
 
 .intro-opening .intro-copy-names {
-  animation:
-    intro-names-copy
-    3.3s ease
-    9.75s both;
+
+  animation: intro-names-copy 3.3s ease 9.75s both;
+
 }
 
+
+/* Mờ dần toàn bộ cảnh mở đầu */
+
+
 .intro-cover.intro-opening {
+
   animation:
+
     intro-cover-out
+
     0.95s ease-in-out
+
     13.25s forwards;
+
 }
 
 
@@ -1828,20 +1864,47 @@ a:focus-visible {
   overflow-wrap: anywhere;
 
 }
-.intro-film-frame video,
-.intro-envelope-animation {
-  display: block;
 
-  width: 100%;
-  height: 100%;
+/* =========================================
+ * ZALO WEBVIEW - ANIMATED WEBP TIMING
+ * 44 frame / 12 FPS
+ *
+ * Zalo decode Animated WebP chậm hơn thời gian thực,
+ * nên cảnh phong bì được giữ thêm 0.6s.
+ * ========================================= */
 
-  object-fit: cover;
-
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-user-drag: none;
+.intro-zalo.intro-opening .intro-film {
+  animation:
+    intro-film-out
+    0.8s ease
+    4.3s forwards;
 }
 
-.intro-envelope-animation {
-  pointer-events: none;
+.intro-zalo.intro-opening .intro-paper {
+  animation:
+    intro-paper-in
+    0.8s ease
+    4.3s forwards;
 }
+
+.intro-zalo.intro-opening .intro-copy-invite {
+  animation:
+    intro-invite-copy
+    4.65s ease
+    5.4s both;
+}
+
+.intro-zalo.intro-opening .intro-copy-names {
+  animation:
+    intro-names-copy
+    3.3s ease
+    10.35s both;
+}
+
+.intro-cover.intro-zalo.intro-opening {
+  animation:
+    intro-cover-out
+    0.95s ease-in-out
+    13.85s forwards;
+}
+
