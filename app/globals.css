@@ -1666,3 +1666,94 @@ a:focus-visible {
     0.95s ease-in-out
     17.55s forwards;
 }
+/* =========================================
+   ZALO - ƯU TIÊN TOÀN BỘ TÀI NGUYÊN CHO WEBP
+   ========================================= */
+
+/*
+  Trong lúc WebP đang chạy:
+  - không animate paper
+  - không animate butterfly
+  - không animate text
+  - giảm hiệu ứng tốn GPU
+*/
+
+.intro-zalo:not(.intro-webp-finished) .intro-paper,
+.intro-zalo:not(.intro-webp-finished) .intro-butterfly,
+.intro-zalo:not(.intro-webp-finished) .intro-wing,
+.intro-zalo:not(.intro-webp-finished) .intro-copy {
+  animation: none !important;
+}
+
+.intro-zalo:not(.intro-webp-finished) .intro-paper {
+  opacity: 0 !important;
+  visibility: hidden;
+}
+
+.intro-zalo .intro-film {
+  will-change: auto;
+}
+
+.intro-zalo .intro-envelope-animation {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transform: translateZ(0);
+
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+
+  image-rendering: auto;
+}
+
+.intro-zalo .intro-film-frame {
+  contain: layout paint;
+}
+
+/* tránh shadow/filter trong lúc WebP decode */
+.intro-zalo:not(.intro-webp-finished) .intro-film,
+.intro-zalo:not(.intro-webp-finished) .intro-film-frame,
+.intro-zalo:not(.intro-webp-finished) .intro-envelope-animation {
+  filter: none !important;
+}
+
+/* =========================
+   SAU KHI WEBP CHẠY XONG
+   ========================= */
+
+.intro-zalo.intro-webp-finished .intro-film {
+  animation:
+    intro-film-out
+    0.8s ease forwards;
+}
+
+.intro-zalo.intro-webp-finished .intro-paper {
+  visibility: visible;
+
+  animation:
+    intro-paper-in
+    0.8s ease forwards;
+}
+
+.intro-zalo.intro-webp-finished .intro-copy-invite {
+  animation:
+    intro-invite-copy
+    4.65s ease
+    1.1s both;
+}
+
+.intro-zalo.intro-webp-finished .intro-copy-names {
+  animation:
+    intro-names-copy
+    3.3s ease
+    6.05s both;
+}
+
+.intro-cover.intro-zalo.intro-webp-finished {
+  animation:
+    intro-cover-out
+    0.95s ease-in-out
+    9.55s forwards;
+}
