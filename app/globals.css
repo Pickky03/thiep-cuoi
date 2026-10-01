@@ -1648,6 +1648,8 @@ a:focus-visible {
 
 .intro-zalo .intro-film-frame {
   contain: layout paint;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .intro-zalo .intro-envelope-animation {
@@ -1660,7 +1662,12 @@ a:focus-visible {
 
   pointer-events: none;
 
-  transform: none !important;
+  background: transparent !important;
+
+  transform: translateZ(0) !important;
+  -webkit-transform: translateZ(0) !important;
+  will-change: transform;
+
   filter: none !important;
   box-shadow: none !important;
 

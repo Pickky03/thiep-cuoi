@@ -47,9 +47,6 @@ export default function EnvelopeCover({
   const [mediaMode, setMediaMode] =
     useState<MediaMode>('unknown');
 
-  const [webpKey, setWebpKey] =
-    useState(0);
-
   const [opening, setOpening] =
     useState(false);
 
@@ -72,13 +69,16 @@ export default function EnvelopeCover({
     );
 
     /*
-      Preload WebP trên Zalo qua fetch:
-      File được nạp sẵn vào HTTP cache để hiện ngay lập tức khi click,
-      nhưng KHÔNG dùng new Image() vì sẽ làm animation tự chạy ngầm trước,
-      khiến WebP bị tua trước khi khách kịp bấm con dấu!
+      Preload & Decode trước WebP vào RAM/GPU:
+      Giúp khung hình đầu tiên xuất hiện tức thì khi bấm mở,
+      triệt tiêu độ trễ/khựng CPU lúc chuyển từ poster sang animation!
     */
     if (zalo) {
-      fetch('/videos/zalo4.webp').catch(() => {});
+      const preloadWebp = new Image();
+      preloadWebp.src = '/videos/zalo4.webp';
+      if ('decode' in preloadWebp) {
+        preloadWebp.decode().catch(() => {});
+      }
     }
 
     window.scrollTo(0, 0);
@@ -233,7 +233,6 @@ export default function EnvelopeCover({
       WebView của Zalo luôn cưỡng chế video sang Native Player.
     */
     if (mediaMode === 'zalo') {
-      setWebpKey(Date.now());
       startTimeline(true);
 
       webpTimerRef.current =
@@ -317,7 +316,6 @@ export default function EnvelopeCover({
           {isZalo ? (
             opening ? (
               <img
-                key={webpKey}
                 src="/videos/zalo4.webp"
                 alt=""
                 className="intro-envelope-animation"
