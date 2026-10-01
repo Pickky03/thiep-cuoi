@@ -11,6 +11,17 @@ function unlockPageScroll() {
   document.documentElement.style.removeProperty('overflow');
 }
 
+function detectZaloWebView() {
+  if (typeof navigator === 'undefined') return false;
+
+  const ua = navigator.userAgent.toLowerCase();
+
+  return (
+    ua.includes('zalo') ||
+    ua.includes('zalowebview')
+  );
+}
+
 export default function EnvelopeCover({
   guestName,
 }: {
@@ -19,16 +30,22 @@ export default function EnvelopeCover({
   const router = useRouter();
   const { startMusic } = useMusic();
 
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   const finishTimerRef =
     useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const animationStartedRef = useRef(false);
+  const timelineStartedRef = useRef(false);
 
   const [opening, setOpening] = useState(false);
-  const [animationStarted, setAnimationStarted] = useState(false);
+  const [isZalo, setIsZalo] = useState(false);
+  const [timelineStarted, setTimelineStarted] =
+    useState(false);
   const [finished, setFinished] = useState(false);
 
   useEffect(() => {
+    setIsZalo(detectZaloWebView());
+
     router.prefetch('/thiep-cuoi');
 
     window.scrollTo(0, 0);
@@ -48,10 +65,16 @@ export default function EnvelopeCover({
   const finishIntro = () => {
     unlockPageScroll();
 
-    const url = new URL('/thiep-cuoi', window.location.origin);
+    const url = new URL(
+      '/thiep-cuoi',
+      window.location.origin,
+    );
 
     if (guestName !== 'Quý khách') {
-      url.searchParams.set('guest', guestName);
+      url.searchParams.set(
+        'guest',
+        guestName,
+      );
     }
 
     window.history.replaceState(
@@ -63,11 +86,11 @@ export default function EnvelopeCover({
     setFinished(true);
   };
 
-  const startAnimationTimeline = () => {
-    if (animationStartedRef.current) return;
+  const startTimeline = () => {
+    if (timelineStartedRef.current) return;
 
-    animationStartedRef.current = true;
-    setAnimationStarted(true);
+    timelineStartedRef.current = true;
+    setTimelineStarted(true);
 
     finishTimerRef.current = setTimeout(
       finishIntro,
@@ -78,7 +101,12 @@ export default function EnvelopeCover({
   const handleOpen = () => {
     if (opening) return;
 
-    // Phải gọi trực tiếp trong thao tác click để tránh autoplay restriction.
+    // Kiểm tra lại ngay tại thời điểm click.
+    const zalo = detectZaloWebView();
+
+    setIsZalo(zalo);
+
+    // Phải gọi trực tiếp trong thao tác của người dùng.
     startMusic();
 
     const reducedMotion = window.matchMedia(
@@ -92,7 +120,33 @@ export default function EnvelopeCover({
         finishIntro,
         100,
       );
+
+      return;
     }
+
+    // Zalo KHÔNG được gọi video.play().
+    // Sau khi state render lại, WebP sẽ được mount.
+    if (zalo) {
+      return;
+    }
+
+    // Các trình duyệt bình thường sử dụng MP4.
+    const video = videoRef.current;
+
+    if (!video) {
+      startTimeline();
+      return;
+    }
+
+    try {
+      video.currentTime = 0;
+    } catch {}
+
+    void video.play().catch(() => {
+      // Nếu browser từ chối play,
+      // vẫn tiếp tục intro thay vì treo.
+      startTimeline();
+    });
   };
 
   if (finished) {
@@ -103,7 +157,7 @@ export default function EnvelopeCover({
     <div
       className={[
         'intro-cover',
-        animationStarted ? 'intro-opening' : '',
+        timelineStarted ? 'intro-opening' : '',
       ]
         .filter(Boolean)
         .join(' ')}
@@ -113,48 +167,64 @@ export default function EnvelopeCover({
     >
       <div className="intro-film">
         <div className="intro-film-frame">
-          {!opening ? (
-            <>
-              <img
-                src="/images/envelope-poster.jpg"
-                alt=""
-                className="intro-envelope-poster"
-                draggable={false}
-                aria-hidden="true"
-              />
 
-              <button
-                type="button"
-                className="intro-wax-button"
-                onClick={handleOpen}
-                aria-label="Chạm con dấu để mở thiệp và phát nhạc"
-              >
-                <img
-                  src="/images/wax-seal.png"
-                  alt=""
-                  width={92}
-                  height={92}
-                  draggable={false}
-                />
-              </button>
-            </>
-          ) : (
+          {/* =========================
+              ZALO → ANIMATED WEBP
+          ========================= */}
+
+          {opening && isZalo ? (
             <img
-              src="/videos/preview.webp"
+              src="/videos/preview-zalo.webp"
               alt=""
               className="intro-envelope-animation"
               draggable={false}
               aria-hidden="true"
-              onLoad={startAnimationTimeline}
-              onError={startAnimationTimeline}
+              onLoad={startTimeline}
+              onError={startTimeline}
             />
+          ) : (
+            <>
+              {/* =========================
+                  BROWSER THƯỜNG → MP4
+              ========================= */}
+
+              <video
+                ref={videoRef}
+                src="/videos/envelope-open.mp4"
+                poster="/images/envelope-poster.jpg"
+                muted
+                playsInline
+                preload="auto"
+                aria-hidden="true"
+                onPlaying={startTimeline}
+              />
+
+              {!opening && (
+                <button
+                  type="button"
+                  className="intro-wax-button"
+                  onClick={handleOpen}
+                  aria-label="Chạm con dấu để mở thiệp và phát nhạc"
+                >
+                  <img
+                    src="/images/wax-seal.png"
+                    alt=""
+                    width={92}
+                    height={92}
+                    draggable={false}
+                  />
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>
 
+      {/* PAPER */}
+
       <div
         className="intro-paper"
-        aria-hidden={!animationStarted}
+        aria-hidden={!timelineStarted}
       >
         <div
           className="intro-butterfly"
