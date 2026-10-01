@@ -79,7 +79,7 @@ export default function EnvelopeCover({
       const preloadWebp = new Image();
 
       preloadWebp.src =
-        '/videos/preview-zalo.webp';
+        '/videos/zalo4.webp';
 
       preloadWebp
         .decode?.()
