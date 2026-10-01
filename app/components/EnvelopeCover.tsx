@@ -4,23 +4,11 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMusic } from './MusicProvider';
 
-const NORMAL_INTRO_LENGTH_MS = 14200;
-const ZALO_INTRO_LENGTH_MS = 14800;
+const INTRO_LENGTH_MS = 14200;
 
 function unlockPageScroll() {
   document.body.style.removeProperty('overflow');
   document.documentElement.style.removeProperty('overflow');
-}
-
-function detectZaloWebView() {
-  if (typeof navigator === 'undefined') return false;
-
-  const ua = navigator.userAgent.toLowerCase();
-
-  return (
-    ua.includes('zalo') ||
-    ua.includes('zalowebview')
-  );
 }
 
 export default function EnvelopeCover({
@@ -37,14 +25,12 @@ export default function EnvelopeCover({
   const timelineStartedRef = useRef(false);
 
   const [opening, setOpening] = useState(false);
-  const [isZalo, setIsZalo] = useState(false);
   const [timelineStarted, setTimelineStarted] = useState(false);
   const [finished, setFinished] = useState(false);
 
   useEffect(() => {
-    setIsZalo(detectZaloWebView());
-
     router.prefetch('/thiep-cuoi');
+
     window.scrollTo(0, 0);
 
     document.body.style.overflow = 'hidden';
@@ -77,7 +63,7 @@ export default function EnvelopeCover({
     setFinished(true);
   };
 
-  const startTimeline = (zaloMode: boolean) => {
+  const startTimeline = () => {
     if (timelineStartedRef.current) return;
 
     timelineStartedRef.current = true;
@@ -85,58 +71,51 @@ export default function EnvelopeCover({
 
     finishTimerRef.current = setTimeout(
       finishIntro,
-      zaloMode
-        ? ZALO_INTRO_LENGTH_MS
-        : NORMAL_INTRO_LENGTH_MS,
+      INTRO_LENGTH_MS,
     );
   };
 
   const handleOpen = () => {
     if (opening) return;
 
-    const zalo = detectZaloWebView();
-    setIsZalo(zalo);
-
-    // Giữ trong click handler để audio được phép phát.
+    // Nhạc vẫn phải bắt đầu trực tiếp từ thao tác click.
     startMusic();
 
     const reducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches;
 
-    setOpening(true);
-
     if (reducedMotion) {
+      setOpening(true);
+
       finishTimerRef.current = setTimeout(
         finishIntro,
         100,
       );
+
       return;
     }
 
-    // Zalo dùng Animated WebP, tuyệt đối không gọi video.play().
-    if (zalo) {
-      return;
-    }
-
-    // Browser khác dùng MP4.
     const video = videoRef.current;
 
-    if (!video) {
-      startTimeline(false);
-      return;
+    /*
+      Video đã autoplay muted + loop từ lúc trang load.
+      Khi bấm con dấu chỉ đưa video về frame đầu.
+      TUYỆT ĐỐI không gọi video.play() ở đây.
+    */
+    if (video) {
+      try {
+        video.currentTime = 0;
+      } catch {
+        // Nếu metadata chưa sẵn sàng thì video vẫn tiếp tục autoplay.
+      }
     }
 
-    try {
-      video.currentTime = 0;
-    } catch {
-      // Metadata có thể chưa sẵn sàng.
-    }
+    // Gỡ poster tĩnh phía trên để lộ video đang chạy.
+    setOpening(true);
 
-    void video.play().catch(() => {
-      // Không để intro bị treo nếu browser từ chối phát video.
-      startTimeline(false);
-    });
+    // Bắt đầu timeline CSS ngay từ lúc bấm mở.
+    startTimeline();
   };
 
   if (finished) {
@@ -147,7 +126,6 @@ export default function EnvelopeCover({
     <div
       className={[
         'intro-cover',
-        isZalo ? 'intro-zalo' : '',
         timelineStarted ? 'intro-opening' : '',
       ]
         .filter(Boolean)
@@ -158,45 +136,51 @@ export default function EnvelopeCover({
     >
       <div className="intro-film">
         <div className="intro-film-frame">
-          {opening && isZalo ? (
-            <img
-              src="/videos/preview-zalo.webp"
-              alt=""
-              className="intro-envelope-animation"
-              draggable={false}
-              aria-hidden="true"
-              onLoad={() => startTimeline(true)}
-              onError={() => startTimeline(true)}
-            />
-          ) : (
+          {/*
+            Cách giống hero video của trang tham chiếu:
+            autoplay + muted + loop + playsInline,
+            không gọi video.play() bằng JavaScript.
+          */}
+          <video
+            ref={videoRef}
+            src="/videos/envelope-open.mp4"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            aria-hidden="true"
+            className="intro-envelope-video"
+          />
+
+          {/*
+            Video chạy sẵn phía dưới nhưng người dùng chỉ thấy
+            poster tĩnh cho tới khi bấm con dấu.
+          */}
+          {!opening && (
             <>
-              <video
-                ref={videoRef}
-                src="/videos/envelope-open.mp4"
-                poster="/images/envelope-poster.jpg"
-                playsInline
-                muted
-                preload="auto"
+              <img
+                src="/images/envelope-poster.jpg"
+                alt=""
+                className="intro-envelope-start-poster"
+                draggable={false}
                 aria-hidden="true"
-                onPlaying={() => startTimeline(false)}
               />
 
-              {!opening && (
-                <button
-                  type="button"
-                  className="intro-wax-button"
-                  onClick={handleOpen}
-                  aria-label="Chạm con dấu để mở thiệp và phát nhạc"
-                >
-                  <img
-                    src="/images/wax-seal.png"
-                    alt=""
-                    width={92}
-                    height={92}
-                    draggable={false}
-                  />
-                </button>
-              )}
+              <button
+                type="button"
+                className="intro-wax-button"
+                onClick={handleOpen}
+                aria-label="Chạm con dấu để mở thiệp và phát nhạc"
+              >
+                <img
+                  src="/images/wax-seal.png"
+                  alt=""
+                  width={92}
+                  height={92}
+                  draggable={false}
+                />
+              </button>
             </>
           )}
         </div>
