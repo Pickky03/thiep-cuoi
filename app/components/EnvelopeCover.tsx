@@ -75,9 +75,10 @@ export default function EnvelopeCover({
     );
   };
 
-  const handleOpen = () => {
+  const handleOpen = async () => {
     if (opening) return;
   
+    // 1. Phát nhạc
     startMusic();
   
     const video = videoRef.current;
@@ -85,7 +86,16 @@ export default function EnvelopeCover({
     if (video) {
       try {
         video.currentTime = 0;
-      } catch {}
+        // Bắt buộc gọi play() trực tiếp trong sự kiện click để vượt qua cơ chế chặn của Zalo/iOS
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((error) => {
+            console.log("Lỗi khi ép phát video trên Zalo:", error);
+          });
+        }
+      } catch (err) {
+        console.log(err);
+      }
     }
   
     setOpening(true);
@@ -117,11 +127,9 @@ export default function EnvelopeCover({
           */}
 <video
   ref={videoRef}
-  autoPlay
   muted
-  loop
   playsInline
-  preload="auto"
+  preload="auto" // Giúp trình duyệt tải trước dữ liệu video
   aria-hidden="true"
   className="intro-envelope-video"
 >
