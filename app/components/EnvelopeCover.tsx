@@ -86,7 +86,7 @@ export default function EnvelopeCover({
       reducedMotion ? 100 : INTRO_LENGTH_MS,
     );
   };
-  if (finished) return null;
+  // if (finished) return null;
   return (
     <div
       className={`intro-cover ${opening ? 'intro-opening' : ''}`}
