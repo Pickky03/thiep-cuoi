@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useMusic } from './MusicProvider';
 
 const NORMAL_INTRO_LENGTH_MS = 14200;
-const ZALO_INTRO_LENGTH_MS = 15700;
+const ZALO_INTRO_LENGTH_MS = 18500;
 
 type MediaMode = 'unknown' | 'zalo' | 'browser';
 
@@ -49,20 +49,27 @@ export default function EnvelopeCover({
 
   useEffect(() => {
     const zalo = detectZaloWebView();
-
-    // Zalo tuyệt đối không mount <video>.
-    // Browser khác dùng MP4 như bình thường.
+  
     setMediaMode(zalo ? 'zalo' : 'browser');
-
+  
+    if (zalo) {
+      const preloadWebp = new Image();
+  
+      preloadWebp.src = '/videos/preview-zalo.webp';
+  
+      preloadWebp.decode?.().catch(() => {});
+    }
+  
     router.prefetch('/thiep-cuoi');
+  
     window.scrollTo(0, 0);
-
+  
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
-
+  
     return () => {
       unlockPageScroll();
-
+  
       if (finishTimerRef.current) {
         clearTimeout(finishTimerRef.current);
       }
