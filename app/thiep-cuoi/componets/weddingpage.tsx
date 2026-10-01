@@ -204,10 +204,6 @@ export default function WeddingPage({
     >
       <SakuraPetals />
 
-      <a href="#loi-moi" className="wedding-skip">
-        Bỏ qua đến lời mời
-      </a>
-
       <main className="[font-family:var(--font-be-vietnam,Arial),sans-serif] overflow-x-hidden bg-[#faf7f0]">
         <section
           className="relative isolate h-svh min-h-167.5 max-h-230 overflow-hidden text-white"
