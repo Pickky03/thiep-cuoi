@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useMusic } from './MusicProvider';
 
 const NORMAL_INTRO_LENGTH_MS = 14200;
-const ZALO_INTRO_LENGTH_MS = 14300;
-const ZALO_WEBP_DURATION_MS = 3800;
+const ZALO_INTRO_LENGTH_MS = 16200;
+const ZALO_WEBP_DURATION_MS = 5600;
 
 type MediaMode = 'unknown' | 'zalo' | 'browser';
 
@@ -47,6 +47,9 @@ export default function EnvelopeCover({
   const [mediaMode, setMediaMode] =
     useState<MediaMode>('unknown');
 
+  const [webpKey, setWebpKey] =
+    useState(0);
+
   const [opening, setOpening] =
     useState(false);
 
@@ -69,18 +72,13 @@ export default function EnvelopeCover({
     );
 
     /*
-      Preload WebP trên Zalo để tải/decode sẵn frame,
-      giúp hiệu ứng mở phong bì mượt mà tức thì.
+      Preload WebP trên Zalo qua fetch:
+      File được nạp sẵn vào HTTP cache để hiện ngay lập tức khi click,
+      nhưng KHÔNG dùng new Image() vì sẽ làm animation tự chạy ngầm trước,
+      khiến WebP bị tua trước khi khách kịp bấm con dấu!
     */
     if (zalo) {
-      const preloadWebp = new Image();
-
-      preloadWebp.src =
-        '/videos/zalo4.webp';
-
-      preloadWebp
-        .decode?.()
-        .catch(() => {});
+      fetch('/videos/zalo4.webp').catch(() => {});
     }
 
     window.scrollTo(0, 0);
@@ -235,6 +233,7 @@ export default function EnvelopeCover({
       WebView của Zalo luôn cưỡng chế video sang Native Player.
     */
     if (mediaMode === 'zalo') {
+      setWebpKey(Date.now());
       startTimeline(true);
 
       webpTimerRef.current =
@@ -318,6 +317,7 @@ export default function EnvelopeCover({
           {isZalo ? (
             opening ? (
               <img
+                key={webpKey}
                 src="/videos/zalo4.webp"
                 alt=""
                 className="intro-envelope-animation"
