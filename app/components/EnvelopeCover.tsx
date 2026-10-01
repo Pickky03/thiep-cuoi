@@ -77,44 +77,18 @@ export default function EnvelopeCover({
 
   const handleOpen = () => {
     if (opening) return;
-
-    // Nhạc vẫn phải bắt đầu trực tiếp từ thao tác click.
+  
     startMusic();
-
-    const reducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches;
-
-    if (reducedMotion) {
-      setOpening(true);
-
-      finishTimerRef.current = setTimeout(
-        finishIntro,
-        100,
-      );
-
-      return;
-    }
-
+  
     const video = videoRef.current;
-
-    /*
-      Video đã autoplay muted + loop từ lúc trang load.
-      Khi bấm con dấu chỉ đưa video về frame đầu.
-      TUYỆT ĐỐI không gọi video.play() ở đây.
-    */
+  
     if (video) {
       try {
         video.currentTime = 0;
-      } catch {
-        // Nếu metadata chưa sẵn sàng thì video vẫn tiếp tục autoplay.
-      }
+      } catch {}
     }
-
-    // Gỡ poster tĩnh phía trên để lộ video đang chạy.
+  
     setOpening(true);
-
-    // Bắt đầu timeline CSS ngay từ lúc bấm mở.
     startTimeline();
   };
 
@@ -141,17 +115,21 @@ export default function EnvelopeCover({
             autoplay + muted + loop + playsInline,
             không gọi video.play() bằng JavaScript.
           */}
-          <video
-            ref={videoRef}
-            src="/videos/envelope-open.mp4"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            aria-hidden="true"
-            className="intro-envelope-video"
-          />
+<video
+  ref={videoRef}
+  autoPlay
+  muted
+  loop
+  playsInline
+  preload="auto"
+  aria-hidden="true"
+  className="intro-envelope-video"
+>
+  <source
+    src="https://res.cloudinary.com/mdkfpzjv/video/upload/v1790837013/envelope-open.mp4"
+    type="video/mp4"
+  />
+</video>
 
           {/*
             Video chạy sẵn phía dưới nhưng người dùng chỉ thấy
