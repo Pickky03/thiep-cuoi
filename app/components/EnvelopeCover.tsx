@@ -5,7 +5,7 @@ import { useMusic } from './MusicProvider';
 
 const NORMAL_INTRO_LENGTH_MS = 14200;
 const ZALO_INTRO_LENGTH_MS = 16800;
-const ZALO_WEBP_DURATION_MS = 8200;
+const ZALO_WEBP_DURATION_MS = 3800;
 
 type MediaMode = 'unknown' | 'zalo' | 'browser';
 
