@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useMusic } from './MusicProvider';
 
 const NORMAL_INTRO_LENGTH_MS = 14200;
@@ -28,10 +27,11 @@ function detectZaloWebView() {
 
 export default function EnvelopeCover({
   guestName,
+  onFinished,
 }: {
   guestName: string;
+  onFinished?: () => void;
 }) {
-  const router = useRouter();
   const { startMusic } = useMusic();
 
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -60,6 +60,8 @@ export default function EnvelopeCover({
     useState(false);
 
   useEffect(() => {
+    document.body.classList.add('wedding-intro-active');
+
     const zalo = detectZaloWebView();
 
     setMediaMode(
@@ -84,8 +86,6 @@ export default function EnvelopeCover({
         .catch(() => {});
     }
 
-    router.prefetch('/thiep-cuoi');
-
     window.scrollTo(0, 0);
 
     document.body.style.overflow =
@@ -95,6 +95,7 @@ export default function EnvelopeCover({
       'hidden';
 
     return () => {
+      document.body.classList.remove('wedding-intro-active');
       unlockPageScroll();
 
       if (finishTimerRef.current) {
@@ -109,9 +110,10 @@ export default function EnvelopeCover({
         );
       }
     };
-  }, [router]);
+  }, []);
 
   const finishIntro = () => {
+    document.body.classList.remove('wedding-intro-active');
     unlockPageScroll();
 
     const url = new URL(
@@ -133,6 +135,7 @@ export default function EnvelopeCover({
     );
 
     setFinished(true);
+    onFinished?.();
   };
 
   const startTimeline = (
@@ -357,58 +360,54 @@ export default function EnvelopeCover({
 
       {/* =========================
           PAPER
+
+          Trên Zalo: KHÔNG mount phần này trong lúc WebP chạy.
+          Chỉ mount sau khi webpFinished=true để giảm layout,
+          animation và paint cạnh tranh tài nguyên với Animated WebP.
       ========================= */}
 
-      <div
-        className="intro-paper"
-        aria-hidden={
-          !timelineStarted
-        }
-      >
+      {(!isZalo || webpFinished) && (
         <div
-          className="intro-butterfly"
-          aria-hidden="true"
+          className="intro-paper"
+          aria-hidden={!timelineStarted}
         >
-          <span className="intro-wing intro-wing-left" />
-          <span className="intro-wing intro-wing-right" />
+          <div
+            className="intro-butterfly"
+            aria-hidden="true"
+          >
+            <span className="intro-wing intro-wing-left" />
+            <span className="intro-wing intro-wing-right" />
+          </div>
+
+          <div className="intro-copy intro-copy-invite">
+            <p className="intro-invite-line">
+              TRÂN TRỌNG KÍNH MỜI
+            </p>
+
+            <h5 className="intro-guest-name">
+              {guestName}
+            </h5>
+
+            <p className="intro-invite-line">
+              ĐẾN CHUNG VUI
+            </p>
+          </div>
+
+          <div className="intro-copy intro-copy-names">
+            <p>
+              CHÚNG MÌNH SẮP VỀ CHUNG MỘT NHÀ
+            </p>
+
+            <h1>
+              <span>Văn Hải</span>
+              <em>&amp;</em>
+              <span>Kim Hường</span>
+            </h1>
+
+            <p>06 · 11 · 2026</p>
+          </div>
         </div>
-
-        <div className="intro-copy intro-copy-invite">
-          <p className="intro-invite-line">
-            TRÂN TRỌNG KÍNH MỜI
-          </p>
-
-          <h5 className="intro-guest-name">
-            {guestName}
-          </h5>
-
-          <p className="intro-invite-line">
-            ĐẾN CHUNG VUI
-          </p>
-        </div>
-
-        <div className="intro-copy intro-copy-names">
-          <p>
-            CHÚNG MÌNH SẮP VỀ CHUNG
-            MỘT NHÀ
-          </p>
-
-          <h1>
-            <span>Văn Hải</span>
-
-            <em>&amp;</em>
-
-            <span>
-              Kim Hường
-            </span>
-          </h1>
-
-          <p>
-            06 · 11 · 2026
-          </p>
-        </div>
-      </div>
-
+      )}
       {!opening && (
         <p className="intro-tap-hint">
           Chạm vào con dấu để mở

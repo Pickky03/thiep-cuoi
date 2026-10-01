@@ -1615,126 +1615,73 @@ a:focus-visible {
 }
 
 /* =========================================
-   ZALO WEBVIEW - LONG WEBP TIMELINE
-   ========================================= */
+   ZALO - ƯU TIÊN ANIMATED WEBP
+   =========================================
 
-/*
-  Giữ WebP nguyên vẹn trong 8 giây.
-  Sau 8 giây mới bắt đầu fade sang paper.
+   Mục tiêu:
+   - Trong lúc WebP chạy: không chạy bất kỳ intro CSS animation nào khác.
+   - Không fade intro-film trước khi WebP thật sự kết thúc.
+   - Sau khi React thêm .intro-webp-finished mới bắt đầu paper/text.
+   - Không ép translateZ(0), tránh tạo compositor layer không cần thiết
+     trong Zalo WebView.
 */
 
-.intro-zalo.intro-opening .intro-film {
-  animation:
-    intro-film-out
-    0.8s ease
-    8s forwards;
-}
-
-.intro-zalo.intro-opening .intro-paper {
-  animation:
-    intro-paper-in
-    0.8s ease
-    8s forwards;
-}
-
-/*
-  Sau khi paper gần hiện xong mới bắt đầu lời mời.
-*/
-.intro-zalo.intro-opening .intro-copy-invite {
-  animation:
-    intro-invite-copy
-    4.65s ease
-    9.1s both;
-}
-
-/*
-  Dời phần tên theo cùng khoảng thời gian.
-*/
-.intro-zalo.intro-opening .intro-copy-names {
-  animation:
-    intro-names-copy
-    3.3s ease
-    14.05s both;
-}
-
-/*
-  Fade toàn intro ở cuối.
-*/
-.intro-cover.intro-zalo.intro-opening {
-  animation:
-    intro-cover-out
-    0.95s ease-in-out
-    17.55s forwards;
-}
-/* =========================================
-   ZALO - ƯU TIÊN TOÀN BỘ TÀI NGUYÊN CHO WEBP
-   ========================================= */
-
-/*
-  Trong lúc WebP đang chạy:
-  - không animate paper
-  - không animate butterfly
-  - không animate text
-  - giảm hiệu ứng tốn GPU
-*/
-
-.intro-zalo:not(.intro-webp-finished) .intro-paper,
-.intro-zalo:not(.intro-webp-finished) .intro-butterfly,
-.intro-zalo:not(.intro-webp-finished) .intro-wing,
-.intro-zalo:not(.intro-webp-finished) .intro-copy {
+/* Trạng thái đang chạy WebP: giữ scene hoàn toàn tĩnh ngoài chính WebP. */
+.intro-zalo.intro-opening:not(.intro-webp-finished),
+.intro-zalo.intro-opening:not(.intro-webp-finished) .intro-film,
+.intro-zalo.intro-opening:not(.intro-webp-finished) .intro-film-frame,
+.intro-zalo.intro-opening:not(.intro-webp-finished) .intro-envelope-animation {
   animation: none !important;
+  filter: none !important;
+  box-shadow: none !important;
 }
 
-.intro-zalo:not(.intro-webp-finished) .intro-paper {
-  opacity: 0 !important;
-  visibility: hidden;
+.intro-zalo.intro-opening:not(.intro-webp-finished) .intro-film {
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .intro-zalo .intro-film {
   will-change: auto;
 }
 
-.intro-zalo .intro-envelope-animation {
-  width: 100%;
-  height: 100%;
-
-  object-fit: cover;
-
-  transform: translateZ(0);
-
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-
-  image-rendering: auto;
-}
-
 .intro-zalo .intro-film-frame {
   contain: layout paint;
 }
 
-/* tránh shadow/filter trong lúc WebP decode */
-.intro-zalo:not(.intro-webp-finished) .intro-film,
-.intro-zalo:not(.intro-webp-finished) .intro-film-frame,
-.intro-zalo:not(.intro-webp-finished) .intro-envelope-animation {
+.intro-zalo .intro-envelope-animation {
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  object-position: center;
+
+  pointer-events: none;
+
+  transform: none !important;
   filter: none !important;
+  box-shadow: none !important;
+
+  image-rendering: auto;
+
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
-/* =========================
-   SAU KHI WEBP CHẠY XONG
-   ========================= */
-
+/* Paper chỉ được mount sau khi WebP đã xong. */
 .intro-zalo.intro-webp-finished .intro-film {
   animation:
     intro-film-out
-    0.8s ease forwards;
+    0.8s ease
+    0s forwards;
 }
 
 .intro-zalo.intro-webp-finished .intro-paper {
-  visibility: visible;
-
   animation:
     intro-paper-in
-    0.8s ease forwards;
+    0.8s ease
+    0s forwards;
 }
 
 .intro-zalo.intro-webp-finished .intro-copy-invite {
@@ -1756,4 +1703,15 @@ a:focus-visible {
     intro-cover-out
     0.95s ease-in-out
     9.55s forwards;
+}
+
+/*
+  Safety net:
+  nếu sau này có component khác ngoài EnvelopeCover vẫn được mount,
+  các animation phổ biến sẽ bị pause trong thời gian intro.
+*/
+body.wedding-intro-active .wedding-reveal,
+body.wedding-intro-active .hero-explore-icon,
+body.wedding-intro-active .sakura-petal {
+  animation-play-state: paused !important;
 }
