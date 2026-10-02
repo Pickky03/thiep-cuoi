@@ -386,14 +386,14 @@ export default function WeddingPage({
           className="relative h-120 overflow-hidden bg-[#d9cfbf] md:h-150"
           aria-label={`Ảnh cưới của ${wedding.groom} và ${wedding.bride}`}
         >
-            <div className="absolute inset-0 overflow-hidden">
-              <img
-                src="/images/DUY08862-bouquet.jpg"
-                alt=""
-                aria-hidden="true"
-                className="h-full w-full object-cover object-[50%_35%] transition-transform duration-500"
-              />
-            </div>
+          <div className="absolute inset-0 overflow-hidden">
+            <img
+              src="/images/DUY08862-bouquet.jpg"
+              alt=""
+              aria-hidden="true"
+              className="h-full w-full object-cover object-[50%_35%] transition-transform duration-500"
+            />
+          </div>
 
           <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(39,25,19,.72),transparent_72%)] md:bg-[linear-gradient(90deg,transparent_32%,rgba(39,25,19,.52)_100%)]" />
 
