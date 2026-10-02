@@ -611,13 +611,30 @@ a:focus-visible {
 }
 
 .intro-wax-button:focus-visible {
-
   outline: 3px solid #f8e1b7;
-
   outline-offset: 5px;
-
   border-radius: 50%;
+}
 
+.intro-wax-button.is-opening {
+  pointer-events: none;
+  animation: intro-seal-pop-out 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes intro-seal-pop-out {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  35% {
+    transform: translate(-50%, -50%) scale(1.15);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.35);
+    opacity: 0;
+    visibility: hidden;
+  }
 }
 
 @keyframes intro-seal-breathe {
@@ -1350,36 +1367,36 @@ a:focus-visible {
  * Mờ dần để hiện trang thiệp cưới
  */
 
-/* Cảnh phong bì biến mất */
-.intro-opening .intro-film {
+/* Cảnh phong bì biến mất (Chỉ áp dụng cho Browser thường, không can thiệp Zalo) */
+.intro-cover:not(.intro-zalo).intro-opening .intro-film {
   animation:
     intro-film-out
     0.8s ease
     4.4s forwards;
 }
 
-.intro-opening .intro-paper {
+.intro-cover:not(.intro-zalo).intro-opening .intro-paper {
   animation:
     intro-paper-in
     0.8s ease
     4.4s forwards;
 }
 
-.intro-opening .intro-copy-invite {
+.intro-cover:not(.intro-zalo).intro-opening .intro-copy-invite {
   animation:
     intro-invite-copy
     5.2s ease-out
     5.0s both;
 }
 
-.intro-opening .intro-copy-names {
+.intro-cover:not(.intro-zalo).intro-opening .intro-copy-names {
   animation:
     intro-names-copy
     3.9s ease-out
     10.2s both;
 }
 
-.intro-cover.intro-opening {
+.intro-cover:not(.intro-zalo).intro-opening {
   animation:
     intro-cover-out
     1.2s ease-in-out
