@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useMusic } from './MusicProvider';
 
 const NORMAL_INTRO_LENGTH_MS = 14700;
-const ZALO_INTRO_LENGTH_MS = 19000;
-const ZALO_WEBP_DURATION_MS = 8000;
+const ZALO_INTRO_LENGTH_MS = 17200;
+const ZALO_WEBP_DURATION_MS = 6200;
 
 type MediaMode = 'unknown' | 'zalo' | 'browser';
 
@@ -37,6 +37,8 @@ export default function EnvelopeCover({
   const { startMusic } = useMusic();
 
   const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const zaloVideoRef = useRef<HTMLVideoElement>(null);
 
   const finishTimerRef =
     useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -82,16 +84,14 @@ export default function EnvelopeCover({
     */
     if (zalo) {
       /*
-        1. Nạp trước file WebP vào HTTP Cache của trình duyệt qua fetch().
-        Lưu ý: KHÔNG dùng new Image() với animated WebP vì sẽ kích hoạt frame timer
-        chạy ngầm trong nền trước khi khách nhấn mở, làm WebP bị tua trước hoặc khựng!
+        Nạp trước file video MP4 vào HTTP Cache để khi bấm mở là phát tức thì.
       */
       if (typeof fetch !== 'undefined') {
-        fetch('/videos/zalo4.webp', { cache: 'force-cache' }).catch(() => {});
+        fetch('/videos/envelope-open.mp4', { cache: 'force-cache' }).catch(() => {});
       }
 
       /*
-        2. Preload cánh bướm CSS:
+        Preload cánh bướm CSS:
         Đảm bảo khi chuyển sang tờ giấy thiệp cưới, bướm hiện tức thì.
       */
       const preloadButterfly = new Image();
@@ -132,6 +132,60 @@ export default function EnvelopeCover({
       }
     };
   }, []);
+
+  /*
+    ZALO VIDEO-TO-CANVAS ANIMATION LOOP:
+    Vẽ từng frame của video MP4 phần cứng lên <canvas>.
+    Trình duyệt Zalo không nhận diện được thẻ video hiển thị nên KHÔNG BUNG Native Player.
+    Video MP4 chạy siêu mượt 60fps từ chip giải mã phần cứng GPU, loại bỏ 100% hiện tượng khựng/giật của WebP!
+  */
+  useEffect(() => {
+    if (!opening || mediaMode !== 'zalo') return;
+
+    const video = zaloVideoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animId: number;
+    let isRunning = true;
+
+    const draw = () => {
+      if (!isRunning) return;
+
+      if (video.readyState >= 2) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      }
+
+      if (!video.ended) {
+        animId = requestAnimationFrame(draw);
+      }
+    };
+
+    draw();
+
+    const handlePlaying = () => {
+      draw();
+    };
+
+    const handleEnded = () => {
+      if (ctx && video.readyState >= 2) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      }
+    };
+
+    video.addEventListener('playing', handlePlaying);
+    video.addEventListener('ended', handleEnded);
+
+    return () => {
+      isRunning = false;
+      cancelAnimationFrame(animId);
+      video.removeEventListener('playing', handlePlaying);
+      video.removeEventListener('ended', handleEnded);
+    };
+  }, [opening, mediaMode]);
 
   const finishIntro = () => {
     document.body.classList.remove('wedding-intro-active');
@@ -175,7 +229,7 @@ export default function EnvelopeCover({
 
     preloadTimerRef.current = setTimeout(() => {
       onPreloadWeddingPage?.();
-    }, zaloMode ? 15500 : 11800);
+    }, zaloMode ? 14000 : 11800);
 
     finishTimerRef.current =
       setTimeout(
@@ -219,18 +273,25 @@ export default function EnvelopeCover({
 
     /*
       ==============================
-      ZALO
+      ZALO: VIDEO-TO-CANVAS (CÁCH 2)
       ==============================
-
-      Không dùng video.
-      Chỉ chạy Animated WebP.
-
-      Sau 8.2 giây:
-      đánh dấu WebP đã hoàn thành,
-      lúc đó CSS mới chạy paper,
-      butterfly và text.
+      Phát video MP4 chạy ngầm và vẽ từng frame lên <canvas>.
+      Trình duyệt Zalo không nhận diện được thẻ video hiển thị nên KHÔNG BUNG Native Player.
+      Video được giải mã bằng chip phần cứng GPU 60fps mượt mà, không tốn CPU, không bị giật.
     */
     if (mediaMode === 'zalo') {
+      const zVideo = zaloVideoRef.current;
+      if (zVideo) {
+        try {
+          zVideo.currentTime = 0;
+          zVideo.playbackRate = 0.84;
+          zVideo.muted = true;
+          zVideo.defaultMuted = true;
+        } catch {}
+
+        void zVideo.play().catch(() => {});
+      }
+
       startTimeline(true);
 
       webpTimerRef.current =
@@ -314,23 +375,50 @@ export default function EnvelopeCover({
           ========================= */}
 
           {isZalo ? (
-            opening ? (
-              <img
-                src="/videos/zalo4.webp"
-                alt=""
-                className="intro-envelope-animation"
-                draggable={false}
+            <>
+              {/* Thẻ video chạy ngầm dùng chip giải mã phần cứng 60fps, không bung Native Player */}
+              <video
+                ref={zaloVideoRef}
+                src="/videos/envelope-open.mp4"
+                muted
+                playsInline
+                preload="auto"
                 aria-hidden="true"
+                tabIndex={-1}
+                style={{
+                  position: 'absolute',
+                  width: '1px',
+                  height: '1px',
+                  opacity: 0.001,
+                  pointerEvents: 'none',
+                  zIndex: -1,
+                }}
+                {...{
+                  'webkit-playsinline': 'true',
+                  'x5-playsinline': 'true',
+                  'x5-video-player-type': 'h5-page',
+                  'x5-video-player-fullscreen': 'false',
+                  'x5-video-orientation': 'portrait',
+                }}
               />
-            ) : (
-              <img
-                src="/images/envelope-poster.jpg"
-                alt=""
-                className="intro-envelope-poster"
-                draggable={false}
-                aria-hidden="true"
-              />
-            )
+              {opening ? (
+                <canvas
+                  ref={canvasRef}
+                  width={720}
+                  height={1280}
+                  className="intro-envelope-animation"
+                  aria-hidden="true"
+                />
+              ) : (
+                <img
+                  src="/images/envelope-poster.jpg"
+                  alt=""
+                  className="intro-envelope-poster"
+                  draggable={false}
+                  aria-hidden="true"
+                />
+              )}
+            </>
           ) : mediaMode ===
             'browser' ? (
 
