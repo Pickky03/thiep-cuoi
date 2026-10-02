@@ -1593,6 +1593,13 @@ a:focus-visible {
 
 .intro-zalo .intro-film-frame {
   contain: layout paint;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+.intro-zalo .intro-envelope-poster.is-opening {
+  opacity: 0;
+  transition: opacity 0.25s ease 0.1s;
 }
 
 .intro-zalo .intro-envelope-animation {
@@ -1605,7 +1612,11 @@ a:focus-visible {
 
   pointer-events: none;
 
-  transform: none !important;
+  background: transparent !important;
+  transform: translateZ(0) !important;
+  -webkit-transform: translateZ(0) !important;
+  will-change: transform;
+
   filter: none !important;
   box-shadow: none !important;
 
@@ -1633,14 +1644,14 @@ a:focus-visible {
 .intro-zalo.intro-webp-finished .intro-copy-invite {
   animation:
     intro-invite-copy
-    5.2s ease-out
-    0.6s both;
+    5.0s ease-out
+    0.8s both;
 }
 
 .intro-zalo.intro-webp-finished .intro-copy-names {
   animation:
     intro-names-copy
-    3.9s ease-out
+    4.0s ease-out
     5.8s both;
 }
 
@@ -1648,7 +1659,7 @@ a:focus-visible {
   animation:
     intro-cover-out
     1.2s ease-in-out
-    9.1s forwards;
+    9.8s forwards;
 }
 
 /*

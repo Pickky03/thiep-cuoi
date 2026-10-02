@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useMusic } from './MusicProvider';
 
 const NORMAL_INTRO_LENGTH_MS = 14700;
-const ZALO_INTRO_LENGTH_MS = 14700;
-const ZALO_WEBP_DURATION_MS = 4400;
+const ZALO_INTRO_LENGTH_MS = 17000;
+const ZALO_WEBP_DURATION_MS = 6000;
 
 type MediaMode = 'unknown' | 'zalo' | 'browser';
 
@@ -81,14 +81,33 @@ export default function EnvelopeCover({
       giúp giảm giật ở frame đầu.
     */
     if (zalo) {
+      /*
+        1. Nạp sẵn file WebP vào HTTP Cache để khi bấm mở là có ngay, không tốn thời gian tải.
+      */
+      if (typeof fetch !== 'undefined') {
+        fetch('/videos/zalo4.webp', { cache: 'force-cache' }).catch(() => {});
+      }
+
+      /*
+        2. Decode trước WebP vào RAM/GPU:
+        Giúp khung hình đầu tiên xuất hiện tức thì khi bấm mở,
+        triệt tiêu độ trễ/khựng lúc mở nắp phong bì.
+      */
       const preloadWebp = new Image();
+      preloadWebp.src = '/videos/zalo4.webp';
+      if ('decode' in preloadWebp) {
+        preloadWebp.decode().catch(() => {});
+      }
 
-      preloadWebp.src =
-        '/videos/preview-zalo.webp';
-
-      preloadWebp
-        .decode?.()
-        .catch(() => {});
+      /*
+        3. Preload cánh bướm CSS:
+        Đảm bảo khi chuyển sang tờ giấy thiệp cưới, bướm hiện tức thì.
+      */
+      const preloadButterfly = new Image();
+      preloadButterfly.src = '/images/butterfly.png';
+      if ('decode' in preloadButterfly) {
+        preloadButterfly.decode().catch(() => {});
+      }
     }
 
     window.scrollTo(0, 0);
@@ -165,7 +184,7 @@ export default function EnvelopeCover({
 
     preloadTimerRef.current = setTimeout(() => {
       onPreloadWeddingPage?.();
-    }, 11800);
+    }, zaloMode ? 14000 : 11800);
 
     finishTimerRef.current =
       setTimeout(
@@ -304,23 +323,26 @@ export default function EnvelopeCover({
           ========================= */}
 
           {isZalo ? (
-            opening ? (
-              <img
-                src="/videos/zalo4.webp"
-                alt=""
-                className="intro-envelope-animation"
-                draggable={false}
-                aria-hidden="true"
-              />
-            ) : (
+            <>
               <img
                 src="/images/envelope-poster.jpg"
                 alt=""
-                className="intro-envelope-poster"
+                className={`intro-envelope-poster ${opening ? 'is-opening' : ''}`}
                 draggable={false}
                 aria-hidden="true"
               />
-            )
+              {opening && (
+                <img
+                  src="/videos/zalo4.webp"
+                  alt=""
+                  className="intro-envelope-animation"
+                  draggable={false}
+                  aria-hidden="true"
+                  loading="eager"
+                  decoding="async"
+                />
+              )}
+            </>
           ) : mediaMode ===
             'browser' ? (
 
