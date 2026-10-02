@@ -3,112 +3,57 @@
 import { useEffect, useRef, useState } from 'react';
 import { useMusic } from './MusicProvider';
 
-const NORMAL_INTRO_LENGTH_MS = 14200;
-const ZALO_INTRO_LENGTH_MS = 16800;
-const ZALO_WEBP_DURATION_MS = 8200;
-
-type MediaMode = 'unknown' | 'zalo' | 'browser';
+const FRAME_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
 function unlockPageScroll() {
   document.body.style.removeProperty('overflow');
   document.documentElement.style.removeProperty('overflow');
 }
 
-function detectZaloWebView() {
-  if (typeof navigator === 'undefined') return false;
-
-  const ua = navigator.userAgent.toLowerCase();
-
-  return (
-    ua.includes('zalo') ||
-    ua.includes('zalowebview')
-  );
-}
-
 export default function EnvelopeCover({
   guestName,
+  onPreloadWeddingPage,
   onFinished,
 }: {
   guestName: string;
+  onPreloadWeddingPage?: () => void;
   onFinished?: () => void;
 }) {
   const { startMusic } = useMusic();
 
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [opening, setOpening] = useState(false);
+  const [timelineStarted, setTimelineStarted] = useState(false);
+  const [finished, setFinished] = useState(false);
 
-  const finishTimerRef =
-    useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const webpTimerRef =
-    useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const timelineStartedRef = useRef(false);
-
-  const [mediaMode, setMediaMode] =
-    useState<MediaMode>('unknown');
-
-  const [opening, setOpening] =
-    useState(false);
-
-  const [timelineStarted, setTimelineStarted] =
-    useState(false);
-
-  const [webpFinished, setWebpFinished] =
-    useState(false);
-
-  const [finished, setFinished] =
-    useState(false);
+  const preloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const finishTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     document.body.classList.add('wedding-intro-active');
+    window.scrollTo(0, 0);
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
 
-    const zalo = detectZaloWebView();
-
-    setMediaMode(
-      zalo ? 'zalo' : 'browser',
-    );
-
-    /*
-      Preload WebP trên Zalo.
-
-      Mục đích:
-      tải/decode trước khi người dùng bấm con dấu,
-      giúp giảm giật ở frame đầu.
-    */
-    if (zalo) {
-      const preloadWebp = new Image();
-
-      preloadWebp.src =
-        '/videos/preview-zalo.webp';
-
-      preloadWebp
-        .decode?.()
-        .catch(() => {});
+    // Preload & decode trước toàn bộ 14 frames vào GPU/RAM để chuyển frame siêu mượt
+    for (let i = 1; i <= 14; i++) {
+      const img = new Image();
+      img.src = `/images/frame${i}.jpg`;
+      if ('decode' in img) {
+        img.decode().catch(() => {});
+      }
     }
 
-    window.scrollTo(0, 0);
-
-    document.body.style.overflow =
-      'hidden';
-
-    document.documentElement.style.overflow =
-      'hidden';
+    const bImg = new Image();
+    bImg.src = '/images/butterfly.png';
+    if ('decode' in bImg) {
+      bImg.decode().catch(() => {});
+    }
 
     return () => {
       document.body.classList.remove('wedding-intro-active');
       unlockPageScroll();
-
-      if (finishTimerRef.current) {
-        clearTimeout(
-          finishTimerRef.current,
-        );
-      }
-
-      if (webpTimerRef.current) {
-        clearTimeout(
-          webpTimerRef.current,
-        );
-      }
+      if (preloadTimerRef.current) clearTimeout(preloadTimerRef.current);
+      if (finishTimerRef.current) clearTimeout(finishTimerRef.current);
     };
   }, []);
 
@@ -116,304 +61,144 @@ export default function EnvelopeCover({
     document.body.classList.remove('wedding-intro-active');
     unlockPageScroll();
 
-    const url = new URL(
-      '/thiep-cuoi',
-      window.location.origin,
-    );
+    if (preloadTimerRef.current) clearTimeout(preloadTimerRef.current);
+    if (finishTimerRef.current) clearTimeout(finishTimerRef.current);
 
+    const url = new URL('/thiep-cuoi', window.location.origin);
     if (guestName !== 'Quý khách') {
-      url.searchParams.set(
-        'guest',
-        guestName,
-      );
+      url.searchParams.set('guest', guestName);
     }
-
-    window.history.replaceState(
-      null,
-      '',
-      `${url.pathname}${url.search}`,
-    );
+    window.history.replaceState(null, '', `${url.pathname}${url.search}`);
 
     setFinished(true);
+    onPreloadWeddingPage?.();
     onFinished?.();
   };
 
-  const startTimeline = (
-    zaloMode: boolean,
-  ) => {
-    if (
-      timelineStartedRef.current
-    ) {
+  const handleOpen = () => {
+    if (opening) return;
+
+    // Kích hoạt nhạc theo thao tác người dùng (tương thích iOS / Android / Safari)
+    startMusic();
+    setOpening(true);
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion) {
+      finishIntro();
       return;
     }
-
-    timelineStartedRef.current =
-      true;
 
     setTimelineStarted(true);
 
-    finishTimerRef.current =
-      setTimeout(
-        finishIntro,
-        zaloMode
-          ? ZALO_INTRO_LENGTH_MS
-          : NORMAL_INTRO_LENGTH_MS,
-      );
+    // Pre-mount trang thiệp cưới ở giây 8.5 (khi tên cặp đôi đang hiện)
+    // để trình duyệt chuẩn bị sẵn nội dung bên dưới, khi màn mở thiệp mờ tan ở 10.8s
+    // thì trang thiệp cưới sẽ hiện ra dần dần, loại bỏ hoàn toàn màn trắng ngắt quãng.
+    if (preloadTimerRef.current) clearTimeout(preloadTimerRef.current);
+    preloadTimerRef.current = setTimeout(() => {
+      onPreloadWeddingPage?.();
+    }, 8500);
+
+    // Màn mở thiệp mờ tan từ 10.8s -> 12.0s (1.2s crossfade mượt mà)
+    if (finishTimerRef.current) clearTimeout(finishTimerRef.current);
+    finishTimerRef.current = setTimeout(finishIntro, 12000);
   };
 
-  const handleOpen = () => {
-    if (
-      opening ||
-      mediaMode === 'unknown'
-    ) {
-      return;
-    }
-
-    /*
-      startMusic phải nằm trực tiếp
-      trong thao tác click của user.
-    */
-    startMusic();
-
-    const reducedMotion =
-      window.matchMedia(
-        '(prefers-reduced-motion: reduce)',
-      ).matches;
-
-    setOpening(true);
-
-    if (reducedMotion) {
-      finishTimerRef.current =
-        setTimeout(
-          finishIntro,
-          100,
-        );
-
-      return;
-    }
-
-    /*
-      ==============================
-      ZALO
-      ==============================
-
-      Không dùng video.
-      Chỉ chạy Animated WebP.
-
-      Sau 8.2 giây:
-      đánh dấu WebP đã hoàn thành,
-      lúc đó CSS mới chạy paper,
-      butterfly và text.
-    */
-    if (mediaMode === 'zalo') {
-      startTimeline(true);
-
-      webpTimerRef.current =
-        setTimeout(() => {
-          setWebpFinished(true);
-        }, ZALO_WEBP_DURATION_MS);
-
-      return;
-    }
-
-    /*
-      ==============================
-      BROWSER THƯỜNG / MESSENGER
-      ==============================
-    */
-
-    const video =
-      videoRef.current;
-
-    if (!video) {
-      startTimeline(false);
-      return;
-    }
-
-    try {
-      video.currentTime = 0;
-    } catch {
-      // Metadata chưa sẵn sàng.
-    }
-
-    void video
-      .play()
-      .catch(() => {
-        startTimeline(false);
-      });
-  };
-
-  if (finished) {
-    return null;
-  }
-
-  const isZalo =
-    mediaMode === 'zalo';
-
-  const isReady =
-    mediaMode !== 'unknown';
+  if (finished) return null;
 
   return (
     <div
-      className={[
-        'intro-cover',
-
-        isZalo
-          ? 'intro-zalo'
-          : '',
-
-        timelineStarted
-          ? 'intro-opening'
-          : '',
-
-        webpFinished
-          ? 'intro-webp-finished'
-          : '',
-      ]
-        .filter(Boolean)
-        .join(' ')}
+      className={`intro-cover intro-mode-blend ${timelineStarted ? 'intro-opening' : ''}`}
+      style={
+        {
+          '--frame-step': '0.18s',
+          '--frame-fade': '0.15s',
+        } as React.CSSProperties
+      }
       role="dialog"
       aria-modal="true"
       aria-label="Mở thiệp cưới Văn Hải và Kim Hường"
     >
       <div className="intro-film">
         <div className="intro-film-frame">
-
-          {/* =========================
-              ZALO → WEBP
-          ========================= */}
-
-          {isZalo ? (
-            opening ? (
-              <img
-                src="/videos/zalo4.webp"
-                alt=""
-                className="intro-envelope-animation"
-                draggable={false}
-                aria-hidden="true"
-              />
-            ) : (
-              <img
-                src="/images/envelope-poster.jpg"
-                alt=""
-                className="intro-envelope-poster"
-                draggable={false}
-                aria-hidden="true"
-              />
-            )
-          ) : mediaMode ===
-            'browser' ? (
-
-            /* =========================
-               BROWSER → MP4
-            ========================= */
-
-            <video
-              ref={videoRef}
-              src="/videos/envelope-open.mp4"
-              poster="/images/envelope-poster.jpg"
-              muted
-              playsInline
-              preload="auto"
-              aria-hidden="true"
-              onPlaying={() =>
-                startTimeline(false)
-              }
-            />
-          ) : (
-
-            /*
-              Chờ detect browser.
-              Chỉ hiện poster,
-              chưa mount video.
-            */
-
-            <img
-              src="/images/envelope-poster.jpg"
-              alt=""
-              className="intro-envelope-poster"
-              draggable={false}
-              aria-hidden="true"
-            />
-          )}
-
-          {!opening && (
+          {/* Nút bỏ qua nhỏ gọn, tinh tế khi đang mở */}
+          {opening && (
             <button
               type="button"
-              className="intro-wax-button"
-              onClick={handleOpen}
-              disabled={!isReady}
-              aria-label="Chạm con dấu để mở thiệp và phát nhạc"
-              aria-disabled={!isReady}
+              className="intro-skip-badge"
+              onClick={finishIntro}
+              aria-label="Bỏ qua màn mở thiệp để vào trang thiệp cưới"
             >
-              <img
-                src="/images/wax-seal.png"
-                alt=""
-                width={92}
-                height={92}
-                draggable={false}
-              />
+              Bỏ qua ›
             </button>
           )}
-        </div>
-      </div>
 
-      {/* =========================
-          PAPER
+          {/* =========================================
+              14 CSS FRAMES - UNIVERSAL CROSS-BROWSER
+              Chế độ mở thiệp mượt mà chuẩn tiêu chuẩn
+          ========================================= */}
+          <div className="intro-envelope-frames">
+            {FRAME_NUMBERS.map((num) => (
+              <img
+                key={num}
+                src={`/images/frame${num}.jpg`}
+                alt=""
+                className={`intro-frame-img intro-frame-${num}`}
+                draggable={false}
+                aria-hidden="true"
+                loading="eager"
+              />
+            ))}
 
-          Trên Zalo: KHÔNG mount phần này trong lúc WebP chạy.
-          Chỉ mount sau khi webpFinished=true để giảm layout,
-          animation và paint cạnh tranh tài nguyên với Animated WebP.
-      ========================= */}
-
-      {(!isZalo || webpFinished) && (
-        <div
-          className="intro-paper"
-          aria-hidden={!timelineStarted}
-        >
-          <div
-            className="intro-butterfly"
-            aria-hidden="true"
-          >
-            <span className="intro-wing intro-wing-left" />
-            <span className="intro-wing intro-wing-right" />
+            {/* Bướm 3D vỗ cánh chậm rãi, tạo cảm giác nhẹ nhàng, lãng mạn */}
+            <div className="intro-butterfly-box" aria-hidden="true">
+              <div className="intro-butterfly-shadow" />
+              <img
+                src="/images/butterfly.png"
+                alt=""
+                className="intro-butterfly-img"
+                draggable={false}
+              />
+            </div>
           </div>
 
+          {/* Con dấu sáp chạm mở */}
+          <button
+            type="button"
+            className={`intro-wax-button ${opening ? 'is-opening' : ''}`}
+            onClick={handleOpen}
+            aria-label="Chạm con dấu để mở thiệp và phát nhạc"
+          >
+            <img
+              src="/images/wax-seal.png"
+              alt=""
+              width={92}
+              height={92}
+              draggable={false}
+            />
+          </button>
+
+          {/* Nội dung thiệp trên nền giấy Frame 14 */}
           <div className="intro-copy intro-copy-invite">
-            <p className="intro-invite-line">
-              TRÂN TRỌNG KÍNH MỜI
-            </p>
-
-            <h5 className="intro-guest-name">
-              {guestName}
-            </h5>
-
-            <p className="intro-invite-line">
-              ĐẾN CHUNG VUI
-            </p>
+            <p className="intro-invite-line">TRÂN TRỌNG KÍNH MỜI</p>
+            <h5 className="intro-guest-name">{guestName}</h5>
+            <p className="intro-invite-line">ĐẾN CHUNG VUI</p>
           </div>
 
           <div className="intro-copy intro-copy-names">
-            <p>
-              CHÚNG MÌNH SẮP VỀ CHUNG MỘT NHÀ
-            </p>
-
+            <p>CHÚNG MÌNH SẮP VỀ CHUNG MỘT NHÀ</p>
             <h1>
               <span>Văn Hải</span>
               <em>&amp;</em>
               <span>Kim Hường</span>
             </h1>
-
             <p>06 · 11 · 2026</p>
           </div>
+
+          {!opening && (
+            <p className="intro-tap-hint">Chạm vào con dấu để mở thiệp ♪</p>
+          )}
         </div>
-      )}
-      {!opening && (
-        <p className="intro-tap-hint">
-          Chạm vào con dấu để mở
-          thiệp ♪
-        </p>
-      )}
+      </div>
     </div>
   );
 }

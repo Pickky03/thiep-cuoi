@@ -14,6 +14,7 @@ import {
 export default function HomePage() {
   const [guestName, setGuestName] = useState<string | null>(null);
   const [introFinished, setIntroFinished] = useState(false);
+  const [mountWeddingPage, setMountWeddingPage] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -30,31 +31,36 @@ export default function HomePage() {
   }
 
   /*
-    Quan trọng cho Zalo:
-    Không mount WeddingPage trong lúc intro đang chạy.
-
-    Như vậy:
-    - Sakura chưa chạy
-    - countdown chưa setInterval
-    - ảnh lớn của WeddingPage chưa decode/render
-    - Reveal/IntersectionObserver chưa khởi tạo
-    - Ant Design/Gallery chưa phải render cùng lúc với WebP
+    Tối ưu hóa:
+    - Trong 8.5s đầu tiên mở phong bì: Chỉ chạy EnvelopeCover để GPU/CPU dồn 100% tài nguyên
+      cho chuyển động mở thiệp và 14 frames, giúp Zalo và mobile cực kỳ mượt mà.
+    - Từ 8.5s (khi thiệp đã mở và tên đang hiện): Pre-mount WeddingPage bên dưới.
+    - Từ 10.8s -> 12.0s: EnvelopeCover mờ dần (opacity 1 -> 0) làm lộ ra WeddingPage
+      đang rõ dần bên dưới, tạo hiệu ứng tan mờ (crossfade) chuẩn điện ảnh, loại bỏ 100% màn trắng.
   */
-  if (!introFinished) {
-    return (
-      <EnvelopeCover
-        guestName={guestName}
-        onFinished={() => setIntroFinished(true)}
-      />
-    );
-  }
-
   return (
-    <WeddingPage
-      wedding={wedding}
-      gallery={gallery}
-      mapsUrl={mapsUrl}
-      guestName={guestName}
-    />
+    <>
+      {(mountWeddingPage || introFinished) && (
+        <div className="wedding-page-revealed">
+          <WeddingPage
+            wedding={wedding}
+            gallery={gallery}
+            mapsUrl={mapsUrl}
+            guestName={guestName}
+          />
+        </div>
+      )}
+
+      {!introFinished && (
+        <EnvelopeCover
+          guestName={guestName}
+          onPreloadWeddingPage={() => setMountWeddingPage(true)}
+          onFinished={() => {
+            setMountWeddingPage(true);
+            setIntroFinished(true);
+          }}
+        />
+      )}
+    </>
   );
 }

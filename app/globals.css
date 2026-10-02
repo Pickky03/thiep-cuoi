@@ -524,28 +524,212 @@ a:focus-visible {
 
 }
 
-.intro-film-frame video,
-.intro-envelope-poster,
-.intro-envelope-animation {
-  display: block;
-
+.intro-envelope-frames {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
+  overflow: hidden;
+  background: #91a4bd;
+}
 
+.intro-frame-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-
+  object-position: center;
+  opacity: 0;
   user-select: none;
   -webkit-user-select: none;
   -webkit-user-drag: none;
-
-  background:
-    url("/images/envelope-poster.jpg")
-    center / cover no-repeat;
+  pointer-events: none;
+  will-change: opacity;
 }
 
-.intro-envelope-animation,
-.intro-envelope-poster {
+/* Khung hình 1 hiển thị mặc định khi chưa mở */
+.intro-frame-img.intro-frame-1 {
+  opacity: 1;
+  z-index: 1;
+}
+
+.intro-frame-img.intro-frame-2 { z-index: 2; }
+.intro-frame-img.intro-frame-3 { z-index: 3; }
+.intro-frame-img.intro-frame-4 { z-index: 4; }
+.intro-frame-img.intro-frame-5 { z-index: 5; }
+.intro-frame-img.intro-frame-6 { z-index: 6; }
+.intro-frame-img.intro-frame-7 { z-index: 7; }
+.intro-frame-img.intro-frame-8 { z-index: 8; }
+.intro-frame-img.intro-frame-9 { z-index: 9; }
+.intro-frame-img.intro-frame-10 { z-index: 10; }
+.intro-frame-img.intro-frame-11 { z-index: 11; }
+.intro-frame-img.intro-frame-12 { z-index: 12; }
+.intro-frame-img.intro-frame-13 { z-index: 13; }
+.intro-frame-img.intro-frame-14 { z-index: 14; }
+
+/* Keyframes cho hiệu ứng mượt (Blend / Crossfade) */
+@keyframes intro-frame-blend-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Keyframes cho hiệu ứng từng bước (Steps / Stop-motion) */
+@keyframes intro-frame-step-in {
+  from { opacity: 1; }
+  to { opacity: 1; }
+}
+
+/* 1. CHẾ ĐỘ MƯỢT MÀ (BLEND / CROSSFADE) */
+.intro-mode-blend.intro-opening .intro-frame-2  { animation: intro-frame-blend-in var(--frame-fade, 0.085s) ease-out calc(var(--frame-step, 0.10s) * 1) forwards; }
+.intro-mode-blend.intro-opening .intro-frame-3  { animation: intro-frame-blend-in var(--frame-fade, 0.085s) ease-out calc(var(--frame-step, 0.10s) * 2) forwards; }
+.intro-mode-blend.intro-opening .intro-frame-4  { animation: intro-frame-blend-in var(--frame-fade, 0.085s) ease-out calc(var(--frame-step, 0.10s) * 3) forwards; }
+.intro-mode-blend.intro-opening .intro-frame-5  { animation: intro-frame-blend-in var(--frame-fade, 0.085s) ease-out calc(var(--frame-step, 0.10s) * 4) forwards; }
+.intro-mode-blend.intro-opening .intro-frame-6  { animation: intro-frame-blend-in var(--frame-fade, 0.085s) ease-out calc(var(--frame-step, 0.10s) * 5) forwards; }
+.intro-mode-blend.intro-opening .intro-frame-7  { animation: intro-frame-blend-in var(--frame-fade, 0.085s) ease-out calc(var(--frame-step, 0.10s) * 6) forwards; }
+.intro-mode-blend.intro-opening .intro-frame-8  { animation: intro-frame-blend-in var(--frame-fade, 0.085s) ease-out calc(var(--frame-step, 0.10s) * 7) forwards; }
+.intro-mode-blend.intro-opening .intro-frame-9  { animation: intro-frame-blend-in var(--frame-fade, 0.085s) ease-out calc(var(--frame-step, 0.10s) * 8) forwards; }
+.intro-mode-blend.intro-opening .intro-frame-10 { animation: intro-frame-blend-in var(--frame-fade, 0.085s) ease-out calc(var(--frame-step, 0.10s) * 9) forwards; }
+.intro-mode-blend.intro-opening .intro-frame-11 { animation: intro-frame-blend-in var(--frame-fade, 0.085s) ease-out calc(var(--frame-step, 0.10s) * 10) forwards; }
+.intro-mode-blend.intro-opening .intro-frame-12 { animation: intro-frame-blend-in var(--frame-fade, 0.085s) ease-out calc(var(--frame-step, 0.10s) * 11) forwards; }
+.intro-mode-blend.intro-opening .intro-frame-13 { animation: intro-frame-blend-in var(--frame-fade, 0.085s) ease-out calc(var(--frame-step, 0.10s) * 12) forwards; }
+.intro-mode-blend.intro-opening .intro-frame-14 { animation: intro-frame-blend-in var(--frame-fade, 0.085s) ease-out calc(var(--frame-step, 0.10s) * 13) forwards; }
+
+/* 2. CHẾ ĐỘ TỪNG BƯỚC (STEPS / STOP-MOTION) */
+.intro-mode-step.intro-opening .intro-frame-2  { animation: intro-frame-step-in 0.001s steps(1) calc(var(--frame-step, 0.10s) * 1) forwards; }
+.intro-mode-step.intro-opening .intro-frame-3  { animation: intro-frame-step-in 0.001s steps(1) calc(var(--frame-step, 0.10s) * 2) forwards; }
+.intro-mode-step.intro-opening .intro-frame-4  { animation: intro-frame-step-in 0.001s steps(1) calc(var(--frame-step, 0.10s) * 3) forwards; }
+.intro-mode-step.intro-opening .intro-frame-5  { animation: intro-frame-step-in 0.001s steps(1) calc(var(--frame-step, 0.10s) * 4) forwards; }
+.intro-mode-step.intro-opening .intro-frame-6  { animation: intro-frame-step-in 0.001s steps(1) calc(var(--frame-step, 0.10s) * 5) forwards; }
+.intro-mode-step.intro-opening .intro-frame-7  { animation: intro-frame-step-in 0.001s steps(1) calc(var(--frame-step, 0.10s) * 6) forwards; }
+.intro-mode-step.intro-opening .intro-frame-8  { animation: intro-frame-step-in 0.001s steps(1) calc(var(--frame-step, 0.10s) * 7) forwards; }
+.intro-mode-step.intro-opening .intro-frame-9  { animation: intro-frame-step-in 0.001s steps(1) calc(var(--frame-step, 0.10s) * 8) forwards; }
+.intro-mode-step.intro-opening .intro-frame-10 { animation: intro-frame-step-in 0.001s steps(1) calc(var(--frame-step, 0.10s) * 9) forwards; }
+.intro-mode-step.intro-opening .intro-frame-11 { animation: intro-frame-step-in 0.001s steps(1) calc(var(--frame-step, 0.10s) * 10) forwards; }
+.intro-mode-step.intro-opening .intro-frame-12 { animation: intro-frame-step-in 0.001s steps(1) calc(var(--frame-step, 0.10s) * 11) forwards; }
+.intro-mode-step.intro-opening .intro-frame-13 { animation: intro-frame-step-in 0.001s steps(1) calc(var(--frame-step, 0.10s) * 12) forwards; }
+.intro-mode-step.intro-opening .intro-frame-14 { animation: intro-frame-step-in 0.001s steps(1) calc(var(--frame-step, 0.10s) * 13) forwards; }
+
+/*
+ * =========================================
+ * BƯỚM 3D VỖ CÁNH KHI MỞ THIỆP ĐẾN NỘI DUNG
+ * =========================================
+ */
+
+.intro-butterfly-box {
+  position: absolute;
+  z-index: 20;
+  top: 15.2%;
+  left: 50%;
+  width: min(38vw, 215px);
+  aspect-ratio: 488 / 319;
+  transform: translateX(-50%);
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  perspective: 800px;
+  -webkit-perspective: 800px;
   pointer-events: none;
+  opacity: 0;
+}
+
+.intro-opening .intro-butterfly-box {
+  animation: intro-butterfly-appear 0.8s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--frame-step, 0.18s) * 11) forwards;
+}
+
+/* Bướm xuất hiện mượt mà khi thiệp mở đến nội dung và giữ nguyên vị trí, vỗ cánh liên tục */
+@keyframes intro-butterfly-appear {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(14px) scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+/* Bóng đổ thực tế dưới cánh bướm xuất hiện đồng bộ và thở theo nhịp cánh */
+.intro-butterfly-shadow {
+  position: absolute;
+  top: 32%;
+  left: 50%;
+  width: 76%;
+  height: 58%;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at center, rgba(62, 48, 35, 0.26) 0%, rgba(62, 48, 35, 0) 70%);
+  border-radius: 50%;
+  filter: blur(8px);
+  z-index: 1;
+  opacity: 0;
+}
+
+.intro-opening .intro-butterfly-shadow {
+  animation:
+    intro-shadow-appear 0.8s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--frame-step, 0.18s) * 11) forwards,
+    intro-shadow-breathe 2.6s cubic-bezier(0.42, 0, 0.58, 1) calc(var(--frame-step, 0.18s) * 11) infinite;
+}
+
+@keyframes intro-shadow-appear {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.8);
+  }
+  100% {
+    opacity: 0.35;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+/* Bướm 3D dùng chung 1 ảnh butterfly.png duy nhất, không bị tách đôi */
+.intro-butterfly-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  -webkit-user-drag: none;
+  user-select: none;
+  filter: drop-shadow(0 4px 14px rgba(70, 55, 40, 0.22));
+  transform-origin: 50% 50%;
+  animation: butterfly-single-flutter 2.6s ease-in-out infinite;
+  will-change: transform;
+  z-index: 2;
+  position: relative;
+}
+
+/* Hoạt họa vỗ cánh 3D chậm rãi, mềm mại, tạo cảm giác nhẹ nhàng, lãng mạn */
+@keyframes butterfly-single-flutter {
+  0%, 100% {
+    transform: perspective(700px) scaleX(1) scaleY(1) translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: perspective(700px) scaleX(0.72) scaleY(1.02) translateY(-4px) rotate(-0.6deg);
+  }
+  50% {
+    transform: perspective(700px) scaleX(1.02) scaleY(1) translateY(-1px) rotate(0.4deg);
+  }
+  75% {
+    transform: perspective(700px) scaleX(0.78) scaleY(1.01) translateY(-3px) rotate(0.6deg);
+  }
+}
+
+/* Nhịp thở bóng đổ dưới cánh bướm đồng điệu với nhịp vỗ cánh 2.6s */
+@keyframes intro-shadow-breathe {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 0.35;
+  }
+  25% {
+    transform: translateX(-50%) scale(0.82);
+    opacity: 0.22;
+  }
+  50% {
+    transform: translateX(-50%) scale(1.02);
+    opacity: 0.36;
+  }
+  75% {
+    transform: translateX(-50%) scale(0.86);
+    opacity: 0.25;
+  }
 }
 
 .intro-wax-button:disabled {
@@ -644,6 +828,26 @@ a:focus-visible {
 
 }
 
+.intro-wax-button.is-opening {
+  pointer-events: none;
+  animation: intro-seal-pop-out 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes intro-seal-pop-out {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  35% {
+    transform: translate(-50%, -50%) scale(1.18);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.45);
+    opacity: 0;
+  }
+}
+
 /* Hướng dẫn chạm con dấu */
 
 .intro-tap-hint {
@@ -674,6 +878,13 @@ a:focus-visible {
 
     0 1px 10px rgba(20, 35, 54, 0.8);
 
+  transition: opacity 0.3s ease;
+
+}
+
+.intro-opening .intro-tap-hint {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /*
@@ -1348,66 +1559,71 @@ a:focus-visible {
  * Mờ dần để hiện trang thiệp cưới
  */
 
-/* Cảnh phong bì biến mất */
-
-.intro-opening .intro-film {
-
-  animation:
-
-    intro-film-out
-
-    0.8s ease
-
-    3.7s forwards;
-
-}
-
-.intro-opening .intro-paper {
-
-  animation:
-
-    intro-paper-in
-
-    0.8s ease
-
-    3.7s forwards;
-
-}
+/* =========================================
+ * CSS FRAME TIMELINE
+ * 0.00 - 2.34s: Mở phong bì mượt mà (14 frames)
+ * 2.34 - 6.04s: Bướm 3D xuất hiện & vỗ cánh 3.7s rồi biến mất từ từ
+ * 3.00 - 7.20s: Lời mời trang trọng xuất hiện
+ * 7.40 - 11.20s: Tên Văn Hải & Kim Hường
+ * 11.80 - 12.75s: Chuyển mượt vào trang thiệp cưới
+ * =========================================
+ */
 
 .intro-opening .intro-copy-invite {
-
-  animation:
-
-    intro-invite-copy
-
-    4.65s ease
-
-    4.8s both;
-
+  animation: intro-invite-copy 4.0s ease 3.0s both;
+  z-index: 16;
 }
 
 .intro-opening .intro-copy-names {
-
-  animation:
-
-    intro-names-copy
-
-    3.3s ease
-
-    9.75s both;
-
+  animation: intro-names-copy 3.8s ease 7.0s both;
+  z-index: 16;
 }
 
 .intro-cover.intro-opening {
+  animation: intro-cover-out 1.2s cubic-bezier(0.4, 0, 0.2, 1) 10.8s forwards;
+}
 
-  animation:
+/* Nút bỏ qua nhỏ gọn, tinh tế khi đang mở thiệp */
+.intro-skip-badge {
+  position: absolute;
+  top: max(env(safe-area-inset-top, 16px), 16px);
+  right: 16px;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(120, 47, 56, 0.2);
+  padding: 5px 13px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #782f38;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
 
-    intro-cover-out
+.intro-skip-badge:hover {
+  background: rgba(255, 255, 255, 0.94);
+  transform: scale(1.04);
+}
 
-    0.95s ease-in-out
+/* Hiệu ứng trang thiệp cưới mờ rồi rõ dần khi mở thiệp tan ra */
+.wedding-page-revealed {
+  animation: wedding-page-reveal-in 1.2s ease-out forwards;
+}
 
-    13.25s forwards;
-
+@keyframes wedding-page-reveal-in {
+  0% {
+    opacity: 0.82;
+    filter: blur(4px);
+    transform: scale(0.99);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: scale(1);
+  }
 }
 
 /*
@@ -1417,113 +1633,58 @@ a:focus-visible {
  */
 
 @keyframes intro-film-out {
-
   to {
-
     opacity: 0;
-
     visibility: hidden;
-
   }
-
 }
 
 @keyframes intro-paper-in {
-
   to {
-
     opacity: 1;
-
   }
-
 }
 
 @keyframes intro-invite-copy {
-
-  0%,
-
-  5% {
-
+  0%, 5% {
     opacity: 0;
-
-    transform:
-
-      translate(-50%, 12px);
-
+    transform: translate(-50%, 12px);
   }
-
-  19%,
-
-  77% {
-
+  19%, 77% {
     opacity: 1;
-
-    transform:
-
-      translate(-50%, 0);
-
+    transform: translate(-50%, 0);
   }
-
   100% {
-
     opacity: 0;
-
-    transform:
-
-      translate(-50%, -10px);
-
+    transform: translate(-50%, -10px);
   }
-
 }
 
 @keyframes intro-names-copy {
-
   0% {
-
     opacity: 0;
-
     transform: translate(-50%, 12px);
-
   }
-
-  20% {
-
+  20%, 75% {
     opacity: 1;
-
     transform: translate(-50%, 0);
-
   }
-
-  75% {
-
-    opacity: 1;
-
-    transform: translate(-50%, 0);
-
-  }
-
   100% {
-
     opacity: 0;
-
     transform: translate(-50%, -10px);
-
   }
-
 }
 
 @keyframes intro-cover-out {
-
-  to {
-
-    opacity: 0;
-
-    visibility: hidden;
-
-    pointer-events: none;
-
+  0% {
+    opacity: 1;
+    visibility: visible;
   }
-
+  100% {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
 }
 
 /*
@@ -1647,6 +1808,8 @@ a:focus-visible {
 
 .intro-zalo .intro-film-frame {
   contain: layout paint;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .intro-zalo .intro-envelope-animation {
@@ -1659,7 +1822,12 @@ a:focus-visible {
 
   pointer-events: none;
 
-  transform: none !important;
+  background: transparent !important;
+
+  transform: translateZ(0) !important;
+  -webkit-transform: translateZ(0) !important;
+  will-change: transform;
+
   filter: none !important;
   box-shadow: none !important;
 
