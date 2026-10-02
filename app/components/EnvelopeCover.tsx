@@ -90,17 +90,17 @@ export default function EnvelopeCover({
 
     setTimelineStarted(true);
 
-    // Pre-mount trang thiệp cưới ở giây 8.5 (khi tên cặp đôi đang hiện)
-    // để trình duyệt chuẩn bị sẵn nội dung bên dưới, khi màn mở thiệp mờ tan ở 10.8s
+    // Pre-mount trang thiệp cưới ở giây 9.5 (khi tên cặp đôi đang hiện)
+    // để trình duyệt chuẩn bị sẵn nội dung bên dưới, khi màn mở thiệp mờ tan ở 11.6s
     // thì trang thiệp cưới sẽ hiện ra dần dần, loại bỏ hoàn toàn màn trắng ngắt quãng.
     if (preloadTimerRef.current) clearTimeout(preloadTimerRef.current);
     preloadTimerRef.current = setTimeout(() => {
       onPreloadWeddingPage?.();
-    }, 8500);
+    }, 9500);
 
-    // Màn mở thiệp mờ tan từ 10.8s -> 12.0s (1.2s crossfade mượt mà)
+    // Màn mở thiệp mờ tan từ 11.6s -> 12.8s (1.2s crossfade mượt mà)
     if (finishTimerRef.current) clearTimeout(finishTimerRef.current);
-    finishTimerRef.current = setTimeout(finishIntro, 12000);
+    finishTimerRef.current = setTimeout(finishIntro, 12800);
   };
 
   if (finished) return null;
@@ -110,8 +110,8 @@ export default function EnvelopeCover({
       className={`intro-cover intro-mode-blend ${timelineStarted ? 'intro-opening' : ''}`}
       style={
         {
-          '--frame-step': '0.18s',
-          '--frame-fade': '0.15s',
+          '--frame-step': '0.20s',
+          '--frame-fade': '0.16s',
         } as React.CSSProperties
       }
       role="dialog"
@@ -120,17 +120,6 @@ export default function EnvelopeCover({
     >
       <div className="intro-film">
         <div className="intro-film-frame">
-          {/* Nút bỏ qua nhỏ gọn, tinh tế khi đang mở */}
-          {opening && (
-            <button
-              type="button"
-              className="intro-skip-badge"
-              onClick={finishIntro}
-              aria-label="Bỏ qua màn mở thiệp để vào trang thiệp cưới"
-            >
-              Bỏ qua ›
-            </button>
-          )}
 
           {/* =========================================
               14 CSS FRAMES - UNIVERSAL CROSS-BROWSER

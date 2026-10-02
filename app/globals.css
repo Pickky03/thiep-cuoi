@@ -633,7 +633,7 @@ a:focus-visible {
 }
 
 .intro-opening .intro-butterfly-box {
-  animation: intro-butterfly-appear 0.8s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--frame-step, 0.18s) * 11) forwards;
+  animation: intro-butterfly-appear 0.8s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--frame-step, 0.20s) * 14) forwards;
 }
 
 /* Bướm xuất hiện mượt mà khi thiệp mở đến nội dung và giữ nguyên vị trí, vỗ cánh liên tục */
@@ -1561,51 +1561,26 @@ a:focus-visible {
 
 /* =========================================
  * CSS FRAME TIMELINE
- * 0.00 - 2.34s: Mở phong bì mượt mà (14 frames)
- * 2.34 - 6.04s: Bướm 3D xuất hiện & vỗ cánh 3.7s rồi biến mất từ từ
- * 3.00 - 7.20s: Lời mời trang trọng xuất hiện
- * 7.40 - 11.20s: Tên Văn Hải & Kim Hường
- * 11.80 - 12.75s: Chuyển mượt vào trang thiệp cưới
+ * 0.00 - 2.80s: Mở phong bì mượt mà (14 frames x 0.20s)
+ * 2.80 - 12.80s: Bướm 3D xuất hiện & vỗ cánh nhẹ nhàng
+ * 3.60 - 8.10s: Lời mời trang trọng xuất hiện từ từ
+ * 8.00 - 11.80s: Tên Văn Hải & Kim Hường
+ * 11.60 - 12.80s: Chuyển cảnh mờ tan (crossfade) vào trang thiệp cưới
  * =========================================
  */
 
 .intro-opening .intro-copy-invite {
-  animation: intro-invite-copy 4.0s ease 3.0s both;
+  animation: intro-invite-copy 4.5s ease 3.6s both;
   z-index: 16;
 }
 
 .intro-opening .intro-copy-names {
-  animation: intro-names-copy 3.8s ease 7.0s both;
+  animation: intro-names-copy 3.8s ease 8.0s both;
   z-index: 16;
 }
 
 .intro-cover.intro-opening {
-  animation: intro-cover-out 1.2s cubic-bezier(0.4, 0, 0.2, 1) 10.8s forwards;
-}
-
-/* Nút bỏ qua nhỏ gọn, tinh tế khi đang mở thiệp */
-.intro-skip-badge {
-  position: absolute;
-  top: max(env(safe-area-inset-top, 16px), 16px);
-  right: 16px;
-  z-index: 50;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(120, 47, 56, 0.2);
-  padding: 5px 13px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #782f38;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.intro-skip-badge:hover {
-  background: rgba(255, 255, 255, 0.94);
-  transform: scale(1.04);
+  animation: intro-cover-out 1.2s cubic-bezier(0.4, 0, 0.2, 1) 11.6s forwards;
 }
 
 /* Hiệu ứng trang thiệp cưới mờ rồi rõ dần khi mở thiệp tan ra */
@@ -1646,32 +1621,48 @@ a:focus-visible {
 }
 
 @keyframes intro-invite-copy {
-  0%, 5% {
+  0% {
     opacity: 0;
-    transform: translate(-50%, 12px);
+    transform: translate(-50%, 22px);
+    filter: blur(5px);
   }
-  19%, 77% {
+  34% {
     opacity: 1;
     transform: translate(-50%, 0);
+    filter: blur(0px);
+  }
+  78% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+    filter: blur(0px);
   }
   100% {
     opacity: 0;
     transform: translate(-50%, -10px);
+    filter: blur(2px);
   }
 }
 
 @keyframes intro-names-copy {
   0% {
     opacity: 0;
-    transform: translate(-50%, 12px);
+    transform: translate(-50%, 18px);
+    filter: blur(4px);
   }
-  20%, 75% {
+  28% {
     opacity: 1;
     transform: translate(-50%, 0);
+    filter: blur(0px);
+  }
+  78% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+    filter: blur(0px);
   }
   100% {
     opacity: 0;
     transform: translate(-50%, -10px);
+    filter: blur(2px);
   }
 }
 

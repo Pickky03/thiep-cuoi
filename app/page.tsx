@@ -32,10 +32,10 @@ export default function HomePage() {
 
   /*
     Tối ưu hóa:
-    - Trong 8.5s đầu tiên mở phong bì: Chỉ chạy EnvelopeCover để GPU/CPU dồn 100% tài nguyên
+    - Trong giai đoạn đầu mở phong bì: Chỉ chạy EnvelopeCover để GPU/CPU dồn 100% tài nguyên
       cho chuyển động mở thiệp và 14 frames, giúp Zalo và mobile cực kỳ mượt mà.
-    - Từ 8.5s (khi thiệp đã mở và tên đang hiện): Pre-mount WeddingPage bên dưới.
-    - Từ 10.8s -> 12.0s: EnvelopeCover mờ dần (opacity 1 -> 0) làm lộ ra WeddingPage
+    - Từ 9.5s (khi tên cặp đôi đang hiện): Pre-mount WeddingPage bên dưới.
+    - Từ 11.6s -> 12.8s: EnvelopeCover mờ dần (opacity 1 -> 0) làm lộ ra WeddingPage
       đang rõ dần bên dưới, tạo hiệu ứng tan mờ (crossfade) chuẩn điện ảnh, loại bỏ 100% màn trắng.
   */
   return (
