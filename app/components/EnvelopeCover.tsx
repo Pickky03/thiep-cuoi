@@ -323,26 +323,23 @@ export default function EnvelopeCover({
           ========================= */}
 
           {isZalo ? (
-            <>
+            opening ? (
               <img
-                src="/images/envelope-poster.jpg"
+                src="/videos/zalo4.webp"
                 alt=""
-                className={`intro-envelope-poster ${opening ? 'is-opening' : ''}`}
+                className="intro-envelope-animation"
                 draggable={false}
                 aria-hidden="true"
               />
-              {opening && (
-                <img
-                  src="/videos/zalo4.webp"
-                  alt=""
-                  className="intro-envelope-animation"
-                  draggable={false}
-                  aria-hidden="true"
-                  loading="eager"
-                  decoding="async"
-                />
-              )}
-            </>
+            ) : (
+              <img
+                src="/images/envelope-poster.jpg"
+                alt=""
+                className="intro-envelope-poster"
+                draggable={false}
+                aria-hidden="true"
+              />
+            )
           ) : mediaMode ===
             'browser' ? (
 

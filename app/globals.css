@@ -527,6 +527,8 @@ a:focus-visible {
 .intro-film-frame video,
 .intro-envelope-poster,
 .intro-envelope-animation {
+  position: absolute;
+  inset: 0;
   display: block;
 
   width: 100%;
@@ -1597,12 +1599,9 @@ a:focus-visible {
   -webkit-transform: translateZ(0);
 }
 
-.intro-zalo .intro-envelope-poster.is-opening {
-  opacity: 0;
-  transition: opacity 0.25s ease 0.1s;
-}
-
 .intro-zalo .intro-envelope-animation {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
@@ -1612,7 +1611,10 @@ a:focus-visible {
 
   pointer-events: none;
 
-  background: transparent !important;
+  background:
+    url("/images/envelope-poster.jpg")
+    center / cover no-repeat;
+
   transform: translateZ(0) !important;
   -webkit-transform: translateZ(0) !important;
   will-change: transform;
