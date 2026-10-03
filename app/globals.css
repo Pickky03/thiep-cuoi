@@ -492,62 +492,357 @@ a:focus-visible {
 
 /*
  * =========================================
- * SCENE 1 - MP4 / ZALO ANIMATED WEBP
+ * CSS 3D ENVELOPE OPENING SYSTEM
+ * Siêu mượt 60fps trên GPU Compositor
+ * Tương thích 100% Zalo WebView, iOS, Android
  * =========================================
  */
 
 .intro-film {
-
   position: absolute;
-
   inset: 0;
-
   z-index: 1;
-
   display: grid;
-
   place-items: center;
-
   background: #91a4bd;
-
 }
 
 .intro-film-frame {
-
   position: relative;
-
   height: 100svh;
-
   width: min(100vw, 56.25svh);
-
   overflow: hidden;
-
+  perspective: 1200px;
+  -webkit-perspective: 1200px;
+  transform-style: flat;
 }
 
-.intro-film-frame video,
-.intro-envelope-poster,
-.intro-envelope-animation {
+/* =========================================
+   3D ENVELOPE STAGE & LETTER CARD
+   ========================================= */
+
+.intro-envelope-3d {
   position: absolute;
   inset: 0;
-  display: block;
-
   width: 100%;
   height: 100%;
-
-  object-fit: cover;
-
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-user-drag: none;
-
-  background:
-    url("/images/envelope-poster.jpg")
-    center / cover no-repeat;
+  perspective: 1200px;
+  -webkit-perspective: 1200px;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  pointer-events: none;
 }
 
-.intro-envelope-animation,
-.intro-envelope-poster {
+/* Tờ giấy thiệp cưới bên trong (Inner Letter Card) */
+.intro-envelope-letter {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  overflow: hidden;
+  transform: scale(0.97);
+  transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 10px 30px rgba(28, 42, 60, 0.25);
+}
+
+.intro-opening .intro-envelope-letter {
+  transform: scale(1);
+}
+
+.intro-envelope-letter-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  background: #faf6f0;
+}
+
+/* =========================================
+   3D FLAPS SYSTEM (4 CÁNH LẬT MỞ TRONG KHÔNG GIAN)
+   ========================================= */
+
+.intro-flaps-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 6;
+  perspective: 1200px;
+  -webkit-perspective: 1200px;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  pointer-events: none;
+}
+
+.intro-flap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  will-change: transform, opacity;
+  transition: opacity 0.5s ease;
+}
+
+.intro-flap-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+}
+
+.intro-flap-front {
+  transform: rotateX(0deg) rotateY(0deg);
+}
+
+.intro-flap-graphic {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: url("/images/envelope-poster.jpg") center / cover no-repeat;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Lớp đổ bóng mô phỏng ánh sáng vật lý khi cánh phong bì gập */
+.intro-flap-shadow {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+
+/* Mặt trong của cánh phong bì (Inner lining) */
+.intro-flap-lining {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  -webkit-user-drag: none;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.25);
+}
+
+/* -----------------------------------------
+   CÁNH TRÁI (LEFT FLAP): mở xoay quanh trục Y bên trái
+   ----------------------------------------- */
+.intro-flap-left {
+  transform-origin: 0% 50%;
+  -webkit-transform-origin: 0% 50%;
+}
+
+.intro-flap-graphic-left {
+  clip-path: polygon(0 0, 50.4% 48%, 0 100%);
+  -webkit-clip-path: polygon(0 0, 50.4% 48%, 0 100%);
+}
+
+.intro-flap-shadow-left {
+  clip-path: polygon(0 0, 50.4% 48%, 0 100%);
+  -webkit-clip-path: polygon(0 0, 50.4% 48%, 0 100%);
+  background: linear-gradient(90deg, rgba(0,0,0,0.4) 0%, transparent 80%);
+}
+
+.intro-flap-lining-left {
+  clip-path: polygon(0 0, 50.4% 48%, 0 100%);
+  -webkit-clip-path: polygon(0 0, 50.4% 48%, 0 100%);
+  background: linear-gradient(135deg, #51647a 0%, #3e4f62 100%);
+  border-right: 1px solid rgba(220, 200, 180, 0.4);
+}
+
+.intro-flap-left .intro-flap-back {
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+}
+
+.intro-zalo-3d.intro-opening .intro-flap-left {
+  animation: flap-left-open 3.5s cubic-bezier(0.20, 0, 0.20, 1) 0.4s forwards;
+}
+
+@keyframes flap-left-open {
+  0% {
+    transform: rotateY(0deg);
+    opacity: 1;
+  }
+  65% {
+    transform: rotateY(-130deg);
+    opacity: 1;
+  }
+  100% {
+    transform: rotateY(-165deg);
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* -----------------------------------------
+   CÁNH PHẢI (RIGHT FLAP): mở xoay quanh trục Y bên phải
+   ----------------------------------------- */
+.intro-flap-right {
+  transform-origin: 100% 50%;
+  -webkit-transform-origin: 100% 50%;
+}
+
+.intro-flap-graphic-right {
+  clip-path: polygon(100% 0, 100% 100%, 49.6% 48%);
+  -webkit-clip-path: polygon(100% 0, 100% 100%, 49.6% 48%);
+}
+
+.intro-flap-shadow-right {
+  clip-path: polygon(100% 0, 100% 100%, 49.6% 48%);
+  -webkit-clip-path: polygon(100% 0, 100% 100%, 49.6% 48%);
+  background: linear-gradient(-90deg, rgba(0,0,0,0.4) 0%, transparent 80%);
+}
+
+.intro-flap-lining-right {
+  clip-path: polygon(100% 0, 100% 100%, 49.6% 48%);
+  -webkit-clip-path: polygon(100% 0, 100% 100%, 49.6% 48%);
+  background: linear-gradient(225deg, #51647a 0%, #3e4f62 100%);
+  border-left: 1px solid rgba(220, 200, 180, 0.4);
+}
+
+.intro-flap-right .intro-flap-back {
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+}
+
+.intro-zalo-3d.intro-opening .intro-flap-right {
+  animation: flap-right-open 3.5s cubic-bezier(0.20, 0, 0.20, 1) 0.4s forwards;
+}
+
+@keyframes flap-right-open {
+  0% {
+    transform: rotateY(0deg);
+    opacity: 1;
+  }
+  65% {
+    transform: rotateY(130deg);
+    opacity: 1;
+  }
+  100% {
+    transform: rotateY(165deg);
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* -----------------------------------------
+   CÁNH TRÊN (TOP FLAP): mở xoay quanh trục X ở mép trên
+   ----------------------------------------- */
+.intro-flap-top {
+  transform-origin: 50% 0%;
+  -webkit-transform-origin: 50% 0%;
+}
+
+.intro-flap-graphic-top {
+  clip-path: polygon(0 0, 100% 0, 50% 48.4%);
+  -webkit-clip-path: polygon(0 0, 100% 0, 50% 48.4%);
+}
+
+.intro-flap-shadow-top {
+  clip-path: polygon(0 0, 100% 0, 50% 48.4%);
+  -webkit-clip-path: polygon(0 0, 100% 0, 50% 48.4%);
+  background: linear-gradient(180deg, rgba(0,0,0,0.35) 0%, transparent 80%);
+}
+
+.intro-flap-lining-top {
+  clip-path: polygon(0 0, 100% 0, 50% 48.4%);
+  -webkit-clip-path: polygon(0 0, 100% 0, 50% 48.4%);
+  background: linear-gradient(180deg, #5a6e85 0%, #3e4f62 100%);
+  border-bottom: 1px solid rgba(220, 200, 180, 0.4);
+}
+
+.intro-flap-top .intro-flap-back {
+  transform: rotateX(180deg);
+  -webkit-transform: rotateX(180deg);
+}
+
+.intro-zalo-3d.intro-opening .intro-flap-top {
+  animation: flap-top-open 3.5s cubic-bezier(0.20, 0, 0.20, 1) 0.55s forwards;
+}
+
+@keyframes flap-top-open {
+  0% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+  65% {
+    transform: rotateX(130deg);
+    opacity: 1;
+  }
+  100% {
+    transform: rotateX(165deg);
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* -----------------------------------------
+   CÁNH DƯỚI (BOTTOM FLAP): mở xoay quanh trục X ở mép dưới
+   ----------------------------------------- */
+.intro-flap-bottom {
+  transform-origin: 50% 100%;
+  -webkit-transform-origin: 50% 100%;
+}
+
+.intro-flap-graphic-bottom {
+  clip-path: polygon(0 100%, 100% 100%, 50% 47.6%);
+  -webkit-clip-path: polygon(0 100%, 100% 100%, 50% 47.6%);
+}
+
+.intro-flap-shadow-bottom {
+  clip-path: polygon(0 100%, 100% 100%, 50% 47.6%);
+  -webkit-clip-path: polygon(0 100%, 100% 100%, 50% 47.6%);
+  background: linear-gradient(0deg, rgba(0,0,0,0.35) 0%, transparent 80%);
+}
+
+.intro-flap-lining-bottom {
+  clip-path: polygon(0 100%, 100% 100%, 50% 47.6%);
+  -webkit-clip-path: polygon(0 100%, 100% 100%, 50% 47.6%);
+  background: linear-gradient(0deg, #5a6e85 0%, #3e4f62 100%);
+  border-top: 1px solid rgba(220, 200, 180, 0.4);
+}
+
+.intro-flap-bottom .intro-flap-back {
+  transform: rotateX(180deg);
+  -webkit-transform: rotateX(180deg);
+}
+
+.intro-zalo-3d.intro-opening .intro-flap-bottom {
+  animation: flap-bottom-open 3.5s cubic-bezier(0.20, 0, 0.20, 1) 0.55s forwards;
+}
+
+@keyframes flap-bottom-open {
+  0% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+  65% {
+    transform: rotateX(-130deg);
+    opacity: 1;
+  }
+  100% {
+    transform: rotateX(-165deg);
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.intro-zalo-3d.intro-opening .intro-flap-shadow {
+  opacity: 0.4;
 }
 
 .intro-wax-button:disabled {
@@ -561,11 +856,8 @@ a:focus-visible {
  */
 
 .intro-wax-button {
-
   position: absolute;
-
-  z-index: 4;
-
+  z-index: 15;
   top: 48%;
 
   left: 50%;
@@ -1350,85 +1642,207 @@ a:focus-visible {
 
 /*
  * =========================================
- * ANIMATION TIMELINE - 14.2 SECONDS
+ * BƯỚM 3D VỖ CÁNH KHI MỞ THIỆP ĐẾN NỘI DUNG
  * =========================================
  */
 
-/*
- * 0.00 - 3.70s:
- * MP4 / Animated WebP mở phong bì
- * 3.70 - 4.50s:
- * Chuyển cảnh sang nền giấy và bướm
- * 4.80 - 9.45s:
- * Lời mời xuất hiện
- * 9.75 - 13.05s:
- * Tên Văn Hải & Kim Hường
- * 13.25 - 14.20s:
- * Mờ dần để hiện trang thiệp cưới
- */
-
-/* Cảnh phong bì biến mất (Chỉ áp dụng cho Browser thường, không can thiệp Zalo) */
-.intro-cover:not(.intro-zalo).intro-opening .intro-film {
-  animation:
-    intro-film-out
-    0.8s ease
-    4.4s forwards;
+.intro-butterfly-box {
+  position: absolute;
+  z-index: 20;
+  top: 15.2%;
+  left: 50%;
+  width: min(38vw, 215px);
+  aspect-ratio: 488 / 319;
+  transform: translateX(-50%);
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  pointer-events: none;
+  opacity: 0;
 }
 
-.intro-cover:not(.intro-zalo).intro-opening .intro-paper {
-  animation:
-    intro-paper-in
-    0.8s ease
-    4.4s forwards;
+.intro-zalo-3d.intro-opening .intro-butterfly-box {
+  animation: intro-butterfly-appear 1.2s cubic-bezier(0.22, 1, 0.36, 1) 3.8s forwards;
 }
 
-.intro-cover:not(.intro-zalo).intro-opening .intro-copy-invite {
-  animation:
-    intro-invite-copy
-    5.2s ease-out
-    5.0s both;
-}
-
-.intro-cover:not(.intro-zalo).intro-opening .intro-copy-names {
-  animation:
-    intro-names-copy
-    3.9s ease-out
-    10.2s both;
-}
-
-.intro-cover:not(.intro-zalo).intro-opening {
-  animation:
-    intro-cover-out
-    1.2s ease-in-out
-    13.5s forwards;
-}
-
-/*
- * =========================================
- * TRANSITION KEYFRAMES
- * =========================================
- */
-
-@keyframes intro-film-out {
-
-  to {
-
+@keyframes intro-butterfly-appear {
+  0% {
     opacity: 0;
-
-    visibility: hidden;
-
+    transform: translateX(-50%) translateY(16px) scale(0.92);
   }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
 
+.intro-butterfly-shadow {
+  position: absolute;
+  top: 32%;
+  left: 50%;
+  width: 76%;
+  height: 58%;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at center, rgba(62, 48, 35, 0.26) 0%, rgba(62, 48, 35, 0) 70%);
+  border-radius: 50%;
+  filter: blur(8px);
+  z-index: 1;
+  opacity: 0;
+}
+
+.intro-zalo-3d.intro-opening .intro-butterfly-shadow {
+  animation:
+    intro-shadow-appear 1.2s cubic-bezier(0.22, 1, 0.36, 1) 3.8s forwards,
+    intro-shadow-breathe 2.6s cubic-bezier(0.42, 0, 0.58, 1) 3.8s infinite;
+}
+
+@keyframes intro-shadow-appear {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.8);
+  }
+  100% {
+    opacity: 0.35;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+.intro-butterfly-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  -webkit-user-drag: none;
+  user-select: none;
+  filter: drop-shadow(0 4px 14px rgba(70, 55, 40, 0.22));
+  transform-origin: 50% 50%;
+  animation: butterfly-single-flutter 2.6s ease-in-out infinite;
+  will-change: transform;
+  z-index: 2;
+  position: relative;
+}
+
+@keyframes butterfly-single-flutter {
+  0%, 100% {
+    transform: perspective(700px) scaleX(1) scaleY(1) translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: perspective(700px) scaleX(0.72) scaleY(1.02) translateY(-4px) rotate(-0.6deg);
+  }
+  50% {
+    transform: perspective(700px) scaleX(1.02) scaleY(1) translateY(-1px) rotate(0.4deg);
+  }
+  75% {
+    transform: perspective(700px) scaleX(0.78) scaleY(1.01) translateY(-3px) rotate(0.6deg);
+  }
+}
+
+@keyframes intro-shadow-breathe {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 0.35;
+  }
+  25% {
+    transform: translateX(-50%) scale(0.82);
+    opacity: 0.22;
+  }
+  50% {
+    transform: translateX(-50%) scale(1.02);
+    opacity: 0.36;
+  }
+  75% {
+    transform: translateX(-50%) scale(0.86);
+    opacity: 0.25;
+  }
+}
+
+/*
+ * =========================================
+ * CSS 3D TIMELINE (ZALO)
+ * 0.00 - 0.35s: Chạm con dấu vỡ ra (pop out)
+ * 0.40 - 4.00s: 4 cánh phong bì lật mở chậm rãi 3D
+ * 3.80 - 12.80s: Bướm 3D bay ra & vỗ cánh nhẹ nhàng
+ * 5.00 - 9.50s: Lời mời trang trọng xuất hiện từ từ
+ * 9.40 - 13.20s: Tên Văn Hải & Kim Hường
+ * 12.00 - 13.20s: Màn mờ dần crossfade vào trang thiệp
+ * =========================================
+ *
+ * BROWSER TIMELINE (VIDEO MP4)
+ * 0.00s    : Video bắt đầu phát (chip GPU giải mã)
+ * ~4.40s   : Video mở xong → tờ thiệp fade in
+ * 5.00s    : Lời mời xuất hiện
+ * 10.20s   : Tên cặp đôi xuất hiện
+ * 13.50s   : Màn cover mờ tan
+ * =========================================
+ */
+
+/* ---- ZALO: text và cover-out ---- */
+.intro-zalo-3d.intro-opening .intro-copy-invite {
+  animation: intro-invite-copy 4.5s ease 5.0s both;
+  z-index: 22;
+}
+
+.intro-zalo-3d.intro-opening .intro-copy-names {
+  animation: intro-names-copy 3.8s ease 9.4s both;
+  z-index: 22;
+}
+
+.intro-cover.intro-zalo-3d.intro-opening {
+  animation: intro-cover-out 1.2s cubic-bezier(0.4, 0, 0.2, 1) 12.0s forwards;
+}
+
+/* ---- BROWSER: film fade out → paper fade in → text → cover-out ---- */
+.intro-cover:not(.intro-zalo-3d).intro-opening .intro-film {
+  animation: intro-film-out 0.8s ease 4.4s forwards;
+}
+
+.intro-cover:not(.intro-zalo-3d).intro-opening .intro-paper {
+  animation: intro-paper-in 0.8s ease 4.4s forwards;
+}
+
+.intro-cover:not(.intro-zalo-3d).intro-opening .intro-copy-invite {
+  animation: intro-invite-copy 5.2s ease-out 5.0s both;
+  z-index: 3;
+}
+
+.intro-cover:not(.intro-zalo-3d).intro-opening .intro-copy-names {
+  animation: intro-names-copy 3.9s ease-out 10.2s both;
+  z-index: 3;
+}
+
+.intro-cover:not(.intro-zalo-3d).intro-opening {
+  animation: intro-cover-out 1.2s ease-in-out 13.5s forwards;
+}
+
+/* Keyframes chung cho browser (film fade out / paper fade in) */
+@keyframes intro-film-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
 }
 
 @keyframes intro-paper-in {
-
   to {
-
     opacity: 1;
-
   }
+}
 
+/* Hiệu ứng trang thiệp cưới mờ rồi rõ dần khi mở thiệp tan ra */
+.wedding-page-revealed {
+  animation: wedding-page-reveal-in 1.2s ease-out forwards;
+}
+
+@keyframes wedding-page-reveal-in {
+  0% {
+    opacity: 0.82;
+    filter: blur(4px);
+    transform: scale(0.99);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: scale(1);
+  }
 }
 
 @keyframes intro-invite-copy {
@@ -1478,207 +1892,15 @@ a:focus-visible {
 }
 
 @keyframes intro-cover-out {
-
-  to {
-
+  0% {
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
     opacity: 0;
-
     visibility: hidden;
-
     pointer-events: none;
-
   }
-
-}
-
-/*
- * =========================================
- * REDUCED MOTION
- * =========================================
- */
-
-@media (prefers-reduced-motion: reduce) {
-
-  .intro-wax-button,
-
-  .intro-butterfly,
-
-  .intro-wing,
-
-  .intro-cover.intro-opening,
-
-  .intro-opening * {
-
-    animation: none !important;
-
-  }
-
-  .intro-cover.intro-opening {
-
-    opacity: 0;
-
-    visibility: hidden;
-
-    pointer-events: none;
-
-  }
-
-}
-
-/*
- * =========================================
- * PERSONALIZED GUEST NAME
- * =========================================
- */
-
-.intro-invite-line {
-
-  margin: 0;
-
-  font-size: clamp(15px, 2.2svh, 18px);
-
-  font-weight: 500;
-
-  letter-spacing: 0.38em;
-
-  line-height: 1.5;
-
-  text-align: center;
-
-  text-transform: uppercase;
-
-  color: #6f84a2;
-
-}
-
-.intro-copy-invite .intro-guest-name {
-
-  display: block;
-
-  max-width: 100%;
-
-  margin: 0;
-
-  padding: 4px 4px;
-
-  font-family: var(--font-luxury-script), var(--font-playfair), Georgia, cursive;
-
-  font-size: clamp(40px, 6.4svh, 58px);
-
-  font-weight: 400;
-
-  line-height: 1.2;
-
-  letter-spacing: 0.02em;
-
-  text-align: center;
-
-  color: #5a6f8c;
-
-  overflow-wrap: anywhere;
-
-}
-
-/* =========================================
-   ZALO - ƯU TIÊN ANIMATED WEBP
-   =========================================
-
-   Mục tiêu:
-   - Trong lúc WebP chạy: không chạy bất kỳ intro CSS animation nào khác.
-   - Không fade intro-film trước khi WebP thật sự kết thúc.
-   - Sau khi React thêm .intro-webp-finished mới bắt đầu paper/text.
-   - Không ép translateZ(0), tránh tạo compositor layer không cần thiết
-     trong Zalo WebView.
-*/
-
-/* Trạng thái đang chạy WebP: giữ scene hoàn toàn tĩnh ngoài chính WebP. */
-.intro-zalo.intro-opening:not(.intro-webp-finished),
-.intro-zalo.intro-opening:not(.intro-webp-finished) .intro-film,
-.intro-zalo.intro-opening:not(.intro-webp-finished) .intro-film-frame,
-.intro-zalo.intro-opening:not(.intro-webp-finished) .intro-envelope-animation {
-  animation: none !important;
-  filter: none !important;
-  box-shadow: none !important;
-}
-
-.intro-zalo.intro-opening:not(.intro-webp-finished) .intro-film {
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-
-.intro-zalo .intro-film {
-  will-change: auto;
-}
-
-.intro-zalo .intro-film-frame {
-  contain: layout paint;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-}
-
-.intro-zalo .intro-envelope-animation {
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-
-  object-fit: cover;
-  object-position: center;
-
-  pointer-events: none;
-
-  background:
-    url("/images/envelope-poster.jpg")
-    center / cover no-repeat;
-
-  transform: translateZ(0) !important;
-  -webkit-transform: translateZ(0) !important;
-  will-change: transform;
-
-  filter: none !important;
-  box-shadow: none !important;
-
-  image-rendering: auto;
-
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-/* Paper chỉ được mount sau khi WebP đã xong. */
-.intro-zalo.intro-webp-finished .intro-film {
-  animation:
-    intro-film-out
-    0.8s ease
-    0s forwards;
-}
-
-.intro-zalo.intro-webp-finished .intro-paper {
-  animation:
-    intro-paper-in
-    0.8s ease
-    0s forwards;
-}
-
-.intro-zalo.intro-webp-finished .intro-copy-invite {
-  animation:
-    intro-invite-copy
-    5.0s ease-out
-    0.8s both;
-}
-
-.intro-zalo.intro-webp-finished .intro-copy-names {
-  animation:
-    intro-names-copy
-    4.0s ease-out
-    5.8s both;
-}
-
-.intro-cover.intro-zalo.intro-webp-finished {
-  animation:
-    intro-cover-out
-    1.2s ease-in-out
-    9.8s forwards;
 }
 
 /*
