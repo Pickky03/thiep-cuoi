@@ -60,8 +60,7 @@ export default function RootLayout({
       lang="vi"
       className={`${beVietnam.variable} ${playfair.variable} ${greatVibes.variable}`} 
     >
-      <body>
-        <MusicProvider>
+      <body>        
         {children}
         </MusicProvider>
         </body>
