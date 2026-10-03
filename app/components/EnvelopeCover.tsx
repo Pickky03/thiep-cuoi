@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useMusic } from './MusicProvider';
 
 const NORMAL_INTRO_LENGTH_MS = 14700;
-const ZALO_INTRO_LENGTH_MS = 13200;
+const ZALO_INTRO_LENGTH_MS = 16200;
 
 type MediaMode = 'unknown' | 'zalo' | 'browser';
 
