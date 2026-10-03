@@ -3,20 +3,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useMusic } from './MusicProvider';
 
-const NORMAL_INTRO_LENGTH_MS = 14700;
-const ZALO_INTRO_LENGTH_MS = 18500;
-
-type MediaMode = 'unknown' | 'zalo' | 'browser';
+const INTRO_LENGTH_MS = 15200;
 
 function unlockPageScroll() {
   document.body.style.removeProperty('overflow');
   document.documentElement.style.removeProperty('overflow');
-}
-
-function detectZaloWebView() {
-  if (typeof navigator === 'undefined') return false;
-  const ua = navigator.userAgent.toLowerCase();
-  return ua.includes('zalo') || ua.includes('zalowebview');
 }
 
 export default function EnvelopeCover({
@@ -31,12 +22,10 @@ export default function EnvelopeCover({
   const { startMusic } = useMusic();
 
   const videoRef = useRef<HTMLVideoElement>(null);
-
   const finishTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const preloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const timelineStartedRef = useRef(false);
 
-  const [mediaMode, setMediaMode] = useState<MediaMode>('unknown');
   const [opening, setOpening] = useState(false);
   const [timelineStarted, setTimelineStarted] = useState(false);
   const [finished, setFinished] = useState(false);
@@ -44,14 +33,11 @@ export default function EnvelopeCover({
   useEffect(() => {
     document.body.classList.add('wedding-intro-active');
 
-    const zalo = detectZaloWebView();
-    setMediaMode(zalo ? 'zalo' : 'browser');
-
     window.scrollTo(0, 0);
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
 
-    // Preload poster và hình ảnh chung
+    // Preload poster và hình ảnh
     const imgPoster = new Image();
     imgPoster.src = '/images/envelope-poster.jpg';
     if ('decode' in imgPoster) imgPoster.decode().catch(() => {});
@@ -59,13 +45,6 @@ export default function EnvelopeCover({
     const imgButterfly = new Image();
     imgButterfly.src = '/images/butterfly.png';
     if ('decode' in imgButterfly) imgButterfly.decode().catch(() => {});
-
-    if (zalo) {
-      // Zalo: Preload ảnh tờ giấy bên trong (CSS 3D)
-      const imgPaper = new Image();
-      imgPaper.src = '/images/frame14_clean_spotless_final.jpg';
-      if ('decode' in imgPaper) imgPaper.decode().catch(() => {});
-    }
 
     return () => {
       document.body.classList.remove('wedding-intro-active');
@@ -92,22 +71,20 @@ export default function EnvelopeCover({
     onFinished?.();
   };
 
-  const startTimeline = (zaloMode: boolean) => {
+  const startTimeline = () => {
     if (timelineStartedRef.current) return;
     timelineStartedRef.current = true;
     setTimelineStarted(true);
 
-    const introLength = zaloMode ? ZALO_INTRO_LENGTH_MS : NORMAL_INTRO_LENGTH_MS;
-
     preloadTimerRef.current = setTimeout(() => {
       onPreloadWeddingPage?.();
-    }, introLength - 2800);
+    }, INTRO_LENGTH_MS - 2700);
 
-    finishTimerRef.current = setTimeout(finishIntro, introLength);
+    finishTimerRef.current = setTimeout(finishIntro, INTRO_LENGTH_MS);
   };
 
   const handleOpen = () => {
-    if (opening || mediaMode === 'unknown') return;
+    if (opening) return;
 
     startMusic();
     setOpening(true);
@@ -118,49 +95,40 @@ export default function EnvelopeCover({
       return;
     }
 
-    if (mediaMode === 'zalo') {
-      // Zalo: Dùng CSS 3D (không dùng video/canvas/WebP)
-      startTimeline(true);
-      return;
-    }
-
-    // Browser thường: Dùng video MP4
     const video = videoRef.current;
     if (!video) {
-      startTimeline(false);
+      startTimeline();
       return;
     }
 
     try {
       video.currentTime = 0;
-      video.playbackRate = 0.84;
+      // Mở chậm từ từ, trang trọng theo kỹ thuật in-vitely (0.82x)
+      video.playbackRate = 0.82;
     } catch {
-      // Metadata chưa sẵn sàng.
+      // ignore
     }
 
     video.onplaying = () => {
-      startTimeline(false);
+      startTimeline();
+    };
+
+    video.onended = () => {
+      // Đảm bảo timeline đã chạy khi video kết thúc
+      startTimeline();
     };
 
     void video.play().catch(() => {
-      startTimeline(false);
+      // Fallback nếu trình duyệt chặn autoplay video
+      startTimeline();
     });
   };
 
   if (finished) return null;
 
-  const isZalo = mediaMode === 'zalo';
-  const isReady = mediaMode !== 'unknown';
-
   return (
     <div
-      className={[
-        'intro-cover',
-        isZalo ? 'intro-zalo-3d' : '',
-        timelineStarted ? 'intro-opening' : '',
-      ]
-        .filter(Boolean)
-        .join(' ')}
+      className={`intro-cover ${timelineStarted ? 'intro-opening' : ''}`}
       role="dialog"
       aria-modal="true"
       aria-label="Mở thiệp cưới Văn Hải và Kim Hường"
@@ -168,170 +136,83 @@ export default function EnvelopeCover({
       <div className="intro-film">
         <div className="intro-film-frame">
 
-          {isZalo ? (
-            /* =========================================
-               ZALO → CSS 3D (Không giật, không lag)
-               4 cánh phong bì lật mở chậm rãi 3D
-            ========================================= */
-            <div className="intro-envelope-3d" aria-hidden="true">
+          {/* ==============================================================
+              VIDEO MP4 MỞ THIỆP CHUẨN IN-VITELY
+              - pointer-events: none (ngón tay không bao giờ chạm tới thẻ video)
+              - muted + playsInline (chặn 100% popup native player của Zalo)
+              - Điều khiển phát video hoàn toàn qua JavaScript lập trình
+          ============================================================== */}
+          <video
+            ref={videoRef}
+            src="/videos/envelope-open.mp4"
+            poster="/images/envelope-poster.jpg"
+            muted
+            playsInline
+            preload="auto"
+            aria-hidden="true"
+            tabIndex={-1}
+            style={{
+              pointerEvents: 'none',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+            }}
+          />
 
-              {/* Tờ giấy thiệp cưới bên trong */}
-              <div className="intro-envelope-letter">
+          {/* ==============================================================
+              LỚP BẤM MỞ TOÀN MÀN HÌNH (IN-VITELY TOUCH OVERLAY)
+              - Phủ trọn màn hình với z-index: 20
+              - Mọi cú chạm của người dùng đều rơi vào thẻ button này,
+                hoàn toàn cách ly ngón tay khỏi thẻ video phía dưới.
+          ============================================================== */}
+          {!opening && (
+            <button
+              type="button"
+              className="intro-touch-overlay"
+              onClick={handleOpen}
+              aria-label="Chạm để mở thiệp và phát nhạc"
+            >
+              <div className="intro-wax-button">
                 <img
-                  src="/images/frame14_clean_spotless_final.jpg"
+                  src="/images/wax-seal.png"
                   alt=""
-                  className="intro-envelope-letter-bg"
+                  width={92}
+                  height={92}
                   draggable={false}
                 />
-
-                {/* Bướm 3D vỗ cánh lãng mạn */}
-                <div className="intro-butterfly-box" aria-hidden="true">
-                  <div className="intro-butterfly-shadow" />
-                  <img
-                    src="/images/butterfly.png"
-                    alt=""
-                    className="intro-butterfly-img"
-                    draggable={false}
-                  />
-                </div>
-
-                {/* Lời mời */}
-                <div className="intro-copy intro-copy-invite">
-                  <p className="intro-invite-line">TRÂN TRỌNG KÍNH MỜI</p>
-                  <h5 className="intro-guest-name">{guestName}</h5>
-                  <p className="intro-invite-line">ĐẾN CHUNG VUI</p>
-                </div>
-
-                {/* Tên cặp đôi */}
-                <div className="intro-copy intro-copy-names">
-                  <p>CHÚNG MÌNH SẮP VỀ CHUNG MỘT NHÀ</p>
-                  <h1>
-                    <span>Văn Hải</span>
-                    <em>&amp;</em>
-                    <span>Kim Hường</span>
-                  </h1>
-                  <p>06 · 11 · 2026</p>
-                </div>
               </div>
-
-              {/* 4 CÁNH PHONG BÌ 3D LẬT MỞ */}
-              <div className="intro-flaps-container">
-                {/* Cánh trái */}
-                <div className="intro-flap intro-flap-left">
-                  <div className="intro-flap-face intro-flap-front">
-                    <div className="intro-flap-graphic intro-flap-graphic-left" />
-                    <div className="intro-flap-shadow intro-flap-shadow-left" />
-                  </div>
-                  <div className="intro-flap-face intro-flap-back">
-                    <div className="intro-flap-lining intro-flap-lining-left" />
-                  </div>
-                </div>
-
-                {/* Cánh phải */}
-                <div className="intro-flap intro-flap-right">
-                  <div className="intro-flap-face intro-flap-front">
-                    <div className="intro-flap-graphic intro-flap-graphic-right" />
-                    <div className="intro-flap-shadow intro-flap-shadow-right" />
-                  </div>
-                  <div className="intro-flap-face intro-flap-back">
-                    <div className="intro-flap-lining intro-flap-lining-right" />
-                  </div>
-                </div>
-
-                {/* Cánh trên */}
-                <div className="intro-flap intro-flap-top">
-                  <div className="intro-flap-face intro-flap-front">
-                    <div className="intro-flap-graphic intro-flap-graphic-top" />
-                    <div className="intro-flap-shadow intro-flap-shadow-top" />
-                  </div>
-                  <div className="intro-flap-face intro-flap-back">
-                    <div className="intro-flap-lining intro-flap-lining-top" />
-                  </div>
-                </div>
-
-                {/* Cánh dưới */}
-                <div className="intro-flap intro-flap-bottom">
-                  <div className="intro-flap-face intro-flap-front">
-                    <div className="intro-flap-graphic intro-flap-graphic-bottom" />
-                    <div className="intro-flap-shadow intro-flap-shadow-bottom" />
-                  </div>
-                  <div className="intro-flap-face intro-flap-back">
-                    <div className="intro-flap-lining intro-flap-lining-bottom" />
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          ) : (
-            /* =========================================
-               BROWSER THƯỜNG → VIDEO MP4 (60fps GPU)
-            ========================================= */
-            <video
-              ref={videoRef}
-              src="/videos/envelope-open.mp4"
-              poster="/images/envelope-poster.jpg"
-              muted
-              playsInline
-              preload="auto"
-              aria-hidden="true"
-            />
-          )}
-
-          {/* Con dấu sáp chạm mở */}
-          <button
-            type="button"
-            className={`intro-wax-button ${opening ? 'is-opening' : ''}`}
-            onClick={handleOpen}
-            disabled={!isReady || opening}
-            aria-label="Chạm con dấu để mở thiệp và phát nhạc"
-            aria-disabled={!isReady || opening}
-          >
-            <img
-              src="/images/wax-seal.png"
-              alt=""
-              width={92}
-              height={92}
-              draggable={false}
-            />
-          </button>
-
-          {!opening && (
-            <p className="intro-tap-hint">Chạm vào con dấu để mở thiệp ♪</p>
+              <p className="intro-tap-hint">Chạm vào con dấu để mở thiệp ♪</p>
+            </button>
           )}
 
         </div>
       </div>
 
-      {/* SCENE 2: TỜ THIỆP VÀ BƯỚM (chỉ Browser, sau khi video xong) */}
-      {!isZalo && (
-        <div
-          className="intro-paper"
-          aria-hidden={!timelineStarted}
-        >
-          <div className="intro-butterfly" aria-hidden="true">
-            <span className="intro-wing intro-wing-left" />
-            <span className="intro-wing intro-wing-right" />
-          </div>
-
-          <div className="intro-copy intro-copy-invite">
-            <p className="intro-invite-line">TRÂN TRỌNG KÍNH MỜI</p>
-            <h5 className="intro-guest-name">{guestName}</h5>
-            <p className="intro-invite-line">ĐẾN CHUNG VUI</p>
-          </div>
-
-          <div className="intro-copy intro-copy-names">
-            <p>CHÚNG MÌNH SẮP VỀ CHUNG MỘT NHÀ</p>
-            <h1>
-              <span>Văn Hải</span>
-              <em>&amp;</em>
-              <span>Kim Hường</span>
-            </h1>
-            <p>06 · 11 · 2026</p>
-          </div>
+      {/* SCENE 2: TỜ THIỆP + BƯỚM VỖ CÁNH 3D + THÔNG TIN MỜI */}
+      <div
+        className="intro-paper"
+        aria-hidden={!timelineStarted}
+      >
+        <div className="intro-butterfly" aria-hidden="true">
+          <span className="intro-wing intro-wing-left" />
+          <span className="intro-wing intro-wing-right" />
         </div>
-      )}
 
-    
+        <div className="intro-copy intro-copy-invite">
+          <p className="intro-invite-line">TRÂN TRỌNG KÍNH MỜI</p>
+          <h5 className="intro-guest-name">{guestName}</h5>
+          <p className="intro-invite-line">ĐẾN CHUNG VUI</p>
+        </div>
+
+        <div className="intro-copy intro-copy-names">
+          <p>CHÚNG MÌNH SẮP VỀ CHUNG MỘT NHÀ</p>
+          <h1>
+            <span>Văn Hải</span>
+            <em>&amp;</em>
+            <span>Kim Hường</span>
+          </h1>
+          <p>06 · 11 · 2026</p>
+        </div>
+      </div>
     </div>
   );
 }

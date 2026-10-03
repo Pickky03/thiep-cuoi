@@ -927,7 +927,35 @@ a:focus-visible {
  * =========================================
  * WAX SEAL HH
  * =========================================
+/*
+ * =========================================
+ * IN-VITELY TOUCH OVERLAY & VIDEO SECURITY
+ * Chặn 100% việc ngón tay chạm vào video
+ * =========================================
  */
+.intro-film video {
+  pointer-events: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+.intro-touch-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 25;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
 
 .intro-wax-button {
   position: absolute;
@@ -1878,42 +1906,38 @@ a:focus-visible {
  * =========================================
  */
 
-/* ---- ZALO: text và cover-out ---- */
-.intro-zalo-3d.intro-opening .intro-copy-invite {
-  animation: intro-invite-copy 4.6s ease 8.2s both;
-  z-index: 22;
+/*
+ * ==============================================================
+ * TIMELINE MỞ THIỆP VIDEO CHUẨN IN-VITELY (ÁP DỤNG MỌI THIẾT BỊ)
+ * 0.00s         : Chạm overlay -> video phát tốc độ 0.82x
+ * 5.20s         : Video mở xong -> màn film mờ dần (intro-film-out)
+ * 5.20s         : Tờ thiệp hiện ra (intro-paper-in)
+ * 5.60s - 10.60s: Lời mời trang trọng xuất hiện
+ * 10.60s - 15.0s: Tên cô dâu chú rể Văn Hải & Kim Hường
+ * 14.50s - 15.2s: Màn mở thiệp mờ tan vào trang thiệp cưới chính
+ * ==============================================================
+ */
+
+.intro-opening .intro-film {
+  animation: intro-film-out 0.8s ease 5.2s forwards;
 }
 
-.intro-zalo-3d.intro-opening .intro-copy-names {
-  animation: intro-names-copy 4.4s ease 12.8s both;
-  z-index: 22;
+.intro-opening .intro-paper {
+  animation: intro-paper-in 0.8s ease 5.2s forwards;
 }
 
-.intro-cover.intro-zalo-3d.intro-opening {
-  animation: intro-cover-out 1.3s cubic-bezier(0.4, 0, 0.2, 1) 17.2s forwards;
-}
-
-/* ---- BROWSER: film fade out → paper fade in → text → cover-out ---- */
-.intro-cover:not(.intro-zalo-3d).intro-opening .intro-film {
-  animation: intro-film-out 0.8s ease 4.4s forwards;
-}
-
-.intro-cover:not(.intro-zalo-3d).intro-opening .intro-paper {
-  animation: intro-paper-in 0.8s ease 4.4s forwards;
-}
-
-.intro-cover:not(.intro-zalo-3d).intro-opening .intro-copy-invite {
-  animation: intro-invite-copy 5.2s ease-out 5.0s both;
+.intro-opening .intro-copy-invite {
+  animation: intro-invite-copy 5.0s ease-out 5.6s both;
   z-index: 3;
 }
 
-.intro-cover:not(.intro-zalo-3d).intro-opening .intro-copy-names {
-  animation: intro-names-copy 3.9s ease-out 10.2s both;
+.intro-opening .intro-copy-names {
+  animation: intro-names-copy 4.0s ease-out 10.6s both;
   z-index: 3;
 }
 
-.intro-cover:not(.intro-zalo-3d).intro-opening {
-  animation: intro-cover-out 1.2s ease-in-out 13.5s forwards;
+.intro-cover.intro-opening {
+  animation: intro-cover-out 1.2s ease-in-out 14.5s forwards;
 }
 
 /* Keyframes chung cho browser (film fade out / paper fade in) */
