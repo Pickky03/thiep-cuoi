@@ -40,11 +40,11 @@ export default function EnvelopeCover({
     // Preload poster và hình ảnh
     const imgPoster = new Image();
     imgPoster.src = '/images/envelope-poster.jpg';
-    if ('decode' in imgPoster) imgPoster.decode().catch(() => {});
+    if ('decode' in imgPoster) imgPoster.decode().catch(() => { });
 
     const imgButterfly = new Image();
     imgButterfly.src = '/images/butterfly.png';
-    if ('decode' in imgButterfly) imgButterfly.decode().catch(() => {});
+    if ('decode' in imgButterfly) imgButterfly.decode().catch(() => { });
 
     return () => {
       document.body.classList.remove('wedding-intro-active');
