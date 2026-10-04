@@ -5,7 +5,7 @@ import { Lottie } from 'lottie-react';
 import { useMusic } from './MusicProvider';
 import envelopeAnimation from './envelope-open.json';
 
-const INTRO_LENGTH_MS = 15200;
+const INTRO_LENGTH_MS = 7300;
 
 function unlockPageScroll() {
   document.body.style.removeProperty('overflow');
@@ -79,7 +79,7 @@ export default function EnvelopeCover({
 
     preloadTimerRef.current = setTimeout(() => {
       onPreloadWeddingPage?.();
-    }, INTRO_LENGTH_MS - 2700);
+    }, INTRO_LENGTH_MS - 2000);
 
     finishTimerRef.current = setTimeout(finishIntro, INTRO_LENGTH_MS);
   };
@@ -96,10 +96,10 @@ export default function EnvelopeCover({
       return;
     }
 
-    // Safety fallback: kích hoạt timeline sau 3.8s nếu onComplete gặp sự cố trên thiết bị yếu
+    // Safety fallback: kích hoạt timeline sau 3.2s nếu onComplete gặp sự cố trên thiết bị yếu
     setTimeout(() => {
       startTimeline();
-    }, 3800);
+    }, 3200);
   };
 
   if (finished) return null;
@@ -121,6 +121,7 @@ export default function EnvelopeCover({
           ============================================================== */}
           {opening ? (
             <Lottie
+              renderer="canvas"
               src={envelopeAnimation}
               loop={false}
               autoplay={true}
