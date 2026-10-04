@@ -101,6 +101,13 @@ export default function EnvelopeCover({
       return;
     }
 
+    // Gán src tại đây (không để src trong DOM) để Zalo quét trang
+    // không thấy media URL nào → không mở native player.
+    if (!video.src || video.src === window.location.href) {
+      video.src = '/videos/envelope-open.mp4';
+      video.load();
+    }
+
     try {
       video.currentTime = 0;
       // Mở chậm từ từ, trang trọng theo kỹ thuật in-vitely (0.82x)
@@ -138,17 +145,18 @@ export default function EnvelopeCover({
 
           {/* ==============================================================
               VIDEO MP4 MỞ THIỆP CHUẨN IN-VITELY
-              - pointer-events: none (ngón tay không bao giờ chạm tới thẻ video)
-              - muted + playsInline (chặn 100% popup native player của Zalo)
-              - Điều khiển phát video hoàn toàn qua JavaScript lập trình
+              - KHÔNG để src trong JSX: Zalo quét DOM sẽ không thấy URL video
+                → không intercept → không hiện native player.
+              - src được gán qua JS khi người dùng nhấn nút (handleOpen).
+              - preload="none": không tải trước khi chưa có src.
+              - poster vẫn để để hiện ảnh nền thiệp khi chờ.
           ============================================================== */}
           <video
             ref={videoRef}
-            src="/videos/envelope-open.mp4"
             poster="/images/envelope-poster.jpg"
             muted
             playsInline
-            preload="auto"
+            preload="none"
             aria-hidden="true"
             tabIndex={-1}
             style={{
