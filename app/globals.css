@@ -487,6 +487,27 @@ a:focus-visible {
   transform-style: flat;
 }
 
+.intro-film-frame canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  image-rendering: auto;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: smooth;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.intro-envelope-poster {
+  image-rendering: auto;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: smooth;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
 /* =========================================
    3D ENVELOPE STAGE & LETTER CARD
    ========================================= */
@@ -940,12 +961,33 @@ a:focus-visible {
 
   transform: translate(-50%, -50%);
 
-  filter: drop-shadow(0 5px 7px rgba(23, 35, 48, 0.27));
+  filter: drop-shadow(0 8px 18px rgba(23, 35, 48, 0.35));
 
   animation:
 
     intro-seal-breathe 2.4s ease-in-out infinite;
 
+}
+
+.intro-wax-button::before {
+  content: "";
+  position: absolute;
+  inset: -14px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(235, 192, 107, 0.4) 0%, rgba(235, 192, 107, 0) 70%);
+  animation: intro-seal-glow 2.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes intro-seal-glow {
+  0%, 100% {
+    opacity: 0.45;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.12);
+  }
 }
 
 .intro-wax-button img {
@@ -1118,36 +1160,21 @@ a:focus-visible {
 
 }
 
-/* Vân giấy nhẹ nằm trên tờ giấy giữa */
-
+/* Viền khung vàng sang trọng trên tờ thiệp cưới */
 .intro-paper::after {
-
   content: "";
-
   position: absolute;
-
-  top: 0;
-
+  top: 14px;
+  bottom: 14px;
   left: 50%;
-
-  width: min(100vw, 56.25svh);
-
-  height: 100svh;
-
+  width: min(calc(100vw - 28px), calc(56.25svh - 28px));
   transform: translateX(-50%);
-
-  opacity: 0.18;
-
+  border: 1px solid rgba(197, 160, 89, 0.32);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+    0 0 0 1px rgba(197, 160, 89, 0.12);
   pointer-events: none;
-
-  background-image:
-
-    radial-gradient(#cdbeb2 0.45px,
-
-      transparent 0.45px);
-
-  background-size: 6px 6px;
-
+  border-radius: 4px;
 }
 
 /*
@@ -1514,110 +1541,96 @@ a:focus-visible {
 
 }
 
-.intro-invite-sub {
-
+.intro-invite-line {
   margin: 0;
-
-  font-size: clamp(13px, 1.9svh, 16px);
-
-  font-weight: 400;
-
-  letter-spacing: 0.2em;
-
-  line-height: 1.7;
-
+  font-family: var(--font-be-vietnam), sans-serif;
+  font-size: clamp(10px, 1.6svh, 13px);
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  line-height: 1.6;
   text-align: center;
+  text-transform: uppercase;
+  color: #6d829f;
+}
 
-  text-transform: lowercase;
+.intro-guest-name {
+  max-width: 100%;
+  margin: 2px 0;
+  padding: 0 8px;
+  font-family: var(--font-luxury-script), var(--font-playfair), Georgia, cursive;
+  font-size: clamp(38px, 6.2svh, 54px);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  text-align: center;
+  color: #263c56;
+  text-shadow: 0 1px 3px rgba(38, 60, 86, 0.12);
+  overflow-wrap: anywhere;
+}
 
+.intro-invite-sub {
+  margin: 0;
+  font-family: var(--font-be-vietnam), sans-serif;
+  font-size: clamp(10px, 1.5svh, 12px);
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  line-height: 1.7;
+  text-align: center;
+  text-transform: uppercase;
   color: #7a8fab;
-
 }
 
 /* Tên cô dâu chú rể */
-
-.intro-copy-names p {
-
-  margin: 0;
-
-  font-size: clamp(10px, 1.8vw, 13px);
-
-  letter-spacing: 0.19em;
-
-  line-height: 1.8;
-
+.intro-copy-names {
+  top: 48%;
 }
 
-.intro-copy-names {
-
-  top: 49%;
-
+.intro-copy-names p:first-of-type {
+  margin: 0;
+  font-family: var(--font-be-vietnam), sans-serif;
+  font-size: clamp(10px, 1.5svh, 12px);
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  line-height: 1.8;
+  text-align: center;
+  text-transform: uppercase;
+  color: #6d829f;
 }
 
 .intro-copy-names h1 {
-
-  margin: 14px 0;
-
+  margin: 10px 0;
   display: flex;
-
   align-items: center;
-
   flex-direction: column;
-
-  gap: 4px;
-
-  font-family:
-
-    var(--font-playfair),
-
-    var(--font-be-vietnam),
-
-    serif;
-
-  /* Giảm cỡ chữ và tính theo chiều cao màn hình */
-
-  font-size: clamp(30px, 4.8svh, 46px);
-
+  gap: 2px;
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: clamp(32px, 5svh, 46px);
   font-weight: 400;
-
-  line-height: 1.08;
-
+  line-height: 1.1;
   white-space: nowrap;
+  color: #213547;
+}
 
+.intro-copy-names h1 span {
+  letter-spacing: 0.02em;
 }
 
 .intro-copy-names h1 em {
-
-  font-size: 0.5em;
-
-  color: #a6b2c1;
-
-  line-height: 1;
-
+  font-family: var(--font-luxury-script), Georgia, cursive;
+  font-size: 0.75em;
+  font-style: normal;
+  color: #c5a059;
+  line-height: 0.9;
+  margin: -2px 0;
 }
 
-.intro-copy-names p {
-
+.intro-copy-names p:last-of-type {
   margin: 0;
-
-  font-size: clamp(9px, 1.5svh, 12px);
-
-  letter-spacing: 0.12em;
-
-  line-height: 1.6;
-
-  text-align: center;
-
-}
-
-.intro-copy-names h1 em {
-
-  font-size: 0.55em;
-
-  color: #a6b2c1;
-
-  line-height: 1;
-
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: clamp(13px, 2svh, 16px);
+  letter-spacing: 0.28em;
+  color: #8fa1b8;
+  font-weight: 500;
 }
 
 /*
@@ -1837,15 +1850,29 @@ a:focus-visible {
 
 /* Keyframes chung cho browser (film fade out / paper fade in) */
 @keyframes intro-film-out {
-  to {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0px);
+  }
+  100% {
     opacity: 0;
+    transform: scale(1.02);
+    filter: blur(2px);
     visibility: hidden;
   }
 }
 
 @keyframes intro-paper-in {
-  to {
+  0% {
+    opacity: 0;
+    transform: scale(0.97);
+    filter: blur(2px);
+  }
+  100% {
     opacity: 1;
+    transform: scale(1);
+    filter: blur(0px);
   }
 }
 
