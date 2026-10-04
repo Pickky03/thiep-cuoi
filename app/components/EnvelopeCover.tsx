@@ -23,6 +23,7 @@ export default function EnvelopeCover({
 }) {
   const { startMusic } = useMusic();
 
+  const frameRef = useRef<HTMLDivElement>(null);
   const finishTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const preloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const timelineStartedRef = useRef(false);
@@ -54,6 +55,24 @@ export default function EnvelopeCover({
       if (preloadTimerRef.current) clearTimeout(preloadTimerRef.current);
     };
   }, []);
+
+  // Đảm bảo Canvas Context luôn kích hoạt chế độ làm mượt ảnh (Image Smoothing) cao nhất
+  useEffect(() => {
+    if (!opening) return;
+    const applySmoothing = () => {
+      const canvas = frameRef.current?.querySelector('canvas');
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+        }
+      }
+    };
+    applySmoothing();
+    const timer = setInterval(applySmoothing, 80);
+    return () => clearInterval(timer);
+  }, [opening]);
 
   const finishIntro = () => {
     document.body.classList.remove('wedding-intro-active');
@@ -112,20 +131,47 @@ export default function EnvelopeCover({
       aria-label="Mở thiệp cưới Văn Hải và Kim Hường"
     >
       <div className="intro-film">
-        <div className="intro-film-frame">
+        <div className="intro-film-frame" ref={frameRef}>
           {/* ==============================================================
               LOTTIE CANVAS ANIMATION MỞ THIỆP CHUẨN IN-VITELY
               - 100% Canvas, KHÔNG dùng thẻ <video>
               - Hoàn toàn miễn nhiễm với lỗi Zalo iOS Native Player!
               - Tự động phát khi người dùng bấm mở thiệp
+              - DPR theo devicePixelRatio cho độ nét chuẩn Retina
+              - Image smoothing Enabled khử vỡ hạt pixel
           ============================================================== */}
           {opening ? (
             <Lottie
               renderer="canvas"
+              rendererSettings={{
+                dpr: typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2.5) : 1,
+                preserveAspectRatio: 'xMidYMid slice',
+                clearCanvas: true,
+              }}
               src={envelopeAnimation}
               loop={false}
               autoplay={true}
               subscriptions={{
+                ready: () => {
+                  const canvas = frameRef.current?.querySelector('canvas');
+                  if (canvas) {
+                    const ctx = canvas.getContext('2d');
+                    if (ctx) {
+                      ctx.imageSmoothingEnabled = true;
+                      ctx.imageSmoothingQuality = 'high';
+                    }
+                  }
+                },
+                frame: () => {
+                  const canvas = frameRef.current?.querySelector('canvas');
+                  if (canvas) {
+                    const ctx = canvas.getContext('2d');
+                    if (ctx && (!ctx.imageSmoothingEnabled || ctx.imageSmoothingQuality !== 'high')) {
+                      ctx.imageSmoothingEnabled = true;
+                      ctx.imageSmoothingQuality = 'high';
+                    }
+                  }
+                },
                 complete: startTimeline,
               }}
               style={{
@@ -191,9 +237,20 @@ export default function EnvelopeCover({
         </div>
 
         <div className="intro-copy intro-copy-invite">
+          <span className="intro-invite-flourish" aria-hidden="true" />
           <p className="intro-invite-line">TRÂN TRỌNG KÍNH MỜI</p>
+          <div className="intro-invite-rule" aria-hidden="true">
+            <span />
+            <i />
+            <span />
+          </div>
           <h5 className="intro-guest-name">{guestName}</h5>
-          <p className="intro-invite-line">ĐẾN CHUNG VUI</p>
+          <div className="intro-invite-rule intro-invite-rule-soft" aria-hidden="true">
+            <span />
+            <i />
+            <span />
+          </div>
+          <p className="intro-invite-sub">ĐẾN CHUNG VUI CÙNG GIA ĐÌNH CHÚNG MÌNH</p>
         </div>
 
         <div className="intro-copy intro-copy-names">
