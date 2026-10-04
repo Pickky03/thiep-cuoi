@@ -95,6 +95,24 @@ export default function EnvelopeCover({
       return;
     }
 
+    // ── Phát hiện WebView trong app (Zalo, Facebook, Messenger…) ──────────────
+    // iOS WebView (WKWebView): UA KHÔNG chứa "Safari/" — đây là dấu hiệu tin cậy
+    //   vì Mobile Safari LUÔN có "Safari/xxx.x" nhưng WKWebView thì không.
+    // Android WebView: UA chứa flag "wv".
+    // Trong WebView của Zalo, WKWebView được cấu hình allowsInlineMediaPlayback=false
+    //   ở cấp native → mọi video.play() đều bị iOS đẩy ra native player.
+    //   Giải pháp duy nhất: bỏ qua video, chỉ dùng CSS animation.
+    const ua = navigator.userAgent;
+    const isIOSWebView = /iP(hone|ad|od)/i.test(ua) && !/Safari\//i.test(ua);
+    const isAndroidWebView = /Android/i.test(ua) && /wv\b/i.test(ua);
+
+    if (isIOSWebView || isAndroidWebView) {
+      // Môi trường bị giới hạn → bỏ video, CSS animation tự xử lý
+      startTimeline();
+      return;
+    }
+    // ──────────────────────────────────────────────────────────────────────────
+
     const video = videoRef.current;
     if (!video) {
       startTimeline();
@@ -128,6 +146,7 @@ export default function EnvelopeCover({
     void video.play().catch(() => {
       // Fallback nếu trình duyệt chặn autoplay video
       startTimeline();
+
     });
   };
 
