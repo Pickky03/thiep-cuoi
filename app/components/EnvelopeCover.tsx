@@ -54,6 +54,16 @@ export default function EnvelopeCover({
     };
   }, []);
 
+  useEffect(() => {
+    if (videoRef.current) {
+      // Ép trực tiếp vào Native DOM, bỏ qua bộ lọc của React
+      videoRef.current.setAttribute('playsinline', 'true');
+      videoRef.current.setAttribute('webkit-playsinline', 'true');
+      videoRef.current.muted = true;
+    }
+  }, []);
+
+
   // Preload video dưới dạng Blob URL:
   // blob: URL không chứa extension .mp4 → Zalo/WebView không nhận ra
   // là media file để intercept → video phát inline bình thường.
@@ -136,6 +146,8 @@ export default function EnvelopeCover({
     // blob: URL không có đuôi .mp4 → Zalo không nhận ra để intercept.
     const src = videoBlobUrlRef.current ?? '/videos/envelope-open.mp4';
     if (!video.src || video.src === window.location.href || video.src !== src) {
+      video.setAttribute('playsinline', 'true');        // Ép lại trước khi load
+      video.setAttribute('webkit-playsinline', 'true'); // Ép lại trước khi load
       video.src = src;
       video.load();
     }
@@ -180,7 +192,7 @@ export default function EnvelopeCover({
             poster="/images/envelope-poster.jpg"
             muted
             playsInline={true}
-            webkit-playsinline="true"
+            webkit-playsinline=""
             preload="none"
             aria-hidden="true"
             tabIndex={-1}
