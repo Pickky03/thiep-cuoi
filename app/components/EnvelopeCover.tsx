@@ -19,7 +19,7 @@ export default function EnvelopeCover({
   onPreloadWeddingPage?: () => void;
   onFinished?: () => void;
 }) {
-  const { startMusic } = useMusic();
+  // const { startMusic } = useMusic();
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const finishTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -86,7 +86,7 @@ export default function EnvelopeCover({
   const handleOpen = () => {
     if (opening) return;
 
-    startMusic();
+    // startMusic();
     setOpening(true);
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
