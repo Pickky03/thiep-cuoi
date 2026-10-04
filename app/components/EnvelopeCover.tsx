@@ -54,6 +54,26 @@ export default function EnvelopeCover({
     };
   }, []);
 
+  // Preload video dưới dạng Blob URL:
+  // blob: URL không chứa extension .mp4 → Zalo/WebView không nhận ra
+  // là media file để intercept → video phát inline bình thường.
+  const videoBlobUrlRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    let blobUrl: string | null = null;
+    fetch('/videos/envelope-open.mp4')
+      .then((r) => r.blob())
+      .then((blob) => {
+        blobUrl = URL.createObjectURL(blob);
+        videoBlobUrlRef.current = blobUrl;
+      })
+      .catch(() => { /* fallback sang URL thường */ });
+
+    return () => {
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
+    };
+  }, []);
+
   const finishIntro = () => {
     document.body.classList.remove('wedding-intro-active');
     unlockPageScroll();
@@ -95,60 +115,45 @@ export default function EnvelopeCover({
       return;
     }
 
-    // ── Phát hiện WebView trong app (Zalo, Facebook, Messenger…) ──────────────
-    // iOS WebView (WKWebView): UA KHÔNG chứa "Safari/" — đây là dấu hiệu tin cậy
-    //   vì Mobile Safari LUÔN có "Safari/xxx.x" nhưng WKWebView thì không.
-    // Android WebView: UA chứa flag "wv".
-    // Trong WebView của Zalo, WKWebView được cấu hình allowsInlineMediaPlayback=false
-    //   ở cấp native → mọi video.play() đều bị iOS đẩy ra native player.
-    //   Giải pháp duy nhất: bỏ qua video, chỉ dùng CSS animation.
-    const ua = navigator.userAgent;
-    const isIOSWebView = /iP(hone|ad|od)/i.test(ua) && !/Safari\//i.test(ua);
-    const isAndroidWebView = /Android/i.test(ua) && /wv\b/i.test(ua);
-
-    if (isIOSWebView || isAndroidWebView) {
-      // Môi trường bị giới hạn → bỏ video, CSS animation tự xử lý
-      startTimeline();
-      return;
-    }
-    // ──────────────────────────────────────────────────────────────────────────
-
     const video = videoRef.current;
     if (!video) {
       startTimeline();
       return;
     }
 
-    // Gán src tại đây (không để src trong DOM) để Zalo quét trang
-    // không thấy media URL nào → không mở native player.
-    if (!video.src || video.src === window.location.href) {
-      video.src = '/videos/envelope-open.mp4';
+    // Nếu iOS đẩy video vào native player (fullscreen), sự kiện
+    // webkitbeginfullscreen sẽ bắn ra. Ta tự exit fullscreen và
+    // chạy CSS animation thay thế — không block video hoàn toàn.
+    const onNativePlayer = () => {
+      video.pause();
+      const v = video as HTMLVideoElement & { webkitExitFullscreen?: () => void };
+      v.webkitExitFullscreen?.();
+      startTimeline();
+    };
+    video.addEventListener('webkitbeginfullscreen', onNativePlayer, { once: true });
+
+    // Dùng blob URL nếu đã preload xong, fallback sang URL thường.
+    // blob: URL không có đuôi .mp4 → Zalo không nhận ra để intercept.
+    const src = videoBlobUrlRef.current ?? '/videos/envelope-open.mp4';
+    if (!video.src || video.src === window.location.href || video.src !== src) {
+      video.src = src;
       video.load();
     }
 
     try {
       video.currentTime = 0;
-      // Mở chậm từ từ, trang trọng theo kỹ thuật in-vitely (0.82x)
       video.playbackRate = 0.82;
-    } catch {
-      // ignore
-    }
+    } catch { /* ignore */ }
 
-    video.onplaying = () => {
-      startTimeline();
-    };
-
-    video.onended = () => {
-      // Đảm bảo timeline đã chạy khi video kết thúc
-      startTimeline();
-    };
+    video.onplaying = () => startTimeline();
+    video.onended = () => startTimeline();
 
     void video.play().catch(() => {
-      // Fallback nếu trình duyệt chặn autoplay video
+      video.removeEventListener('webkitbeginfullscreen', onNativePlayer);
       startTimeline();
-
     });
   };
+
 
   if (finished) return null;
 
