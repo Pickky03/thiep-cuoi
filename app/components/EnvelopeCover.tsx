@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { Lottie } from 'lottie-react';
 import { useMusic } from './MusicProvider';
+import envelopeAnimation from './envelope-open.json';
 
-const INTRO_LENGTH_MS = 15200;
+const INTRO_LENGTH_MS = 7300;
 
 function unlockPageScroll() {
   document.body.style.removeProperty('overflow');
@@ -21,7 +23,6 @@ export default function EnvelopeCover({
 }) {
   const { startMusic } = useMusic();
 
-  const videoRef = useRef<HTMLVideoElement>(null);
   const finishTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const preloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const timelineStartedRef = useRef(false);
@@ -40,37 +41,17 @@ export default function EnvelopeCover({
     // Preload poster và hình ảnh
     const imgPoster = new Image();
     imgPoster.src = '/images/envelope-poster.jpg';
-    if ('decode' in imgPoster) imgPoster.decode().catch(() => { });
+    if ('decode' in imgPoster) imgPoster.decode().catch(() => {});
 
     const imgButterfly = new Image();
     imgButterfly.src = '/images/butterfly.png';
-    if ('decode' in imgButterfly) imgButterfly.decode().catch(() => { });
+    if ('decode' in imgButterfly) imgButterfly.decode().catch(() => {});
 
     return () => {
       document.body.classList.remove('wedding-intro-active');
       unlockPageScroll();
       if (finishTimerRef.current) clearTimeout(finishTimerRef.current);
       if (preloadTimerRef.current) clearTimeout(preloadTimerRef.current);
-    };
-  }, []);
-
-  // Preload video dưới dạng Blob URL:
-  // blob: URL không chứa extension .mp4 → Zalo/WebView không nhận ra
-  // là media file để intercept → video phát inline bình thường.
-  const videoBlobUrlRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    let blobUrl: string | null = null;
-    fetch('/videos/envelope-open.mp4')
-      .then((r) => r.blob())
-      .then((blob) => {
-        blobUrl = URL.createObjectURL(blob);
-        videoBlobUrlRef.current = blobUrl;
-      })
-      .catch(() => { /* fallback sang URL thường */ });
-
-    return () => {
-      if (blobUrl) URL.revokeObjectURL(blobUrl);
     };
   }, []);
 
@@ -98,7 +79,7 @@ export default function EnvelopeCover({
 
     preloadTimerRef.current = setTimeout(() => {
       onPreloadWeddingPage?.();
-    }, INTRO_LENGTH_MS - 2700);
+    }, INTRO_LENGTH_MS - 2000);
 
     finishTimerRef.current = setTimeout(finishIntro, INTRO_LENGTH_MS);
   };
@@ -115,45 +96,11 @@ export default function EnvelopeCover({
       return;
     }
 
-    const video = videoRef.current;
-    if (!video) {
+    // Safety fallback: kích hoạt timeline sau 3.2s nếu onComplete gặp sự cố trên thiết bị yếu
+    setTimeout(() => {
       startTimeline();
-      return;
-    }
-
-    // Nếu iOS đẩy video vào native player (fullscreen), sự kiện
-    // webkitbeginfullscreen sẽ bắn ra. Ta tự exit fullscreen và
-    // chạy CSS animation thay thế — không block video hoàn toàn.
-    const onNativePlayer = () => {
-      video.pause();
-      const v = video as HTMLVideoElement & { webkitExitFullscreen?: () => void };
-      v.webkitExitFullscreen?.();
-      startTimeline();
-    };
-    video.addEventListener('webkitbeginfullscreen', onNativePlayer, { once: true });
-
-    // Dùng blob URL nếu đã preload xong, fallback sang URL thường.
-    // blob: URL không có đuôi .mp4 → Zalo không nhận ra để intercept.
-    const src = videoBlobUrlRef.current ?? '/videos/envelope-open.mp4';
-    if (!video.src || video.src === window.location.href || video.src !== src) {
-      video.src = src;
-      video.load();
-    }
-
-    try {
-      video.currentTime = 0;
-      video.playbackRate = 0.82;
-    } catch { /* ignore */ }
-
-    video.onplaying = () => startTimeline();
-    video.onended = () => startTimeline();
-
-    void video.play().catch(() => {
-      video.removeEventListener('webkitbeginfullscreen', onNativePlayer);
-      startTimeline();
-    });
+    }, 3200);
   };
-
 
   if (finished) return null;
 
@@ -166,35 +113,50 @@ export default function EnvelopeCover({
     >
       <div className="intro-film">
         <div className="intro-film-frame">
-
           {/* ==============================================================
-              VIDEO MP4 MỞ THIỆP CHUẨN IN-VITELY
-              - KHÔNG để src trong JSX: Zalo quét DOM sẽ không thấy URL video
-                → không intercept → không hiện native player.
-              - src được gán qua JS khi người dùng nhấn nút (handleOpen).
-              - preload="none": không tải trước khi chưa có src.
-              - poster vẫn để để hiện ảnh nền thiệp khi chờ.
+              LOTTIE CANVAS ANIMATION MỞ THIỆP CHUẨN IN-VITELY
+              - 100% Canvas, KHÔNG dùng thẻ <video>
+              - Hoàn toàn miễn nhiễm với lỗi Zalo iOS Native Player!
+              - Tự động phát khi người dùng bấm mở thiệp
           ============================================================== */}
-          <video
-            ref={videoRef}
-            poster="/images/envelope-poster.jpg"
-            muted
-            playsInline
-            preload="none"
-            aria-hidden="true"
-            tabIndex={-1}
-            style={{
-              pointerEvents: 'none',
-              userSelect: 'none',
-              WebkitUserSelect: 'none',
-            }}
-          />
+          {opening ? (
+            <Lottie
+              renderer="canvas"
+              src={envelopeAnimation}
+              loop={false}
+              autoplay={true}
+              subscriptions={{
+                complete: startTimeline,
+              }}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+              }}
+            />
+          ) : (
+            <img
+              src="/images/envelope-poster.jpg"
+              alt=""
+              className="intro-envelope-poster"
+              draggable={false}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                pointerEvents: 'none',
+                userSelect: 'none',
+              }}
+            />
+          )}
 
           {/* ==============================================================
               LỚP BẤM MỞ TOÀN MÀN HÌNH (IN-VITELY TOUCH OVERLAY)
               - Phủ trọn màn hình với z-index: 20
-              - Mọi cú chạm của người dùng đều rơi vào thẻ button này,
-                hoàn toàn cách ly ngón tay khỏi thẻ video phía dưới.
+              - Mọi cú chạm của người dùng đều rơi vào thẻ button này
           ============================================================== */}
           {!opening && (
             <button
@@ -215,7 +177,6 @@ export default function EnvelopeCover({
               <p className="intro-tap-hint">Chạm vào con dấu để mở thiệp ♪</p>
             </button>
           )}
-
         </div>
       </div>
 

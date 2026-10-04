@@ -1803,36 +1803,36 @@ a:focus-visible {
 
 /*
  * ==============================================================
- * TIMELINE MỞ THIỆP VIDEO CHUẨN IN-VITELY (ÁP DỤNG MỌI THIẾT BỊ)
- * 0.00s         : Chạm overlay -> video phát tốc độ 0.82x
- * 5.20s         : Video mở xong -> màn film mờ dần (intro-film-out)
- * 5.20s         : Tờ thiệp hiện ra (intro-paper-in)
- * 5.60s - 10.60s: Lời mời trang trọng xuất hiện
- * 10.60s - 15.0s: Tên cô dâu chú rể Văn Hải & Kim Hường
- * 14.50s - 15.2s: Màn mở thiệp mờ tan vào trang thiệp cưới chính
+ * TIMELINE MỞ THIỆP CHUẨN IN-VITELY (LOTTIE CANVAS)
+ * 0.00s          : Chạm con dấu -> Canvas Lottie mở phong bì (~2.8s)
+ * Khi mở xong    : Kích hoạt .intro-opening:
+ * + 0.00s - 0.60s: Màn film canvas mờ dần, tờ thiệp hiện ra ngay (intro-film-out / intro-paper-in)
+ * + 0.10s - 3.30s: Lời mời trang trọng xuất hiện ngay lập tức (intro-invite-copy)
+ * + 3.30s - 6.50s: Tên cô dâu chú rể Văn Hải & Kim Hường (intro-names-copy)
+ * + 6.50s - 7.40s: Màn mở thiệp mờ tan vào trang thiệp cưới chính (intro-cover-out)
  * ==============================================================
  */
 
 .intro-opening .intro-film {
-  animation: intro-film-out 0.8s ease 5.2s forwards;
+  animation: intro-film-out 0.6s ease 0s forwards;
 }
 
 .intro-opening .intro-paper {
-  animation: intro-paper-in 0.8s ease 5.2s forwards;
+  animation: intro-paper-in 0.6s ease 0s forwards;
 }
 
 .intro-opening .intro-copy-invite {
-  animation: intro-invite-copy 5.0s ease-out 5.6s both;
+  animation: intro-invite-copy 3.2s ease-out 0.1s both;
   z-index: 3;
 }
 
 .intro-opening .intro-copy-names {
-  animation: intro-names-copy 4.0s ease-out 10.6s both;
+  animation: intro-names-copy 3.2s ease-out 3.3s both;
   z-index: 3;
 }
 
 .intro-cover.intro-opening {
-  animation: intro-cover-out 1.2s ease-in-out 14.5s forwards;
+  animation: intro-cover-out 0.9s ease-in-out 6.5s forwards;
 }
 
 /* Keyframes chung cho browser (film fade out / paper fade in) */
@@ -1871,17 +1871,17 @@ a:focus-visible {
 @keyframes intro-invite-copy {
   0% {
     opacity: 0;
-    transform: translate(-50%, 22px);
-    filter: blur(5px);
+    transform: translate(-50%, 16px);
+    filter: blur(3px);
   }
 
-  34% {
+  18% {
     opacity: 1;
     transform: translate(-50%, 0);
     filter: blur(0px);
   }
 
-  78% {
+  82% {
     opacity: 1;
     transform: translate(-50%, 0);
     filter: blur(0px);
@@ -1889,7 +1889,7 @@ a:focus-visible {
 
   100% {
     opacity: 0;
-    transform: translate(-50%, -10px);
+    transform: translate(-50%, -8px);
     filter: blur(2px);
   }
 }
@@ -1897,17 +1897,17 @@ a:focus-visible {
 @keyframes intro-names-copy {
   0% {
     opacity: 0;
-    transform: translate(-50%, 18px);
-    filter: blur(4px);
+    transform: translate(-50%, 16px);
+    filter: blur(3px);
   }
 
-  28% {
+  18% {
     opacity: 1;
     transform: translate(-50%, 0);
     filter: blur(0px);
   }
 
-  78% {
+  82% {
     opacity: 1;
     transform: translate(-50%, 0);
     filter: blur(0px);
@@ -1915,7 +1915,7 @@ a:focus-visible {
 
   100% {
     opacity: 0;
-    transform: translate(-50%, -10px);
+    transform: translate(-50%, -8px);
     filter: blur(2px);
   }
 }
