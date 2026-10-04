@@ -1,9 +1,9 @@
-
 'use client';
 
 import {
   createContext,
   useContext,
+  useEffect,
   useRef,
   useState,
 } from 'react';
@@ -36,30 +36,44 @@ export default function MusicProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const audioRef = useRef<HTMLAudioElement>(null);
+  // Dung new Audio() thay vi the <audio> trong DOM.
+  // Zalo WebView quet DOM tim the <audio> va intercept thanh native player.
+  // Khi tao bang JS thuan (khong append vao DOM), Zalo khong detect duoc.
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const pathname = usePathname();
 
   const [isPlaying, setIsPlaying] = useState(false);
 
+  useEffect(() => {
+    const audio = new Audio('/music/nhac-nen.mp3');
+    audio.loop = true;
+    audio.volume = 0.35;
+    audio.preload = 'none';
+
+    audio.addEventListener('play', () => setIsPlaying(true));
+    audio.addEventListener('pause', () => setIsPlaying(false));
+
+    audioRef.current = audio;
+
+    return () => {
+      audio.pause();
+      audio.src = '';
+      audioRef.current = null;
+    };
+  }, []);
+
   const startMusic = () => {
     const audio = audioRef.current;
-
     if (!audio) return;
-
-    audio.volume = 0.35;
-
-    // Gọi trực tiếp khi khách nhấn nút mở thiệp.
     void audio.play().catch(() => {
-      console.warn('Trình duyệt chưa cho phép phát nhạc.');
+      console.warn('Trinh duyet chua cho phep phat nhac.');
     });
   };
 
   const toggleMusic = () => {
     const audio = audioRef.current;
-
     if (!audio) return;
-
     if (audio.paused) {
       startMusic();
     } else {
@@ -69,36 +83,18 @@ export default function MusicProvider({
 
   return (
     <MusicContext.Provider value={{ startMusic }}>
-      {/* playsInline + x-webkit-airplay="deny": bắt buộc phát inline trong WebView Zalo,
-          ngăn Zalo/iOS mở native media player.
-          preload="none": không tải trước, tránh Zalo intercept media stream khi load trang. */}
-      <audio
-        ref={audioRef}
-        src="/music/nhac-nen.mp3"
-        loop
-        preload="none"
-        playsInline
-        x-webkit-airplay="deny"
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-      />
-
+      {/* Khong co the <audio> trong DOM - Zalo se khong intercept */}
       {children}
 
-      {/* Chỉ hiện nút điều khiển tại trang thiệp cưới */}
       {pathname.startsWith('/thiep-cuoi') && (
         <button
           type="button"
           onClick={toggleMusic}
-          aria-label={isPlaying ? 'Tắt nhạc nền' : 'Bật nhạc nền'}
+          aria-label={isPlaying ? 'Tat nhac nen' : 'Bat nhac nen'}
           aria-pressed={isPlaying}
-          className="fixed right-4 bottom-5 z-50 flex items-center gap-2 rounded-full border border-white/50  px-4 py-3 text-sm text-white shadow-lg transition-transform hover:scale-105 sm:right-6 sm:bottom-6"
+          className="fixed right-4 bottom-5 z-50 flex items-center gap-2 rounded-full border border-white/50 px-4 py-3 text-sm text-white shadow-lg transition-transform hover:scale-105 sm:right-6 sm:bottom-6"
         >
           {isPlaying ? <SoundOutlined /> : <MutedOutlined />}
-
-          {/* <span>
-            {isPlaying ? 'Đang phát nhạc' : 'Bật nhạc'}
-          </span> */}
         </button>
       )}
     </MusicContext.Provider>
