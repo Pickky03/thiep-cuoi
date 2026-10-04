@@ -26,6 +26,7 @@ export default function EnvelopeCover({
   const preloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const timelineStartedRef = useRef(false);
 
+  const [renderVideo, setRenderVideo] = useState(false);
   const [opening, setOpening] = useState(false);
   const [timelineStarted, setTimelineStarted] = useState(false);
   const [finished, setFinished] = useState(false);
@@ -61,8 +62,7 @@ export default function EnvelopeCover({
       videoRef.current.setAttribute('webkit-playsinline', 'true');
       videoRef.current.muted = true;
     }
-  }, []);
-
+  }, [renderVideo]);
 
   // Preload video dưới dạng Blob URL:
   // blob: URL không chứa extension .mp4 → Zalo/WebView không nhận ra
@@ -125,47 +125,59 @@ export default function EnvelopeCover({
       return;
     }
 
-    const video = videoRef.current;
-    if (!video) {
-      startTimeline();
-      return;
-    }
+    // 1. Kích hoạt render thẻ video vào DOM
+    setRenderVideo(true);
 
-    // Nếu iOS đẩy video vào native player (fullscreen), sự kiện
-    // webkitbeginfullscreen sẽ bắn ra. Ta tự exit fullscreen và
-    // chạy CSS animation thay thế — không block video hoàn toàn.
-    const onNativePlayer = () => {
-      video.pause();
-      const v = video as HTMLVideoElement & { webkitExitFullscreen?: () => void };
-      v.webkitExitFullscreen?.();
-      startTimeline();
-    };
-    video.addEventListener('webkitbeginfullscreen', onNativePlayer, { once: true });
+    // 2. Đợi DOM cập nhật xong (50ms) rồi mới gán src và phát
+    setTimeout(() => {
+      const video = videoRef.current;
+      if (!video) {
+        startTimeline();
+        return;
+      }
 
-    // Dùng blob URL nếu đã preload xong, fallback sang URL thường.
-    // blob: URL không có đuôi .mp4 → Zalo không nhận ra để intercept.
-    const src = videoBlobUrlRef.current ?? '/videos/envelope-open.mp4';
-    if (!video.src || video.src === window.location.href || video.src !== src) {
-      video.setAttribute('playsinline', 'true');        // Ép lại trước khi load
-      video.setAttribute('webkit-playsinline', 'true'); // Ép lại trước khi load
+      // Thiết lập thuộc tính chuẩn trực tiếp trên native DOM
+      video.setAttribute('playsinline', 'true');
+      video.setAttribute('webkit-playsinline', 'true');
+      video.muted = true;
+
+      // Lắng nghe sự kiện nếu vô tình bị dính native player thì tắt đi
+      const onNativePlayer = () => {
+        video.pause();
+        const v = video as HTMLVideoElement & { webkitExitFullscreen?: () => void };
+        v.webkitExitFullscreen?.();
+        startTimeline();
+      };
+      video.addEventListener('webkitbeginfullscreen', onNativePlayer, { once: true });
+
+      // Nạp luồng video (Blob URL hoặc URL thường)
+      const src = videoBlobUrlRef.current ?? '/videos/envelope-open.mp4';
       video.src = src;
       video.load();
-    }
 
-    try {
-      video.currentTime = 0;
-      video.playbackRate = 0.82;
-    } catch { /* ignore */ }
+      try {
+        video.currentTime = 0;
+        video.playbackRate = 0.82;
+      } catch {
+        /* ignore */
+      }
 
-    video.onplaying = () => startTimeline();
-    video.onended = () => startTimeline();
+      video.onplaying = () => startTimeline();
+      video.onended = () => startTimeline();
 
-    void video.play().catch(() => {
-      video.removeEventListener('webkitbeginfullscreen', onNativePlayer);
-      startTimeline();
-    });
+      // Thực hiện phát
+      void video
+        .play()
+        .then(() => {
+          video.removeEventListener('webkitbeginfullscreen', onNativePlayer);
+        })
+        .catch((err) => {
+          console.log('iOS Play Error: ', err);
+          video.removeEventListener('webkitbeginfullscreen', onNativePlayer);
+          startTimeline();
+        });
+    }, 50); // Độ trễ băm nhỏ giúp vượt qua bộ quét tự động của Zalo
   };
-
 
   if (finished) return null;
 
@@ -178,30 +190,52 @@ export default function EnvelopeCover({
     >
       <div className="intro-film">
         <div className="intro-film-frame">
+          {/* Ảnh poster tĩnh hiển thị khi thẻ video chưa được mount */}
+          <img
+            src="/images/envelope-poster.jpg"
+            alt=""
+            className="intro-envelope-poster"
+            draggable={false}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              pointerEvents: 'none',
+              userSelect: 'none',
+            }}
+          />
 
           {/* ==============================================================
               VIDEO MP4 MỞ THIỆP CHUẨN IN-VITELY
-              - KHÔNG để src trong JSX: Zalo quét DOM sẽ không thấy URL video
-                → không intercept → không hiện native player.
-              - src được gán qua JS khi người dùng nhấn nút (handleOpen).
-              - preload="none": không tải trước khi chưa có src.
-              - poster vẫn để để hiện ảnh nền thiệp khi chờ.
+              - Chỉ khi bấm nút, thẻ video mới được sinh ra trong DOM.
+              - Lúc trang vừa load: 100% không có thẻ <video> trong DOM,
+                Zalo WebView iOS quét DOM hoàn toàn không tìm thấy video
+                → triệt tiêu hoàn toàn lỗi tự động giật Native Player Fullscreen!
           ============================================================== */}
-          <video
-            ref={videoRef}
-            poster="/images/envelope-poster.jpg"
-            muted
-            playsInline={true}
-            webkit-playsinline=""
-            preload="none"
-            aria-hidden="true"
-            tabIndex={-1}
-            style={{
-              pointerEvents: 'none',
-              userSelect: 'none',
-              WebkitUserSelect: 'none',
-            }}
-          />
+          {renderVideo && (
+            <video
+              ref={videoRef}
+              poster="/images/envelope-poster.jpg"
+              muted
+              playsInline={true}
+              webkit-playsinline=""
+              preload="auto"
+              aria-hidden="true"
+              tabIndex={-1}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                pointerEvents: 'none',
+                userSelect: 'none',
+                WebkitUserSelect: 'none',
+              }}
+            />
+          )}
 
           {/* ==============================================================
               LỚP BẤM MỞ TOÀN MÀN HÌNH (IN-VITELY TOUCH OVERLAY)
