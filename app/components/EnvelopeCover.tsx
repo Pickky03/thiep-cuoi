@@ -179,7 +179,8 @@ export default function EnvelopeCover({
             ref={videoRef}
             poster="/images/envelope-poster.jpg"
             muted
-            playsInline
+            playsInline={true}
+            webkit-playsinline="true"
             preload="none"
             aria-hidden="true"
             tabIndex={-1}
