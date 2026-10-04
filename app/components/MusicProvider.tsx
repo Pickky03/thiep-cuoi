@@ -78,7 +78,6 @@ export default function MusicProvider({
         loop
         preload="none"
         playsInline
-        // @ts-expect-error – thuộc tính WebKit không chuẩn, cần thiết cho Zalo iOS
         x-webkit-airplay="deny"
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
