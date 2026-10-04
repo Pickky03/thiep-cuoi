@@ -58,13 +58,14 @@ export default function RootLayout({
   return (
     <html
       lang="vi"
-      className={`${beVietnam.variable} ${playfair.variable} ${greatVibes.variable}`} 
+      className={`${beVietnam.variable} ${playfair.variable} ${greatVibes.variable}`}
     >
       <body>
         <MusicProvider>
-        {children}
+          {children}
         </MusicProvider>
-        </body>
+
+      </body>
     </html>
   );
 }

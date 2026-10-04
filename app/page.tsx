@@ -13,8 +13,8 @@ import {
 
 export default function HomePage() {
   const [guestName, setGuestName] = useState<string | null>(null);
+  const [preloadWeddingPage, setPreloadWeddingPage] = useState(false);
   const [introFinished, setIntroFinished] = useState(false);
-  const [mountWeddingPage, setMountWeddingPage] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -32,33 +32,25 @@ export default function HomePage() {
 
   /*
     Tối ưu hóa:
-    - Trong 8.5s đầu tiên mở phong bì: Chỉ chạy EnvelopeCover để GPU/CPU dồn 100% tài nguyên
-      cho chuyển động mở thiệp và 14 frames, giúp Zalo và mobile cực kỳ mượt mà.
-    - Từ 8.5s (khi thiệp đã mở và tên đang hiện): Pre-mount WeddingPage bên dưới.
-    - Từ 10.8s -> 12.0s: EnvelopeCover mờ dần (opacity 1 -> 0) làm lộ ra WeddingPage
-      đang rõ dần bên dưới, tạo hiệu ứng tan mờ (crossfade) chuẩn điện ảnh, loại bỏ 100% màn trắng.
+    - Trong phần lớn thời gian intro, không mount WeddingPage để tiết kiệm CPU/RAM (đặc biệt Zalo WebView).
+    - Ở 2.5 giây cuối (lúc hiển thị tên cô dâu chú rể), WeddingPage được preload ngầm dưới EnvelopeCover.
+    - Khi EnvelopeCover mờ dần (intro-cover-out), trang thiệp cưới hiện ra liền mạch, không bị chớp trắng hay giật.
   */
   return (
     <>
-      {(mountWeddingPage || introFinished) && (
-        <div className="wedding-page-revealed">
-          <WeddingPage
-            wedding={wedding}
-            gallery={gallery}
-            mapsUrl={mapsUrl}
-            guestName={guestName}
-          />
-        </div>
+      {(preloadWeddingPage || introFinished) && (
+        <WeddingPage
+          wedding={wedding}
+          gallery={gallery}
+          mapsUrl={mapsUrl}
+          guestName={guestName}
+        />
       )}
-
       {!introFinished && (
         <EnvelopeCover
           guestName={guestName}
-          onPreloadWeddingPage={() => setMountWeddingPage(true)}
-          onFinished={() => {
-            setMountWeddingPage(true);
-            setIntroFinished(true);
-          }}
+          onPreloadWeddingPage={() => setPreloadWeddingPage(true)}
+          onFinished={() => setIntroFinished(true)}
         />
       )}
     </>
