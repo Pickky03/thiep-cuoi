@@ -69,11 +69,17 @@ export default function MusicProvider({
 
   return (
     <MusicContext.Provider value={{ startMusic }}>
+      {/* playsInline + x-webkit-airplay="deny": bắt buộc phát inline trong WebView Zalo,
+          ngăn Zalo/iOS mở native media player.
+          preload="none": không tải trước, tránh Zalo intercept media stream khi load trang. */}
       <audio
         ref={audioRef}
-        src="/music/nhac nen.mp3"
+        src="/music/nhac-nen.mp3"
         loop
-        preload="auto"
+        preload="none"
+        playsInline
+        // @ts-expect-error – thuộc tính WebKit không chuẩn, cần thiết cho Zalo iOS
+        x-webkit-airplay="deny"
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
       />
