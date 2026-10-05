@@ -48,7 +48,7 @@ export default function MusicProvider({
   useEffect(() => {
     const audio = new Audio('/music/nhac-nen.mp3');
     audio.loop = true;
-    audio.volume = 0.35;
+    audio.volume = 0.45;
     audio.preload = 'none';
 
     audio.addEventListener('play', () => setIsPlaying(true));
