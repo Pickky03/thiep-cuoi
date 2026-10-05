@@ -5,7 +5,7 @@ import { Lottie } from 'lottie-react';
 import { useMusic } from './MusicProvider';
 import envelopeAnimation from './envelope-open.json';
 
-const INTRO_LENGTH_MS = 7300;
+const INTRO_LENGTH_MS = 7600;
 
 function unlockPageScroll() {
   document.body.style.removeProperty('overflow');
@@ -42,11 +42,19 @@ export default function EnvelopeCover({
     // Preload poster và hình ảnh
     const imgPoster = new Image();
     imgPoster.src = '/images/envelope-poster.jpg';
-    if ('decode' in imgPoster) imgPoster.decode().catch(() => {});
+    if ('decode' in imgPoster) imgPoster.decode().catch(() => { });
 
-    const imgButterfly = new Image();
-    imgButterfly.src = '/images/butterfly.png';
-    if ('decode' in imgButterfly) imgButterfly.decode().catch(() => {});
+    const imgButterflyBody = new Image();
+    imgButterflyBody.src = '/images/butterfly-body-hd.png';
+    if ('decode' in imgButterflyBody) imgButterflyBody.decode().catch(() => { });
+
+    const imgButterflyLeft = new Image();
+    imgButterflyLeft.src = '/images/butterfly-wing-left-hd.png';
+    if ('decode' in imgButterflyLeft) imgButterflyLeft.decode().catch(() => { });
+
+    const imgButterflyRight = new Image();
+    imgButterflyRight.src = '/images/butterfly-wing-right-hd.png';
+    if ('decode' in imgButterflyRight) imgButterflyRight.decode().catch(() => { });
 
     return () => {
       document.body.classList.remove('wedding-intro-active');
@@ -98,7 +106,7 @@ export default function EnvelopeCover({
 
     preloadTimerRef.current = setTimeout(() => {
       onPreloadWeddingPage?.();
-    }, INTRO_LENGTH_MS - 2000);
+    }, 4800);
 
     finishTimerRef.current = setTimeout(finishIntro, INTRO_LENGTH_MS);
   };
@@ -129,6 +137,11 @@ export default function EnvelopeCover({
       role="dialog"
       aria-modal="true"
       aria-label="Mở thiệp cưới Văn Hải và Kim Hường"
+      onAnimationEnd={(e) => {
+        if (e.animationName === 'intro-cover-out') {
+          finishIntro();
+        }
+      }}
     >
       <div className="intro-film">
         <div className="intro-film-frame" ref={frameRef}>
@@ -234,11 +247,12 @@ export default function EnvelopeCover({
         <div className="intro-butterfly" aria-hidden="true">
           <span className="intro-wing intro-wing-left" />
           <span className="intro-wing intro-wing-right" />
+          <span className="intro-butterfly-body" />
         </div>
 
         <div className="intro-copy intro-copy-invite">
           <span className="intro-invite-flourish" aria-hidden="true" />
-          <p className="intro-invite-line">TRÂN TRỌNG KÍNH MỜI</p>
+          <p className="intro-invite-line">THÂN MỜI</p>
           <div className="intro-invite-rule" aria-hidden="true">
             <span />
             <i />
@@ -250,7 +264,7 @@ export default function EnvelopeCover({
             <i />
             <span />
           </div>
-          <p className="intro-invite-sub">ĐẾN CHUNG VUI CÙNG GIA ĐÌNH CHÚNG MÌNH</p>
+          <p className="intro-invite-sub">ĐẾN THAM DỰ BỮA TIỆC</p>
         </div>
 
         <div className="intro-copy intro-copy-names">
