@@ -494,8 +494,6 @@ a:focus-visible {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover;
-  image-rendering: auto;
-  image-rendering: -webkit-optimize-contrast;
   image-rendering: smooth;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
@@ -504,8 +502,6 @@ a:focus-visible {
 }
 
 .intro-envelope-poster {
-  image-rendering: auto;
-  image-rendering: -webkit-optimize-contrast;
   image-rendering: smooth;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
