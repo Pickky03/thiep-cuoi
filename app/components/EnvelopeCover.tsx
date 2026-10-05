@@ -114,21 +114,34 @@ export default function EnvelopeCover({
     }
   }, [isMounted, isZalo]);
 
+function enforceCanvasSmoothing(canvas: HTMLCanvasElement | null | undefined) {
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+
+  if (!(ctx as any)._smoothingEnforced) {
+    (ctx as any)._smoothingEnforced = true;
+    const origRestore = ctx.restore;
+    ctx.restore = function () {
+      const res = origRestore.apply(this, arguments as any);
+      this.imageSmoothingEnabled = true;
+      this.imageSmoothingQuality = 'high';
+      return res;
+    };
+  }
+}
+
   // Đảm bảo Canvas Context luôn kích hoạt chế độ làm mượt ảnh (Image Smoothing) cao nhất cho Zalo
   useEffect(() => {
     if (!opening || !isZalo) return;
     const applySmoothing = () => {
       const canvas = frameRef.current?.querySelector('canvas');
-      if (canvas) {
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.imageSmoothingEnabled = true;
-          ctx.imageSmoothingQuality = 'high';
-        }
-      }
+      enforceCanvasSmoothing(canvas);
     };
     applySmoothing();
-    const timer = setInterval(applySmoothing, 80);
+    const timer = setInterval(applySmoothing, 60);
     return () => clearInterval(timer);
   }, [opening, isZalo]);
 
@@ -275,7 +288,7 @@ export default function EnvelopeCover({
               <Lottie
                 renderer="canvas"
                 rendererSettings={{
-                  dpr: typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2.5) : 1,
+                  dpr: typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 3) : 1,
                   preserveAspectRatio: 'xMidYMid slice',
                   clearCanvas: true,
                 }}
@@ -285,23 +298,11 @@ export default function EnvelopeCover({
                 subscriptions={{
                   ready: () => {
                     const canvas = frameRef.current?.querySelector('canvas');
-                    if (canvas) {
-                      const ctx = canvas.getContext('2d');
-                      if (ctx) {
-                        ctx.imageSmoothingEnabled = true;
-                        ctx.imageSmoothingQuality = 'high';
-                      }
-                    }
+                    enforceCanvasSmoothing(canvas);
                   },
                   frame: () => {
                     const canvas = frameRef.current?.querySelector('canvas');
-                    if (canvas) {
-                      const ctx = canvas.getContext('2d');
-                      if (ctx && (!ctx.imageSmoothingEnabled || ctx.imageSmoothingQuality !== 'high')) {
-                        ctx.imageSmoothingEnabled = true;
-                        ctx.imageSmoothingQuality = 'high';
-                      }
-                    }
+                    enforceCanvasSmoothing(canvas);
                   },
                   complete: startTimeline,
                 }}
