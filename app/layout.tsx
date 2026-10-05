@@ -44,17 +44,17 @@ const playfair = Playfair_Display({
   display: 'swap',
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://vanhai-kimhuong.com';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://haihuong.io.vn';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: 'Văn Hải & Kim Hường | Thiệp cưới',
   description:
-    'Trân trọng kính mời bạn chung vui trong ngày cưới của Văn Hải và Kim Hường.',
+    'Trân trọng kính mời bạn chung vui trong ngày cưới của chúng mình.',
   openGraph: {
     title: 'Văn Hải & Kim Hường | Thiệp cưới',
     description:
-      'Trân trọng kính mời bạn chung vui trong ngày cưới của Văn Hải và Kim Hường.',
+      'Trân trọng kính mời bạn chung vui trong ngày cưới của chúng mình.',
     url: '/',
     siteName: 'Thiệp cưới Văn Hải & Kim Hường',
     locale: 'vi_VN',
@@ -62,8 +62,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: '/images/DUY0811.jpg',
-        width: 1200,
-        height: 630,
+        width: 1706,
+        height: 2560,
         alt: 'Thiệp cưới Văn Hải & Kim Hường',
       },
     ],
