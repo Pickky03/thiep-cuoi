@@ -72,7 +72,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Văn Hải & Kim Hường | Thiệp cưới',
     description:
-      'Trân trọng kính mời bạn chung vui trong ngày cưới của Văn Hải và Kim Hường.',
+      'Trân trọng kính mời bạn chung vui trong ngày cưới của chúng mình.',
     images: ['/images/DUY0811.jpg'],
   },
 };
