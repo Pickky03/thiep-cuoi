@@ -475,6 +475,8 @@ a:focus-visible {
   display: grid;
   place-items: center;
   background: #91a4bd;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .intro-film-frame {
@@ -487,7 +489,8 @@ a:focus-visible {
   transform-style: flat;
 }
 
-.intro-film-frame canvas {
+.intro-film-frame canvas,
+.intro-film-frame video {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover;
@@ -1074,23 +1077,18 @@ a:focus-visible {
  */
 
 .intro-paper {
-
   position: absolute;
-
   inset: 0;
-
   z-index: 2;
-
   overflow: hidden;
-
   opacity: 0;
-
   pointer-events: none;
-
   /* Hai bên nền xanh */
-
   background: #95a9c4;
-
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 /* Tờ giấy dọc ở giữa */
@@ -1179,7 +1177,7 @@ a:focus-visible {
 
 .intro-opening .intro-butterfly {
   animation:
-    butterfly-appear 0.8s ease-out 0s both,
+    butterfly-appear 0.8s cubic-bezier(0.25, 1, 0.5, 1) 0s both,
     butterfly-float 4.8s ease-in-out 0.8s infinite,
     intro-butterfly-exit 1.1s cubic-bezier(0.25, 1, 0.5, 1) 6.4s forwards;
 }
@@ -1765,20 +1763,22 @@ a:focus-visible {
  */
 
 .intro-opening .intro-film {
-  animation: intro-film-out 0.7s ease 0s forwards;
+  animation: intro-film-out 0.8s cubic-bezier(0.25, 1, 0.5, 1) 0s forwards;
+  will-change: opacity;
 }
 
 .intro-opening .intro-paper {
-  animation: intro-paper-in 0.7s ease 0s forwards;
+  animation: intro-paper-in 0.8s cubic-bezier(0.25, 1, 0.5, 1) 0s forwards;
+  will-change: opacity;
 }
 
 .intro-opening .intro-copy-invite {
-  animation: intro-invite-copy 3.2s ease-out 0.1s both;
+  animation: intro-invite-copy 3.2s cubic-bezier(0.25, 1, 0.5, 1) 0.15s both;
   z-index: 3;
 }
 
 .intro-opening .intro-copy-names {
-  animation: intro-names-copy 3.2s ease-out 3.3s both;
+  animation: intro-names-copy 3.2s cubic-bezier(0.25, 1, 0.5, 1) 3.3s both;
   z-index: 3;
 }
 
