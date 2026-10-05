@@ -50,11 +50,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: 'Văn Hải & Kim Hường | Thiệp cưới',
   description:
-    'Trân trọng kính mời bạn chung vui trong ngày cưới của chúng mình.',
+    'Thân mời đến tham dự ngày vui của chúng mình',
   openGraph: {
     title: 'Văn Hải & Kim Hường | Thiệp cưới',
     description:
-      'Trân trọng kính mời bạn chung vui trong ngày cưới của chúng mình.',
+      'Thân mời đến tham dự ngày vui của chúng mình',
     url: '/',
     siteName: 'Thiệp cưới Văn Hải & Kim Hường',
     locale: 'vi_VN',
@@ -72,7 +72,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Văn Hải & Kim Hường | Thiệp cưới',
     description:
-      'Trân trọng kính mời bạn chung vui trong ngày cưới của chúng mình.',
+      'Thân mời đến tham dự ngày vui của chúng mình',
     images: ['/images/DUY0811.jpg'],
   },
 };

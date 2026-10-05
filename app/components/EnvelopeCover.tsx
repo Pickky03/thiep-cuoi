@@ -12,6 +12,25 @@ function unlockPageScroll() {
   document.documentElement.style.removeProperty('overflow');
 }
 
+function checkIsZalo(): boolean {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
+  try {
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.get('mode') === 'canvas' || searchParams.get('zalo') === '1') {
+      return true;
+    }
+    if (searchParams.get('mode') === 'video') {
+      return false;
+    }
+  } catch { }
+  const ua = (navigator.userAgent || navigator.vendor || '').toLowerCase();
+  return (
+    ua.includes('zalo') ||
+    ua.includes('zalowebview') ||
+    Boolean((window as any).ZaloJavaScriptInterface)
+  );
+}
+
 export default function EnvelopeCover({
   guestName,
   onPreloadWeddingPage,
@@ -24,15 +43,23 @@ export default function EnvelopeCover({
   const { startMusic } = useMusic();
 
   const frameRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const finishTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const preloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const animFrameIdRef = useRef<number | null>(null);
   const timelineStartedRef = useRef(false);
 
+  const [isMounted, setIsMounted] = useState(false);
+  const [isZalo, setIsZalo] = useState(false);
   const [opening, setOpening] = useState(false);
   const [timelineStarted, setTimelineStarted] = useState(false);
   const [finished, setFinished] = useState(false);
 
   useEffect(() => {
+    const zalo = checkIsZalo();
+    setIsZalo(zalo);
+    setIsMounted(true);
+
     document.body.classList.add('wedding-intro-active');
 
     window.scrollTo(0, 0);
@@ -61,12 +88,35 @@ export default function EnvelopeCover({
       unlockPageScroll();
       if (finishTimerRef.current) clearTimeout(finishTimerRef.current);
       if (preloadTimerRef.current) clearTimeout(preloadTimerRef.current);
+      if (animFrameIdRef.current) {
+        cancelAnimationFrame(animFrameIdRef.current);
+        animFrameIdRef.current = null;
+      }
+      if (videoRef.current) {
+        try {
+          videoRef.current.pause();
+          videoRef.current.src = '';
+          videoRef.current.load();
+        } catch { }
+      }
     };
   }, []);
 
-  // Đảm bảo Canvas Context luôn kích hoạt chế độ làm mượt ảnh (Image Smoothing) cao nhất
+  // Cấu hình video inline cho các trình duyệt thường
   useEffect(() => {
-    if (!opening) return;
+    if (videoRef.current) {
+      videoRef.current.setAttribute('playsinline', 'true');
+      videoRef.current.setAttribute('webkit-playsinline', 'true');
+      videoRef.current.muted = true;
+      try {
+        videoRef.current.load();
+      } catch { }
+    }
+  }, [isMounted, isZalo]);
+
+  // Đảm bảo Canvas Context luôn kích hoạt chế độ làm mượt ảnh (Image Smoothing) cao nhất cho Zalo
+  useEffect(() => {
+    if (!opening || !isZalo) return;
     const applySmoothing = () => {
       const canvas = frameRef.current?.querySelector('canvas');
       if (canvas) {
@@ -80,7 +130,7 @@ export default function EnvelopeCover({
     applySmoothing();
     const timer = setInterval(applySmoothing, 80);
     return () => clearInterval(timer);
-  }, [opening]);
+  }, [opening, isZalo]);
 
   const finishIntro = () => {
     document.body.classList.remove('wedding-intro-active');
@@ -123,10 +173,80 @@ export default function EnvelopeCover({
       return;
     }
 
-    // Safety fallback: kích hoạt timeline sau 3.2s nếu onComplete gặp sự cố trên thiết bị yếu
-    setTimeout(() => {
-      startTimeline();
-    }, 3200);
+    const zalo = isZalo || checkIsZalo();
+
+    if (zalo) {
+      // Safety fallback cho Zalo: kích hoạt timeline sau 3.5s nếu onComplete gặp sự cố trên thiết bị yếu
+      setTimeout(() => {
+        startTimeline();
+      }, 3500);
+    } else {
+      const video = videoRef.current;
+      if (video) {
+        let transitioned = false;
+        const triggerTransition = () => {
+          if (transitioned) return;
+          transitioned = true;
+          if (animFrameIdRef.current) {
+            cancelAnimationFrame(animFrameIdRef.current);
+            animFrameIdRef.current = null;
+          }
+          video.removeEventListener('timeupdate', onTimeUpdate);
+          video.removeEventListener('ended', triggerTransition);
+          video.removeEventListener('webkitbeginfullscreen', onNativePlayer);
+          startTimeline();
+        };
+
+        const onNativePlayer = () => {
+          video.pause();
+          const v = video as HTMLVideoElement & { webkitExitFullscreen?: () => void };
+          v.webkitExitFullscreen?.();
+          triggerTransition();
+        };
+        video.addEventListener('webkitbeginfullscreen', onNativePlayer, { once: true });
+
+        try {
+          video.currentTime = 0;
+        } catch { }
+
+        // Chuyển cảnh mượt mà ngay khi phong bì mở xong (~2.85s) trong lúc video vẫn đang chạy mượt.
+        // Điều này triệt tiêu hoàn toàn hiện tượng khựng hình (freeze) khi video chạy đến cuối file.
+        const onTimeUpdate = () => {
+          if (video.currentTime >= 2.85) {
+            triggerTransition();
+          }
+        };
+
+        const checkProgress = () => {
+          if (video.currentTime >= 2.85 || video.ended) {
+            triggerTransition();
+            return;
+          }
+          if (!transitioned && !video.paused) {
+            animFrameIdRef.current = requestAnimationFrame(checkProgress);
+          }
+        };
+
+        video.addEventListener('timeupdate', onTimeUpdate);
+        video.addEventListener('ended', triggerTransition);
+
+        video.onplaying = () => {
+          animFrameIdRef.current = requestAnimationFrame(checkProgress);
+          // Safety timeout nếu video chạy quá thời lượng
+          setTimeout(triggerTransition, 3800);
+        };
+
+        // Safety fallback tối đa 4.5s
+        setTimeout(triggerTransition, 4500);
+
+        void video.play().catch((err) => {
+          console.warn('Video play interrupted, fallback to timeline:', err);
+          triggerTransition();
+        });
+      } else {
+        startTimeline();
+      }
+    }
   };
 
   if (finished) return null;
@@ -146,60 +266,80 @@ export default function EnvelopeCover({
       <div className="intro-film">
         <div className="intro-film-frame" ref={frameRef}>
           {/* ==============================================================
-              LOTTIE CANVAS ANIMATION MỞ THIỆP CHUẨN IN-VITELY
-              - 100% Canvas, KHÔNG dùng thẻ <video>
-              - Hoàn toàn miễn nhiễm với lỗi Zalo iOS Native Player!
-              - Tự động phát khi người dùng bấm mở thiệp
-              - DPR theo devicePixelRatio cho độ nét chuẩn Retina
-              - Image smoothing Enabled khử vỡ hạt pixel
+              NỀN / MEDIA MỞ THIỆP:
+              - ZALO: Dùng Lottie Canvas 100% như cũ (miễn nhiễm lỗi Zalo Native Player)
+              - TRÌNH DUYỆT KHÁC: Dùng Video MP4 sắc nét, tối ưu phần cứng GPU
           ============================================================== */}
-          {opening ? (
-            <Lottie
-              renderer="canvas"
-              rendererSettings={{
-                dpr: typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2.5) : 1,
-                preserveAspectRatio: 'xMidYMid slice',
-                clearCanvas: true,
-              }}
-              src={envelopeAnimation}
-              loop={false}
-              autoplay={true}
-              subscriptions={{
-                ready: () => {
-                  const canvas = frameRef.current?.querySelector('canvas');
-                  if (canvas) {
-                    const ctx = canvas.getContext('2d');
-                    if (ctx) {
-                      ctx.imageSmoothingEnabled = true;
-                      ctx.imageSmoothingQuality = 'high';
+          {(!isMounted || isZalo) ? (
+            opening && isZalo ? (
+              <Lottie
+                renderer="canvas"
+                rendererSettings={{
+                  dpr: typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2.5) : 1,
+                  preserveAspectRatio: 'xMidYMid slice',
+                  clearCanvas: true,
+                }}
+                src={envelopeAnimation}
+                loop={false}
+                autoplay={true}
+                subscriptions={{
+                  ready: () => {
+                    const canvas = frameRef.current?.querySelector('canvas');
+                    if (canvas) {
+                      const ctx = canvas.getContext('2d');
+                      if (ctx) {
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
+                      }
                     }
-                  }
-                },
-                frame: () => {
-                  const canvas = frameRef.current?.querySelector('canvas');
-                  if (canvas) {
-                    const ctx = canvas.getContext('2d');
-                    if (ctx && (!ctx.imageSmoothingEnabled || ctx.imageSmoothingQuality !== 'high')) {
-                      ctx.imageSmoothingEnabled = true;
-                      ctx.imageSmoothingQuality = 'high';
+                  },
+                  frame: () => {
+                    const canvas = frameRef.current?.querySelector('canvas');
+                    if (canvas) {
+                      const ctx = canvas.getContext('2d');
+                      if (ctx && (!ctx.imageSmoothingEnabled || ctx.imageSmoothingQuality !== 'high')) {
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
+                      }
                     }
-                  }
-                },
-                complete: startTimeline,
-              }}
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-              }}
-            />
+                  },
+                  complete: startTimeline,
+                }}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                }}
+              />
+            ) : (
+              <img
+                src="/images/envelope-poster.jpg"
+                alt=""
+                className="intro-envelope-poster"
+                draggable={false}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  pointerEvents: 'none',
+                  userSelect: 'none',
+                }}
+              />
+            )
           ) : (
-            <img
-              src="/images/envelope-poster.jpg"
-              alt=""
-              className="intro-envelope-poster"
-              draggable={false}
+            <video
+              ref={videoRef}
+              src="/videos/envelope-open.mp4"
+              poster="/images/envelope-poster.jpg"
+              muted
+              playsInline
+              preload="auto"
+              aria-hidden="true"
+              tabIndex={-1}
+              onEnded={startTimeline}
               style={{
                 position: 'absolute',
                 inset: 0,
