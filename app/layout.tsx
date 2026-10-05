@@ -61,7 +61,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/images/og-preview.jpg',
+        url: '/images/DUY0811.jpg',
         width: 1200,
         height: 630,
         alt: 'Thiệp cưới Văn Hải & Kim Hường',
